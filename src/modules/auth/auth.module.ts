@@ -4,7 +4,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { RandomOTP } from 'src/utils/util.random';
 import { typeOrmConfig } from '../../configs/config.typeorm';
 import { MailService } from '../sendEmail/email.service';
-import { User } from '../users/user.entity';
+import { UserEntity } from '../users/user.entity';
 import { UserRepository } from '../users/user.repo';
 import { VerificationEntity } from '../verification/verification.entity';
 import { VerificationRepository } from '../verification/verification.repo';
@@ -15,7 +15,7 @@ import { AuthService } from './auth.service';
 @Module({
   imports: [
     TypeOrmModule.forRoot(typeOrmConfig),
-    TypeOrmModule.forFeature([User, VerificationEntity]),
+    TypeOrmModule.forFeature([UserEntity, VerificationEntity]),
     JwtModule.register({
       secret: process.env.SECRET,
     }),

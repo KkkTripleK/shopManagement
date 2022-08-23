@@ -43,7 +43,7 @@ export class CreateUserDto {
 
   @IsString()
   @IsOptional()
-  status: string;
+  accountStatus: string;
 
   @IsString()
   @IsOptional()

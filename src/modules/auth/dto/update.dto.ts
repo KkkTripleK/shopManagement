@@ -19,7 +19,7 @@ export class UpdateDTO {
 
   @IsString()
   @IsOptional()
-  status?: string;
+  accountStatus: string;
 
   @IsString()
   @IsOptional()

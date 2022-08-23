@@ -6,7 +6,7 @@ import {
   Post
 } from '@nestjs/common';
 import { MailService } from '../sendEmail/email.service';
-import { User } from '../users/user.entity';
+import { UserEntity } from '../users/user.entity';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from './dto/create.dto';
 import { LoginDTO } from './dto/login.dto';
@@ -38,7 +38,7 @@ export class AuthController {
   }
 
   @Patch('/info')
-  async updateInfo(@Body() param: UpdateDTO): Promise<User> {
+  async updateInfo(@Body() param: UpdateDTO): Promise<UserEntity> {
     const username = 'hoaNK97122';
     console.log(param);
     return await this.authService.updateInfo({ username }, param);

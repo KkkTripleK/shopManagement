@@ -2,7 +2,7 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { RandomOTP } from 'src/utils/util.random';
 import { MailService } from '../sendEmail/email.service';
-import { User } from '../users/user.entity';
+import { UserEntity } from '../users/user.entity';
 import { UserRepository } from '../users/user.repo';
 import { VerificationService } from '../verification/verification.service';
 import { CreateUserDto } from './dto/create.dto';
@@ -65,7 +65,7 @@ export class AuthService {
     }
     this.userRepository.updateInfo(
       { username: verifyDTO.username },
-      { status: 'Active' },
+      { accountStatus: 'Active' },
     );
   }
 
@@ -79,7 +79,7 @@ export class AuthService {
         HttpStatus.BAD_REQUEST,
       );
     }
-    if (resultFindAccount.status === 'Not Active') {
+    if (resultFindAccount.accountStatus === 'Not Active') {
       throw new HttpException(
         {
           error: 'Please verify account before login!',
@@ -107,11 +107,11 @@ export class AuthService {
     return [{ refreshToken, accessToken }];
   }
 
-  async showInfo(username: object): Promise<User> {
+  async showInfo(username: object): Promise<UserEntity> {
     return this.userRepository.showInfo(username);
   }
 
-  async updateInfo(id: object, param: UpdateDTO): Promise<User> {
+  async updateInfo(id: object, param: UpdateDTO): Promise<UserEntity> {
     return this.userRepository.updateInfo(id, param);
   }
 }

@@ -1,7 +1,7 @@
 import { BaseEntity, Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
-export class User extends BaseEntity {
+export class UserEntity extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: string;
   @Column()
@@ -23,10 +23,10 @@ export class User extends BaseEntity {
   age: string;
 
   @Column({ nullable: true, default: 'Not Active' })
-  status?: string;
+  accountStatus: string;
 
   @Column({ nullable: true, default: 'false' })
-  isAdmin?: string;
+  isAdmin: string;
 
   @Column()
   address: string;

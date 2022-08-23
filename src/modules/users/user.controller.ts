@@ -1,6 +1,6 @@
 import { Controller, Get, Headers } from '@nestjs/common';
 import { VerifyToken } from 'src/utils/util.verifyToken';
-import { User } from './user.entity';
+import { UserEntity } from './user.entity';
 import { UserService } from './user.service';
 
 @Controller('user')
@@ -11,7 +11,7 @@ export class UserController {
   ) {}
 
   @Get('/info')
-  async showInfo(@Headers() header: any): Promise<User> {
+  async showInfo(@Headers() header: any): Promise<UserEntity> {
     const payload = await this.verifyToken.verifyJWT(header);
     console.log(payload);
     const username = payload.username;
