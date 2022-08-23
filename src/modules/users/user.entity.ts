@@ -1,0 +1,33 @@
+import { BaseEntity, Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+
+@Entity()
+export class User extends BaseEntity {
+  @PrimaryGeneratedColumn()
+  id: string;
+  @Column()
+  username: string;
+
+  @Column()
+  password: string;
+
+  @Column()
+  email: string;
+
+  @Column()
+  fullName: string;
+
+  @Column({ nullable: true })
+  gender: string;
+
+  @Column({ nullable: true })
+  age: string;
+
+  @Column({ nullable: true, default: 'Not Active' })
+  status?: string;
+
+  @Column({ nullable: true, default: 'false' })
+  isAdmin?: string;
+
+  @Column()
+  address: string;
+}
