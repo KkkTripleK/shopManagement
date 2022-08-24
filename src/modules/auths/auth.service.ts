@@ -5,7 +5,7 @@ import { RandomOTP } from 'src/utils/util.random';
 import { VerifyToken } from 'src/utils/util.verifyToken';
 import { MailService } from '../email/email.service';
 import { UserRepository } from '../users/user.repo';
-import { VerificationService } from '../verification/verification.service';
+import { VerificationService } from '../verifications/verification.service';
 import { CreateUserDto } from './dto/create.dto';
 import { VerifyDTO } from './dto/verify.dto';
 

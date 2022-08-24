@@ -2,7 +2,7 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { Payload } from 'src/utils/dto/util.verifyToken.dto';
 import { RandomOTP } from 'src/utils/util.random';
-import { CreateUserDto } from '../auth/dto/create.dto';
+import { CreateUserDto } from '../auths/dto/create.dto';
 import { MailService } from '../email/email.service';
 import { ChangePasswordDTO } from './dto/changePassword.dto';
 import { UpdateDTO } from './dto/update.dto';

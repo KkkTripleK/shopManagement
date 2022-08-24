@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { VerifyDTO } from '../auth/dto/verify.dto';
+import { VerifyDTO } from '../auths/dto/verify.dto';
 import { VerificationDTO } from './dto/verification.dto';
 import { VerificationRepository } from './verification.repo';
 

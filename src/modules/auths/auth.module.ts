@@ -6,12 +6,12 @@ import { RandomOTP } from 'src/utils/util.random';
 import { VerifyToken } from 'src/utils/util.verifyToken';
 import { typeOrmConfig } from '../../configs/config.typeorm';
 import { MailService } from '../email/email.service';
-import { LocalStrategy } from '../strategy/strategy.guard.validate';
+import { LocalStrategy } from '../strategies/strategy.guard.validate';
 import { UserEntity } from '../users/user.entity';
 import { UserRepository } from '../users/user.repo';
-import { VerificationEntity } from '../verification/verification.entity';
-import { VerificationRepository } from '../verification/verification.repo';
-import { VerificationService } from '../verification/verification.service';
+import { VerificationEntity } from '../verifications/verification.entity';
+import { VerificationRepository } from '../verifications/verification.repo';
+import { VerificationService } from '../verifications/verification.service';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 

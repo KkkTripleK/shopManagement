@@ -1,6 +1,6 @@
 import { MailerModule } from '@nestjs-modules/mailer';
 import { Module } from '@nestjs/common';
-import { AuthModule } from './modules/auth/auth.module';
+import { AuthModule } from './modules/auths/auth.module';
 import { UserModule } from './modules/users/user.module';
 
 @Module({
