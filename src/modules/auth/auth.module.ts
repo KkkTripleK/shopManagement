@@ -5,7 +5,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { RandomOTP } from 'src/utils/util.random';
 import { typeOrmConfig } from '../../configs/config.typeorm';
 import { MailService } from '../sendEmail/email.service';
-import { LocalStrategy } from '../strategy/strategy.guard.local';
+import { LocalStrategy } from '../strategy/strategy.guard.validate';
 import { UserEntity } from '../users/user.entity';
 import { UserRepository } from '../users/user.repo';
 import { VerificationEntity } from '../verification/verification.entity';

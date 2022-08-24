@@ -1,6 +1,6 @@
 import { MailerModule } from '@nestjs-modules/mailer';
 import { Module } from '@nestjs/common';
-import { ExampleService } from './common.sendMail.service';
+
 @Module({
   imports: [
     MailerModule.forRoot({
@@ -20,6 +20,6 @@ import { ExampleService } from './common.sendMail.service';
     }),
   ],
   controllers: [],
-  providers: [ExampleService],
+  providers: [],
 })
 export class MailModule {}

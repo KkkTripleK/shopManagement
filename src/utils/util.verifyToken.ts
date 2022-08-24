@@ -7,7 +7,7 @@ export class VerifyToken {
   constructor(private jwtService: JwtService) {}
 
   async verifyJWT(header: any): Promise<Payload> {
-    const token = header.authorization.split(' ');
+    const token = header.split(' ');
     return this.jwtService.verifyAsync(token[1], {
       secret: process.env.SECRET,
     });

@@ -9,7 +9,9 @@ import {
   UseGuards
 } from '@nestjs/common';
 import { VerifyToken } from 'src/utils/util.verifyToken';
+import { Roles } from '../decorator/decorator.roles';
 import { JwtAuthGuard } from '../guards/guard.jwt';
+import { RolesGuard } from '../guards/guard.roles';
 import { UpdateDTO } from './dto/update.dto';
 import { UserEntity } from './user.entity';
 import { UserService } from './user.service';
@@ -21,10 +23,14 @@ export class UserController {
     private verifyToken: VerifyToken,
   ) {}
 
-  @UseGuards(JwtAuthGuard)
   @Get('info')
+  @UseGuards(JwtAuthGuard)
+  @UseGuards(RolesGuard)
+  @Roles('admin', 'member')
   async findInfo(@Headers() requestHeader: any): Promise<UserEntity> {
-    const payload = await this.verifyToken.verifyJWT(requestHeader);
+    const payload = await this.verifyToken.verifyJWT(
+      requestHeader.authorization,
+    );
     return await this.userService.findInfo({ username: payload.username });
   }
 
@@ -34,7 +40,9 @@ export class UserController {
     @Body() param: UpdateDTO,
     @Headers() requestHeader: any,
   ): Promise<any> {
-    const payload = await this.verifyToken.verifyJWT(requestHeader);
+    const payload = await this.verifyToken.verifyJWT(
+      requestHeader.authorization,
+    );
     return this.userService.updateInfo({ username: payload.username }, param);
   }
 

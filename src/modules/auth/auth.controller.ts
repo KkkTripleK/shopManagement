@@ -5,7 +5,7 @@ import {
   // eslint-disable-next-line prettier/prettier
   UseGuards
 } from '@nestjs/common';
-import { ValidateAuthGuard } from '../guards/guard.auth.local';
+import { ValidateAuthGuard } from '../guards/guard.validations';
 import { MailService } from '../sendEmail/email.service';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from './dto/create.dto';
