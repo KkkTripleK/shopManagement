@@ -3,6 +3,9 @@ import { Entity } from 'typeorm';
 
 @Entity()
 export class UpdateDTO {
+  @IsString()
+  password?: string;
+
   @IsAlpha()
   @IsString()
   @Length(3, 20)
@@ -19,7 +22,7 @@ export class UpdateDTO {
 
   @IsString()
   @IsOptional()
-  accountStatus: string;
+  accountStatus?: string;
 
   @IsString()
   @IsOptional()

@@ -2,12 +2,13 @@ import { Injectable } from '@nestjs/common/decorators';
 import { HttpStatus } from '@nestjs/common/enums';
 import { HttpException } from '@nestjs/common/exceptions';
 import { JwtService } from '@nestjs/jwt';
+import { Payload } from './dto/util.verifyToken.dto';
 
 @Injectable()
 export class VerifyToken {
   constructor(private jwtService: JwtService) {}
 
-  async verifyJWT(header: any): Promise<any> {
+  async verifyJWT(header: any): Promise<Payload> {
     try {
       const token = header.authorization.split(' ');
       if (token[0] !== 'Bearer' || token[1] === undefined) {

@@ -1,12 +1,12 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import * as bcrypt from 'bcrypt';
 import { RandomOTP } from 'src/utils/util.random';
 import { MailService } from '../sendEmail/email.service';
-import { UserEntity } from '../users/user.entity';
 import { UserRepository } from '../users/user.repo';
 import { VerificationService } from '../verification/verification.service';
 import { CreateUserDto } from './dto/create.dto';
-import { UpdateDTO } from './dto/update.dto';
+import { LoginDTO } from './dto/login.dto';
 import { VerifyDTO } from './dto/verify.dto';
 
 @Injectable()
@@ -42,7 +42,7 @@ export class AuthService {
       );
     }
     const activeCode = this.randomOTP.randomOTP();
-    this.mailService.sendMail(createUserDto, activeCode);
+    this.mailService.sendMail(createUserDto.email, activeCode);
     await this.verificationService.saveActiveCode(
       createUserDto.username,
       activeCode,
@@ -69,50 +69,43 @@ export class AuthService {
     );
   }
 
-  async userLogin(info: object): Promise<object> {
-    const resultFindAccount = await this.userRepository.userLogin(info);
-    if (!resultFindAccount) {
+  async userLogin(info: LoginDTO): Promise<object> {
+    const userInfo = await this.userRepository.showInfo({
+      username: info.username,
+    });
+    if (userInfo === null) {
+      throw new HttpException('Username is not exist!', HttpStatus.BAD_REQUEST);
+    }
+    const isMatch = await bcrypt.compare(info.password, userInfo.password);
+    if (!isMatch) {
       throw new HttpException(
-        {
-          error: 'Username or password are not correct!',
-        },
+        'Password is not correct!',
         HttpStatus.BAD_REQUEST,
       );
     }
-    if (resultFindAccount.accountStatus === 'Not Active') {
+    if (userInfo.accountStatus === 'Not Active') {
       throw new HttpException(
-        {
-          error: 'Please verify account before login!',
-        },
+        'Please verify account before login!',
         HttpStatus.BAD_REQUEST,
       );
     }
-    const refreshToken = await this.jwtService.signAsync(
-      {
-        username: resultFindAccount.username,
-      },
-      { expiresIn: '50h' },
-    );
-    const accessToken = await this.jwtService.signAsync(
-      {
-        username: resultFindAccount.username,
-      },
-      { expiresIn: '10h' },
-    );
+    const refreshToken = await this.createToken(userInfo.username, '50h');
+    const accessToken = await this.createToken(userInfo.username, '10m');
     this.verificationService.saveToken(
-      resultFindAccount.username,
+      userInfo.username,
       accessToken,
       refreshToken,
     );
     return [{ refreshToken, accessToken }];
   }
 
-  async showInfo(username: object): Promise<UserEntity> {
-    return this.userRepository.showInfo(username);
-  }
-
-  async updateInfo(id: object, param: UpdateDTO): Promise<UserEntity> {
-    return this.userRepository.updateInfo(id, param);
+  createToken(username: string, expiresTime: string) {
+    return this.jwtService.signAsync(
+      {
+        username: username,
+      },
+      { expiresIn: expiresTime },
+    );
   }
 }
 // deleteItem(info: object): Promise<object> {
