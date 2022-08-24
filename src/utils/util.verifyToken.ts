@@ -12,4 +12,10 @@ export class VerifyToken {
       secret: process.env.SECRET,
     });
   }
+
+  async verifyTokenWithoutBearer(token: string): Promise<Payload> {
+    return this.jwtService.verifyAsync(token, {
+      secret: process.env.SECRET,
+    });
+  }
 }

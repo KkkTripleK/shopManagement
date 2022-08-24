@@ -5,8 +5,8 @@ import {
   // eslint-disable-next-line prettier/prettier
   UseGuards
 } from '@nestjs/common';
-import { ValidateAuthGuard } from '../guards/guard.validations';
-import { MailService } from '../sendEmail/email.service';
+import { MailService } from '../email/email.service';
+import { ValidateAuthGuard } from '../guards/guard.validate';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from './dto/create.dto';
 import { LoginDTO } from './dto/login.dto';
@@ -19,57 +19,26 @@ export class AuthController {
     private mailService: MailService,
   ) {}
 
-  @Post('/register')
+  @Post('register')
   async userRegister(@Body() createUserDto: CreateUserDto): Promise<object> {
     await this.authService.checkExistUsername(createUserDto);
     return this.authService.createUser(createUserDto);
   }
 
-  @Post('/register/verify')
+  @Post('register/verify')
   async userVerify(@Body() verifyDTO: VerifyDTO): Promise<string> {
     await this.authService.verifyUser(verifyDTO);
     return 'Verify account successful!';
   }
 
   @UseGuards(ValidateAuthGuard)
-  @Post('/login')
+  @Post('login')
   async userLogin(@Body() loginDTO: LoginDTO): Promise<object> {
     return this.authService.userLogin(loginDTO.username);
   }
+
+  @Post('regenerateToken')
+  async regenerateToken(@Body() requestBody: any): Promise<any> {
+    return this.authService.regenerateToken(requestBody.refreshToken);
+  }
 }
-// @Patch('/info')
-// async updateInfo(@Body() param: UpdateDTO): Promise<UserEntity> {
-//   const username = 'hoaNK97122';
-//   console.log(param);
-//   return await this.authService.updateInfo({ username }, param);
-// }
-
-// @Delete('remove')
-// userDelete(@Body() removeID: DeleteUser): Promise<object> {
-//   return this.authService.deleteItem(removeID);
-// }
-
-// @Patch('update')
-// update(@Body() param: UpdateDTO): Promise<UpdateDTO> {
-//   console.log(param);
-//   return this.authService.updateInfo({ id: '10' }, param);
-// }
-
-// @Get('sendMail')
-// sendMail(): void {
-//   return this.mailService.example();
-// }
-
-// @Get(':id')
-// getUserByID(@Param('id') id: string): Promise<object> {
-//   return this.authService.getUserByID(id);
-// }
-
-// @Get('/:id')
-// getUserByID(@Param('id', ParseIntPipe) id: number): Promise<User> {
-//   return this.authService.getUserByID(id);
-// }
-// @Get('login')
-// getHello(): string {
-//   return 'hello';
-// }

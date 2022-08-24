@@ -3,8 +3,9 @@ import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { RandomOTP } from 'src/utils/util.random';
+import { VerifyToken } from 'src/utils/util.verifyToken';
 import { typeOrmConfig } from '../../configs/config.typeorm';
-import { MailService } from '../sendEmail/email.service';
+import { MailService } from '../email/email.service';
 import { LocalStrategy } from '../strategy/strategy.guard.validate';
 import { UserEntity } from '../users/user.entity';
 import { UserRepository } from '../users/user.repo';
@@ -32,6 +33,7 @@ import { AuthService } from './auth.service';
     VerificationService,
     VerificationRepository,
     LocalStrategy,
+    VerifyToken,
   ],
 })
 export class AuthModule {}

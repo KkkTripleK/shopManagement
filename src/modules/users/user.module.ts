@@ -6,7 +6,7 @@ import { RandomOTP } from 'src/utils/util.random';
 import { VerifyToken } from 'src/utils/util.verifyToken';
 import { typeOrmConfig } from '../../configs/config.typeorm';
 import { CreateUserDto } from '../auth/dto/create.dto';
-import { MailService } from '../sendEmail/email.service';
+import { MailService } from '../email/email.service';
 import { JwtStrategy } from '../strategy/strategy.guard.jwt';
 import { UserController } from './user.controller';
 import { UserEntity } from './user.entity';

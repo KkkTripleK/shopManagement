@@ -86,3 +86,35 @@ export class UserRepository {
 //     }
 //     return found;
 //   }
+// @Patch('/info')
+// async updateInfo(@Body() param: UpdateDTO): Promise<UserEntity> {
+//   const username = 'hoaNK97122';
+//   console.log(param);
+//   return await this.authService.updateInfo({ username }, param);
+// }
+
+// @Delete('remove')
+// userDelete(@Body() removeID: DeleteUser): Promise<object> {
+//   return this.authService.deleteItem(removeID);
+// }
+
+// @Patch('update')
+// update(@Body() param: UpdateDTO): Promise<UpdateDTO> {
+//   console.log(param);
+//   return this.authService.updateInfo({ id: '10' }, param);
+// }
+
+// @Get('sendMail')
+// sendMail(): void {
+//   return this.mailService.example();
+// }
+
+// @Get(':id')
+// getUserByID(@Param('id') id: string): Promise<object> {
+//   return this.authService.getUserByID(id);
+// }
+
+// @Get('/:id')
+// getUserByID(@Param('id', ParseIntPipe) id: number): Promise<User> {
+//   return this.authService.getUserByID(id);
+// }

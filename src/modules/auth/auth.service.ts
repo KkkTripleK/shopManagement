@@ -2,7 +2,8 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { RandomOTP } from 'src/utils/util.random';
-import { MailService } from '../sendEmail/email.service';
+import { VerifyToken } from 'src/utils/util.verifyToken';
+import { MailService } from '../email/email.service';
 import { UserRepository } from '../users/user.repo';
 import { VerificationService } from '../verification/verification.service';
 import { CreateUserDto } from './dto/create.dto';
@@ -16,16 +17,9 @@ export class AuthService {
     private randomOTP: RandomOTP,
     private verificationService: VerificationService,
     private jwtService: JwtService,
+    private verifyToken: VerifyToken,
   ) {}
-  // constructor(
-  //   @InjectRepository(User)
-  //   private userRepo: Repository<User>,
-  // ) {}
 
-  // getAll(): Promise<User[]> {
-  //   return this.userRepo.find();
-  // }
-  // // CRUD
   async checkExistUsername(createUserDto: CreateUserDto): Promise<number> {
     return this.userRepository.checkExistUsername(createUserDto);
   }
@@ -94,6 +88,13 @@ export class AuthService {
       );
     }
     return userInfo;
+  }
+
+  async regenerateToken(refreshToken: string): Promise<any> {
+    const payload = await this.verifyToken.verifyTokenWithoutBearer(
+      refreshToken,
+    );
+    return this.createToken(payload.username, '10m');
   }
 
   createToken(username: string, expiresTime: string) {
