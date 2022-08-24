@@ -18,8 +18,8 @@ export class UserService {
     private mailService: MailService,
   ) {}
 
-  async showInfo(username: object): Promise<UserEntity> {
-    return this.userRepository.showInfo(username);
+  async findInfo(username: object): Promise<UserEntity> {
+    return this.userRepository.findInfo(username);
   }
 
   async updateInfo(username: object, param: UpdateDTO): Promise<UserEntity> {
@@ -27,7 +27,7 @@ export class UserService {
   }
 
   async forgotPassword(username: object) {
-    const userInfo = await this.userRepository.showInfo(username);
+    const userInfo = await this.userRepository.findInfo(username);
     const activeCode = this.randomOTP.randomOTP();
     this.mailService.sendMail(userInfo.email, activeCode);
     const newPassword = await bcrypt.hash(
@@ -40,7 +40,7 @@ export class UserService {
   async changePassword(requestBody: ChangePasswordDTO, payload: Payload) {
     const oldPassword = requestBody.password;
     const newPassword = requestBody.newPassword;
-    const userInfo = await this.userRepository.showInfo({
+    const userInfo = await this.userRepository.findInfo({
       username: payload.username,
     });
     const isMatch = await bcrypt.compare(oldPassword, userInfo.password);

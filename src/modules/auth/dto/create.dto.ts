@@ -45,9 +45,9 @@ export class CreateUserDto {
   @IsOptional()
   accountStatus: string;
 
-  @IsString()
-  @IsOptional()
-  isAdmin: string;
+  // @IsString()
+  // @IsOptional()
+  // isAdmin: string;
 
   @IsString()
   @IsOptional()

@@ -1,15 +1,8 @@
-import {
-  HttpException,
-  HttpStatus,
-  Injectable,
-  // eslint-disable-next-line prettier/prettier
-  NotFoundException
-} from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
 import { Repository } from 'typeorm';
 import { CreateUserDto } from '../auth/dto/create.dto';
-import { LoginDTO } from '../auth/dto/login.dto';
 import { UpdateDTO } from './dto/update.dto';
 import { UserEntity } from './user.entity';
 
@@ -41,22 +34,22 @@ export class UserRepository {
     }
   }
 
-  async userLogin(info: LoginDTO): Promise<UserEntity> {
-    const userInfo = await this.userRepo.findOne({
-      where: [{ username: info.username }],
-    });
-    if (userInfo === null) {
-      throw new HttpException('Username is not exist!', HttpStatus.BAD_REQUEST);
-    }
-    const isMatch = await bcrypt.compare(info.password, userInfo.password);
-    if (!isMatch) {
-      throw new HttpException(
-        'Password is not correct!',
-        HttpStatus.BAD_REQUEST,
-      );
-    }
-    return userInfo;
-  }
+  // async validateUser(info: LoginDTO): Promise<UserEntity> {
+  //   const userInfo = await this.userRepo.findOne({
+  //     where: [{ username: info.username }],
+  //   });
+  //   if (userInfo === null) {
+  //     throw new HttpException('Username is not exist!', HttpStatus.BAD_REQUEST);
+  //   }
+  //   const isMatch = await bcrypt.compare(info.password, userInfo.password);
+  //   if (!isMatch) {
+  //     throw new HttpException(
+  //       'Password is not correct!',
+  //       HttpStatus.BAD_REQUEST,
+  //     );
+  //   }
+  //   return userInfo;
+  // }
 
   async deleteItem(info: object): Promise<object> {
     return this.userRepo.delete(info);
@@ -70,15 +63,12 @@ export class UserRepository {
     return this.userRepo.save(findInfo);
   }
 
-  async showInfo(username: object): Promise<UserEntity> {
+  async findInfo(username: object): Promise<UserEntity> {
     const userInfo = await this.userRepo.findOne({ where: [username] });
-    if (!userInfo) {
-      throw new NotFoundException('Can not find username');
-    }
     return userInfo;
   }
 
-  async checkExistUser(createUserDto: CreateUserDto): Promise<number> {
+  async checkExistUsername(createUserDto: CreateUserDto): Promise<number> {
     const username = createUserDto.username;
     return this.userRepo.count({ where: [{ username }] });
   }

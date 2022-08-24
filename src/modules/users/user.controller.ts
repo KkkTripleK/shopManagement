@@ -1,5 +1,15 @@
-import { Body, Controller, Get, Headers, Patch, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Headers,
+  Patch,
+  Post,
+  // eslint-disable-next-line prettier/prettier
+  UseGuards
+} from '@nestjs/common';
 import { VerifyToken } from 'src/utils/util.verifyToken';
+import { JwtAuthGuard } from '../guards/guard.jwt';
 import { UpdateDTO } from './dto/update.dto';
 import { UserEntity } from './user.entity';
 import { UserService } from './user.service';
@@ -11,14 +21,14 @@ export class UserController {
     private verifyToken: VerifyToken,
   ) {}
 
+  @UseGuards(JwtAuthGuard)
   @Get('info')
-  async showInfo(@Headers() requestHeader: any): Promise<UserEntity> {
+  async findInfo(@Headers() requestHeader: any): Promise<UserEntity> {
     const payload = await this.verifyToken.verifyJWT(requestHeader);
-    console.log(payload);
-    const username = payload.username;
-    return await this.userService.showInfo({ username });
+    return await this.userService.findInfo({ username: payload.username });
   }
 
+  @UseGuards(JwtAuthGuard)
   @Patch('update')
   async updateInfo(
     @Body() param: UpdateDTO,
@@ -33,6 +43,7 @@ export class UserController {
     return this.userService.forgotPassword({ username: requestBody.username });
   }
 
+  @UseGuards(JwtAuthGuard)
   @Post('change-password')
   async changePassword(
     @Body() requestBody: any,

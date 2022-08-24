@@ -1,9 +1,11 @@
 import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
+import { PassportModule } from '@nestjs/passport';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { RandomOTP } from 'src/utils/util.random';
 import { typeOrmConfig } from '../../configs/config.typeorm';
 import { MailService } from '../sendEmail/email.service';
+import { LocalStrategy } from '../strategy/strategy.guard.local';
 import { UserEntity } from '../users/user.entity';
 import { UserRepository } from '../users/user.repo';
 import { VerificationEntity } from '../verification/verification.entity';
@@ -19,6 +21,7 @@ import { AuthService } from './auth.service';
     JwtModule.register({
       secret: process.env.SECRET,
     }),
+    PassportModule,
   ],
   controllers: [AuthController],
   providers: [
@@ -28,6 +31,7 @@ import { AuthService } from './auth.service';
     RandomOTP,
     VerificationService,
     VerificationRepository,
+    LocalStrategy,
   ],
 })
 export class AuthModule {}

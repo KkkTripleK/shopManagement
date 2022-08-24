@@ -1,9 +1,11 @@
 import {
   Body,
   Controller,
+  Post,
   // eslint-disable-next-line prettier/prettier
-  Post
+  UseGuards
 } from '@nestjs/common';
+import { ValidateAuthGuard } from '../guards/guard.auth.local';
 import { MailService } from '../sendEmail/email.service';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from './dto/create.dto';
@@ -19,7 +21,7 @@ export class AuthController {
 
   @Post('/register')
   async userRegister(@Body() createUserDto: CreateUserDto): Promise<object> {
-    await this.authService.checkExistUser(createUserDto);
+    await this.authService.checkExistUsername(createUserDto);
     return this.authService.createUser(createUserDto);
   }
 
@@ -29,39 +31,39 @@ export class AuthController {
     return 'Verify account successful!';
   }
 
+  @UseGuards(ValidateAuthGuard)
   @Post('/login')
   async userLogin(@Body() loginDTO: LoginDTO): Promise<object> {
-    return this.authService.userLogin(loginDTO);
+    return this.authService.userLogin(loginDTO.username);
   }
-
-  // @Patch('/info')
-  // async updateInfo(@Body() param: UpdateDTO): Promise<UserEntity> {
-  //   const username = 'hoaNK97122';
-  //   console.log(param);
-  //   return await this.authService.updateInfo({ username }, param);
-  // }
-
-  // @Delete('remove')
-  // userDelete(@Body() removeID: DeleteUser): Promise<object> {
-  //   return this.authService.deleteItem(removeID);
-  // }
-
-  // @Patch('update')
-  // update(@Body() param: UpdateDTO): Promise<UpdateDTO> {
-  //   console.log(param);
-  //   return this.authService.updateInfo({ id: '10' }, param);
-  // }
-
-  // @Get('sendMail')
-  // sendMail(): void {
-  //   return this.mailService.example();
-  // }
-
-  // @Get(':id')
-  // getUserByID(@Param('id') id: string): Promise<object> {
-  //   return this.authService.getUserByID(id);
-  // }
 }
+// @Patch('/info')
+// async updateInfo(@Body() param: UpdateDTO): Promise<UserEntity> {
+//   const username = 'hoaNK97122';
+//   console.log(param);
+//   return await this.authService.updateInfo({ username }, param);
+// }
+
+// @Delete('remove')
+// userDelete(@Body() removeID: DeleteUser): Promise<object> {
+//   return this.authService.deleteItem(removeID);
+// }
+
+// @Patch('update')
+// update(@Body() param: UpdateDTO): Promise<UpdateDTO> {
+//   console.log(param);
+//   return this.authService.updateInfo({ id: '10' }, param);
+// }
+
+// @Get('sendMail')
+// sendMail(): void {
+//   return this.mailService.example();
+// }
+
+// @Get(':id')
+// getUserByID(@Param('id') id: string): Promise<object> {
+//   return this.authService.getUserByID(id);
+// }
 
 // @Get('/:id')
 // getUserByID(@Param('id', ParseIntPipe) id: number): Promise<User> {

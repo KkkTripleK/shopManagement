@@ -6,7 +6,6 @@ import { MailService } from '../sendEmail/email.service';
 import { UserRepository } from '../users/user.repo';
 import { VerificationService } from '../verification/verification.service';
 import { CreateUserDto } from './dto/create.dto';
-import { LoginDTO } from './dto/login.dto';
 import { VerifyDTO } from './dto/verify.dto';
 
 @Injectable()
@@ -27,12 +26,12 @@ export class AuthService {
   //   return this.userRepo.find();
   // }
   // // CRUD
-  async checkExistUser(createUserDto: CreateUserDto): Promise<number> {
-    return this.userRepository.checkExistUser(createUserDto);
+  async checkExistUsername(createUserDto: CreateUserDto): Promise<number> {
+    return this.userRepository.checkExistUsername(createUserDto);
   }
 
   async createUser(createUserDto: CreateUserDto): Promise<CreateUserDto> {
-    const findExistUser = await this.checkExistUser(createUserDto);
+    const findExistUser = await this.checkExistUsername(createUserDto);
     if (findExistUser) {
       throw new HttpException(
         {
@@ -69,14 +68,19 @@ export class AuthService {
     );
   }
 
-  async userLogin(info: LoginDTO): Promise<object> {
-    const userInfo = await this.userRepository.showInfo({
-      username: info.username,
-    });
+  async userLogin(username: string): Promise<object> {
+    const refreshToken = await this.createToken(username, '50h');
+    const accessToken = await this.createToken(username, '10m');
+    this.verificationService.saveToken(username, accessToken, refreshToken);
+    return [{ refreshToken, accessToken }];
+  }
+
+  async validateUser(username: string, password: string) {
+    const userInfo = await this.userRepository.findInfo({ username });
     if (userInfo === null) {
       throw new HttpException('Username is not exist!', HttpStatus.BAD_REQUEST);
     }
-    const isMatch = await bcrypt.compare(info.password, userInfo.password);
+    const isMatch = await bcrypt.compare(password, userInfo.password);
     if (!isMatch) {
       throw new HttpException(
         'Password is not correct!',
@@ -89,14 +93,7 @@ export class AuthService {
         HttpStatus.BAD_REQUEST,
       );
     }
-    const refreshToken = await this.createToken(userInfo.username, '50h');
-    const accessToken = await this.createToken(userInfo.username, '10m');
-    this.verificationService.saveToken(
-      userInfo.username,
-      accessToken,
-      refreshToken,
-    );
-    return [{ refreshToken, accessToken }];
+    return userInfo;
   }
 
   createToken(username: string, expiresTime: string) {
