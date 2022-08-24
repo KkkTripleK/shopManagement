@@ -26,7 +26,7 @@ export class UserController {
   @Get('info')
   @UseGuards(JwtAuthGuard)
   @UseGuards(RolesGuard)
-  @Roles('admin', 'member')
+  @Roles('Admin', 'Member')
   async findInfo(@Headers() requestHeader: any): Promise<UserEntity> {
     const payload = await this.verifyToken.verifyJWT(
       requestHeader.authorization,

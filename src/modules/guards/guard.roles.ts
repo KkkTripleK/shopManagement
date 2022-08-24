@@ -24,7 +24,7 @@ export class RolesGuard implements CanActivate {
     const userInfo = await this.userRepo.findInfo({
       username: payload.username,
     });
-    console.log(userInfo.isAdmin);
+    console.log(userInfo.role);
     return false;
   }
 }

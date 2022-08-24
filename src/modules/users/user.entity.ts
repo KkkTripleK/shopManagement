@@ -25,8 +25,8 @@ export class UserEntity extends BaseEntity {
   @Column({ nullable: true, default: 'Not Active' })
   accountStatus: string;
 
-  @Column({ nullable: true, default: 'false' })
-  isAdmin: string;
+  @Column({ nullable: true, default: 'Member' })
+  role: string;
 
   @Column()
   address: string;
