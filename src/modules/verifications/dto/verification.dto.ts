@@ -10,17 +10,5 @@ export class VerificationDTO {
 
   @IsString()
   @IsOptional()
-  signature: string;
-
-  @IsString()
-  @IsOptional()
-  refreshToken: string;
-
-  @IsString()
-  @IsOptional()
-  accessToken: string;
-
-  @IsString()
-  @IsOptional()
   activeCode: string;
 }

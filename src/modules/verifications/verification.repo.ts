@@ -22,15 +22,3 @@ export class VerificationRepository {
     return this.verificationEntity.count({ where: [verifyDTO] });
   }
 }
-// async saveToken(
-//   username: string,
-//   accessToken: string,
-//   refreshToken: string,
-// ): Promise<VerificationEntity> {
-//   const userVerification = await this.verificationEntity.findOne({
-//     where: [{ username }],
-//   });
-//   userVerification.accessToken = accessToken;
-//   userVerification.refreshToken = refreshToken;
-//   return this.verificationEntity.save(userVerification);
-// }

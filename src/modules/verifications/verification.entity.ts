@@ -9,14 +9,5 @@ export class VerificationEntity extends BaseEntity {
   username: string;
 
   @Column({ nullable: true })
-  signature: string;
-
-  @Column({ nullable: true })
-  refreshToken: string;
-
-  @Column({ nullable: true })
-  accessToken: string;
-
-  @Column({ nullable: true })
   activeCode: string;
 }

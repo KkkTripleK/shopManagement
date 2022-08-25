@@ -18,15 +18,3 @@ export class VerificationService {
     return this.verificationRepository.verifyUser(verifyDTO);
   }
 }
-
-// saveToken(
-//   username: string,
-//   accessToken: string,
-//   refreshToken: string,
-// ): Promise<VerificationDTO> {
-//   return this.verificationRepository.saveToken(
-//     username,
-//     accessToken,
-//     refreshToken,
-//   );
-// }
