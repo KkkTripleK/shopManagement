@@ -10,7 +10,7 @@ export class CreateCategoryDto {
 
   @ApiProperty()
   @IsString()
-  @Length(6, 12)
+  @Length(0, 12)
   name: string;
 
   @ApiProperty()

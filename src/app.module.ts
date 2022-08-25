@@ -1,13 +1,15 @@
 import { MailerModule } from '@nestjs-modules/mailer';
 import { Module } from '@nestjs/common';
 import { AuthModule } from './modules/auths/auth.module';
+import { CategoryModule } from './modules/categories/category.module';
 import { UserModule } from './modules/users/user.module';
 
 @Module({
   imports: [
     AuthModule,
-    MailerModule,
     UserModule,
+    CategoryModule,
+    MailerModule,
     MailerModule.forRoot({
       transport: {
         host: 'smtp.gmail.com',
