@@ -1,6 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
-import { Payload } from 'src/utils/dto/util.verifyToken.dto';
+import { Payload } from 'src/utils/dto/dto.verifyToken';
 import { RandomOTP } from 'src/utils/util.random';
 import { CreateUserDto } from '../auths/dto/dto.create';
 import { CacheService } from '../cache/cache.service';

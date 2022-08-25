@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common/decorators';
 import { JwtService } from '@nestjs/jwt';
-import { Payload } from './dto/util.verifyToken.dto';
+import { Payload } from './dto/dto.verifyToken';
 
 @Injectable()
 export class VerifyToken {
