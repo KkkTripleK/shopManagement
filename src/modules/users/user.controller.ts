@@ -8,14 +8,16 @@ import {
   // eslint-disable-next-line prettier/prettier
   UseGuards
 } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { VerifyToken } from 'src/utils/util.verifyToken';
 import { Roles } from '../decorators/decorator.roles';
 import { JwtAuthGuard } from '../guards/guard.jwt';
 import { RolesGuard } from '../guards/guard.roles';
-import { UpdateDTO } from './dto/update.dto';
+import { UpdateDTO } from './dto/dto.update';
 import { UserEntity } from './user.entity';
 import { UserService } from './user.service';
 
+@ApiTags('User')
 @Controller('user')
 export class UserController {
   constructor(

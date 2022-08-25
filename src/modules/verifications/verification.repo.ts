@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { VerifyDTO } from '../auths/dto/verify.dto';
+import { VerifyDTO } from '../auths/dto/dto.verify';
 import { VerificationEntity } from './verification.entity';
 
 @Injectable()

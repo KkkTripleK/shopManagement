@@ -9,8 +9,8 @@ import { MailService } from '../email/email.service';
 import { UserEntity } from '../users/user.entity';
 import { UserRepository } from '../users/user.repo';
 import { VerificationService } from '../verifications/verification.service';
-import { CreateUserDto } from './dto/create.dto';
-import { VerifyDTO } from './dto/verify.dto';
+import { CreateUserDto } from './dto/dto.create';
+import { VerifyDTO } from './dto/dto.verify';
 
 @Injectable()
 export class AuthService {

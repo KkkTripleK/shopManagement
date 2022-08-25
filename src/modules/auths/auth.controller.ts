@@ -7,14 +7,16 @@ import {
   // eslint-disable-next-line prettier/prettier
   UseGuards
 } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { VerifyToken } from 'src/utils/util.verifyToken';
 import { MailService } from '../email/email.service';
 import { ValidateAuthGuard } from '../guards/guard.validate';
 import { AuthService } from './auth.service';
-import { CreateUserDto } from './dto/create.dto';
-import { LoginDTO } from './dto/login.dto';
-import { VerifyDTO } from './dto/verify.dto';
+import { CreateUserDto } from './dto/dto.create';
+import { LoginDTO } from './dto/dto.login';
+import { VerifyDTO } from './dto/dto.verify';
 
+@ApiTags('Auth')
 @Controller('')
 export class AuthController {
   constructor(

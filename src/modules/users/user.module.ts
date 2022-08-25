@@ -5,7 +5,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { RandomOTP } from 'src/utils/util.random';
 import { VerifyToken } from 'src/utils/util.verifyToken';
 import { typeOrmConfig } from '../../configs/config.typeorm';
-import { CreateUserDto } from '../auths/dto/create.dto';
+import { CreateUserDto } from '../auths/dto/dto.create';
 import { cacheModule } from '../cache/cache.module';
 import { MailService } from '../email/email.service';
 import { JwtStrategy } from '../strategies/strategy.guard.jwt';

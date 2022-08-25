@@ -1,15 +1,16 @@
+import { ApiProperty } from '@nestjs/swagger';
 import { IsAlphanumeric, IsString, Length } from 'class-validator';
 import { Entity } from 'typeorm';
 
 @Entity()
-export class LoginDTO {
+export class VerifyDTO {
+  @ApiProperty()
   @IsAlphanumeric()
   @IsString()
-  @Length(6, 12)
+  @Length(6, 15)
   username: string;
 
-  @IsAlphanumeric()
+  @ApiProperty()
   @IsString()
-  @Length(6, 12)
-  password: string;
+  activeCode: string;
 }
