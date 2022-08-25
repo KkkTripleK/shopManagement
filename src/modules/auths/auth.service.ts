@@ -1,9 +1,12 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config/dist/config.service';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { RandomOTP } from 'src/utils/util.random';
 import { VerifyToken } from 'src/utils/util.verifyToken';
+import { CacheService } from '../cache/cache.service';
 import { MailService } from '../email/email.service';
+import { UserEntity } from '../users/user.entity';
 import { UserRepository } from '../users/user.repo';
 import { VerificationService } from '../verifications/verification.service';
 import { CreateUserDto } from './dto/create.dto';
@@ -18,6 +21,8 @@ export class AuthService {
     private verificationService: VerificationService,
     private jwtService: JwtService,
     private verifyToken: VerifyToken,
+    private cacheService: CacheService,
+    private configService: ConfigService,
   ) {}
 
   async checkExistUsername(createUserDto: CreateUserDto): Promise<number> {
@@ -63,13 +68,29 @@ export class AuthService {
   }
 
   async userLogin(username: string): Promise<object> {
-    const refreshToken = await this.createToken(username, '50h');
-    const accessToken = await this.createToken(username, '10m');
-    this.verificationService.saveToken(username, accessToken, refreshToken);
+    const accessToken = await this.createToken(
+      username,
+      process.env.ACCESS_TOKEN_TTL,
+    );
+    const refreshToken = await this.createToken(
+      username,
+      process.env.REFRESH_TOKEN_TTL,
+    );
+    // this.verificationService.saveToken(username, accessToken, refreshToken);
+    await this.cacheService.set(
+      `users:${username}:accessToken`,
+      accessToken,
+      Number(process.env.CACHE_ACCESS_TOKEN_TTL),
+    );
+    await this.cacheService.set(
+      `users:${username}:refreshToken`,
+      refreshToken,
+      Number(process.env.CACHE_REFRESH_TOKEN_TTL),
+    );
     return [{ refreshToken, accessToken }];
   }
 
-  async validateUser(username: string, password: string) {
+  async validateUser(username: string, password: string): Promise<UserEntity> {
     const userInfo = await this.userRepository.findInfo({ username });
     if (userInfo === null) {
       throw new HttpException('Username is not exist!', HttpStatus.BAD_REQUEST);
@@ -94,7 +115,26 @@ export class AuthService {
     const payload = await this.verifyToken.verifyTokenWithoutBearer(
       refreshToken,
     );
-    return this.createToken(payload.username, '10m');
+    const refreshTokenRedis = await this.cacheService.get(
+      `users:${payload.username}:refreshToken`,
+    );
+    if (refreshToken !== refreshTokenRedis) {
+      throw new HttpException(
+        'Refresh token is invalid!',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    console.log({ refreshToken });
+    console.log({ refreshTokenRedis });
+    const newAccessToken = await this.createToken(
+      payload.username,
+      process.env.ACCESS_TOKEN_TTL,
+    );
+    return { newAccessToken };
+  }
+
+  async userLogout(username: string): Promise<any> {
+    await this.cacheService.del(`users:${username}:refreshToken`);
   }
 
   createToken(username: string, expiresTime: string) {

@@ -1,10 +1,13 @@
 import {
   Body,
   Controller,
+  Get,
+  Headers,
   Post,
   // eslint-disable-next-line prettier/prettier
   UseGuards
 } from '@nestjs/common';
+import { VerifyToken } from 'src/utils/util.verifyToken';
 import { MailService } from '../email/email.service';
 import { ValidateAuthGuard } from '../guards/guard.validate';
 import { AuthService } from './auth.service';
@@ -17,6 +20,7 @@ export class AuthController {
   constructor(
     private authService: AuthService,
     private mailService: MailService,
+    private verifyToken: VerifyToken,
   ) {}
 
   @Post('register')
@@ -40,5 +44,14 @@ export class AuthController {
   @Post('regenerateToken')
   async regenerateToken(@Body() requestBody: any): Promise<any> {
     return this.authService.regenerateToken(requestBody.refreshToken);
+  }
+
+  @Get('logout')
+  async logout(@Headers() requestHeader: any): Promise<any> {
+    const payload = await this.verifyToken.verifyJWT(
+      requestHeader.authorization,
+    );
+    await this.authService.userLogout(payload.username);
+    return 'Logout successful!';
   }
 }

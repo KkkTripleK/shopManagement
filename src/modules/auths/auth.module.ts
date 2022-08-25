@@ -1,10 +1,12 @@
 import { Module } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config/dist/config.service';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { RandomOTP } from 'src/utils/util.random';
 import { VerifyToken } from 'src/utils/util.verifyToken';
 import { typeOrmConfig } from '../../configs/config.typeorm';
+import { cacheModule } from '../cache/cache.module';
 import { MailService } from '../email/email.service';
 import { LocalStrategy } from '../strategies/strategy.guard.validate';
 import { UserEntity } from '../users/user.entity';
@@ -23,6 +25,7 @@ import { AuthService } from './auth.service';
       secret: process.env.SECRET,
     }),
     PassportModule,
+    cacheModule,
   ],
   controllers: [AuthController],
   providers: [
@@ -34,6 +37,7 @@ import { AuthService } from './auth.service';
     VerificationRepository,
     LocalStrategy,
     VerifyToken,
+    ConfigService,
   ],
 })
 export class AuthModule {}

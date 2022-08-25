@@ -3,6 +3,7 @@ import * as bcrypt from 'bcrypt';
 import { Payload } from 'src/utils/dto/util.verifyToken.dto';
 import { RandomOTP } from 'src/utils/util.random';
 import { CreateUserDto } from '../auths/dto/create.dto';
+import { CacheService } from '../cache/cache.service';
 import { MailService } from '../email/email.service';
 import { ChangePasswordDTO } from './dto/changePassword.dto';
 import { UpdateDTO } from './dto/update.dto';
@@ -15,6 +16,7 @@ export class UserService {
     private userRepository: UserRepository,
     private createUserDto: CreateUserDto,
     private randomOTP: RandomOTP,
+    private cacheService: CacheService,
     private mailService: MailService,
   ) {}
 
@@ -26,15 +28,19 @@ export class UserService {
     return this.userRepository.updateInfo(username, param);
   }
 
-  async forgotPassword(username: object) {
-    const userInfo = await this.userRepository.findInfo(username);
+  async forgotPassword(username: string) {
+    const userInfo = await this.userRepository.findInfo({ username });
     const activeCode = this.randomOTP.randomOTP();
     this.mailService.sendMail(userInfo.email, activeCode);
     const newPassword = await bcrypt.hash(
       activeCode,
       Number(process.env.PRIVATE_KEY),
     );
-    return this.userRepository.updateInfo(username, { password: newPassword });
+    await this.userRepository.updateInfo(
+      { username },
+      { password: newPassword },
+    );
+    await this.cacheService.del(`users:${username}:refreshToken`);
   }
 
   async changePassword(requestBody: ChangePasswordDTO, payload: Payload) {

@@ -48,7 +48,8 @@ export class UserController {
 
   @Post('forgot-password')
   async forgotPassword(@Body() requestBody: any): Promise<any> {
-    return this.userService.forgotPassword({ username: requestBody.username });
+    await this.userService.forgotPassword(requestBody.username);
+    return 'New password is sent to your email!';
   }
 
   @UseGuards(JwtAuthGuard)

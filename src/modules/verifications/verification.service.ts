@@ -17,16 +17,16 @@ export class VerificationService {
   verifyUser(verifyDTO: VerifyDTO): Promise<number> {
     return this.verificationRepository.verifyUser(verifyDTO);
   }
-
-  saveToken(
-    username: string,
-    accessToken: string,
-    refreshToken: string,
-  ): Promise<VerificationDTO> {
-    return this.verificationRepository.saveToken(
-      username,
-      accessToken,
-      refreshToken,
-    );
-  }
 }
+
+// saveToken(
+//   username: string,
+//   accessToken: string,
+//   refreshToken: string,
+// ): Promise<VerificationDTO> {
+//   return this.verificationRepository.saveToken(
+//     username,
+//     accessToken,
+//     refreshToken,
+//   );
+// }
