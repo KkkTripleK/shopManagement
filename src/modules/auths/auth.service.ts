@@ -124,8 +124,6 @@ export class AuthService {
         HttpStatus.BAD_REQUEST,
       );
     }
-    console.log({ refreshToken });
-    console.log({ refreshTokenRedis });
     const newAccessToken = await this.createToken(
       payload.username,
       process.env.ACCESS_TOKEN_TTL,

@@ -2,13 +2,21 @@ import {
   Body,
   Controller,
   Delete,
+  FileTypeValidator,
   Get,
+  HttpStatus,
+  MaxFileSizeValidator,
   Param,
+  ParseFilePipe,
+  ParseFilePipeBuilder,
   Patch,
   Post,
+  UploadedFile,
+  UseGuards,
   // eslint-disable-next-line prettier/prettier
-  UseGuards
+  UseInterceptors
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiTags } from '@nestjs/swagger';
 import { Roles } from '../decorators/decorator.roles';
 import { JwtAuthGuard } from '../guards/guard.jwt';
@@ -61,5 +69,47 @@ export class CategoryController {
   async deleteCategoryByID(@Param('categoryID') categoryID: string) {
     await this.cateService.deleteCategoryByID({ categoryID });
     return 'Delete category successful!';
+  }
+
+  // @UseInterceptors(FileInterceptor('file'))
+  // uploadFile(@UploadedFile() file: Express.Multer.File) {
+  //   console.log(file);
+  // }
+  @Post('upload-banner')
+  @UseInterceptors(FileInterceptor('Filee'))
+  uploadFileAndPassValidation(
+    @UploadedFile(
+      new ParseFilePipeBuilder()
+        .addFileTypeValidator({
+          fileType: '.jpeg',
+        })
+        .addMaxSizeValidator({
+          maxSize: 4000000,
+        })
+        .build({
+          errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY,
+        }),
+    )
+    file: Express.Multer.File,
+  ) {
+    return {
+      file: file,
+    };
+  }
+
+  @Post('file')
+  @UseInterceptors(FileInterceptor('Filee'))
+  uploadFile(
+    @UploadedFile(
+      new ParseFilePipe({
+        validators: [
+          new MaxFileSizeValidator({ maxSize: 4000000 }),
+          new FileTypeValidator({ fileType: '.jpg' }),
+        ],
+      }),
+    )
+    file: Express.Multer.File,
+  ) {
+    return file;
   }
 }
