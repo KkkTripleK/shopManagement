@@ -7,7 +7,7 @@ export class VerifyDTO {
   @ApiProperty()
   @IsAlphanumeric()
   @IsString()
-  @Length(6, 15)
+  @Length(4, 15)
   username: string;
 
   @ApiProperty()

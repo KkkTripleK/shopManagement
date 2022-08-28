@@ -51,19 +51,19 @@ export class UserRepository {
   //   return userInfo;
   // }
 
-  async deleteItem(info: object): Promise<object> {
-    return this.userRepo.delete(info);
+  async deleteAccount(id: object): Promise<object> {
+    return this.userRepo.delete(id);
   }
 
-  async updateInfo(username: object, param: UpdateDTO): Promise<UserEntity> {
-    const findInfo = await this.userRepo.findOneBy(username);
+  async updateAccount(username: object, param: UpdateDTO): Promise<UserEntity> {
+    const info = await this.userRepo.findOneBy(username);
     for (const key in param) {
-      findInfo[key] = param[key];
+      info[key] = param[key];
     }
-    return this.userRepo.save(findInfo);
+    return this.userRepo.save(info);
   }
 
-  async findInfo(username: object): Promise<UserEntity> {
+  async findAccount(username: object): Promise<UserEntity> {
     const userInfo = await this.userRepo.findOne({ where: [username] });
     return userInfo;
   }

@@ -2,12 +2,9 @@ import {
   Body,
   Controller,
   Delete,
-  FileTypeValidator,
   Get,
   HttpStatus,
-  MaxFileSizeValidator,
   Param,
-  ParseFilePipe,
   ParseFilePipeBuilder,
   Patch,
   Post,
@@ -27,34 +24,34 @@ import { CreateCategoryDto } from './dto/dto.create';
 import { UpdateCategoryDto } from './dto/dto.update';
 
 @ApiTags('Category')
-@Controller('category')
+@Controller()
 export class CategoryController {
   constructor(private cateService: CategoryService) {}
 
-  @UseGuards(JwtAuthGuard)
-  @UseGuards(RolesGuard)
-  @Roles('Admin', 'Member')
-  @Post('create')
-  async createNewCategory(
-    @Body() createCategoryDto: CreateCategoryDto,
-  ): Promise<CategoryEntity> {
-    return this.cateService.createNewCategory(createCategoryDto);
-  }
-
-  @Get('all')
+  @Get('category/all')
   async getList() {
     return this.cateService.getList();
   }
 
-  @Get(':categoryID')
+  @Get('category/:categoryID')
   async findCategoryByID(@Param('categoryID') categoryID: string) {
     return this.cateService.findCategoryByID({ categoryID });
   }
 
   @UseGuards(JwtAuthGuard)
   @UseGuards(RolesGuard)
-  @Roles('Admin', 'Member')
-  @Patch(':categoryID')
+  @Roles('Admin')
+  @Post('admin/category/create')
+  async createNewCategory(
+    @Body() createCategoryDto: CreateCategoryDto,
+  ): Promise<CategoryEntity> {
+    return this.cateService.createNewCategory(createCategoryDto);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @UseGuards(RolesGuard)
+  @Roles('Admin')
+  @Patch('admin/category/:categoryID')
   async updateCategoryInfo(
     @Param('categoryID') categoryID: string,
     @Body() requestBody: UpdateCategoryDto,
@@ -64,8 +61,8 @@ export class CategoryController {
 
   @UseGuards(JwtAuthGuard)
   @UseGuards(RolesGuard)
-  @Roles('Admin', 'Member')
-  @Delete(':categoryID')
+  @Roles('Admin')
+  @Delete('admin/category/:categoryID')
   async deleteCategoryByID(@Param('categoryID') categoryID: string) {
     await this.cateService.deleteCategoryByID({ categoryID });
     return 'Delete category successful!';
@@ -75,7 +72,10 @@ export class CategoryController {
   // uploadFile(@UploadedFile() file: Express.Multer.File) {
   //   console.log(file);
   // }
-  @Post('upload-banner')
+  @UseGuards(JwtAuthGuard)
+  @UseGuards(RolesGuard)
+  @Roles('Admin')
+  @Post('admin/category/upload-banner')
   @UseInterceptors(FileInterceptor('Filee'))
   uploadFileAndPassValidation(
     @UploadedFile(
@@ -96,20 +96,20 @@ export class CategoryController {
       file: file,
     };
   }
-
-  @Post('file')
-  @UseInterceptors(FileInterceptor('Filee'))
-  uploadFile(
-    @UploadedFile(
-      new ParseFilePipe({
-        validators: [
-          new MaxFileSizeValidator({ maxSize: 4000000 }),
-          new FileTypeValidator({ fileType: '.jpg' }),
-        ],
-      }),
-    )
-    file: Express.Multer.File,
-  ) {
-    return file;
-  }
 }
+
+// @Post('admin/category/file')
+// @UseInterceptors(FileInterceptor('File'))
+// uploadFile(
+//   @UploadedFile(
+//     new ParseFilePipe({
+//       validators: [
+//         new MaxFileSizeValidator({ maxSize: 4000000 }),
+//         new FileTypeValidator({ fileType: '.jpg' }),
+//       ],
+//     }),
+//   )
+//   file: Express.Multer.File,
+// ) {
+//   return file;
+// }

@@ -9,8 +9,8 @@ export class MailService {
       .sendMail({
         to: email, // list of receivers
         from: 'nguyenkhanhhoapso@gmail.com', // sender address
-        subject: 'OPT Code ✔', // Subject line
-        text: 'OPT number', // plaintext body
+        subject: 'OTP Code ✔', // Subject line
+        text: 'OTP number', // plaintext body
         html: OTP, // HTML body content
       })
       .then(() => {

@@ -26,7 +26,7 @@ export class RolesGuard implements CanActivate {
       );
       const request = context.switchToHttp().getRequest();
       const payload = await this.verifyToken.verifyJWT(request.rawHeaders[1]);
-      const userInfo = await this.userRepo.findInfo({
+      const userInfo = await this.userRepo.findAccount({
         username: payload.username,
       });
       return requiredRoles.includes(userInfo.role);

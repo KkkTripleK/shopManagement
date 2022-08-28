@@ -6,6 +6,7 @@ import { Entity } from 'typeorm';
 export class UpdateDTO {
   @ApiProperty()
   @IsString()
+  @IsOptional()
   password?: string;
 
   @ApiProperty()

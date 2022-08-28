@@ -20,23 +20,35 @@ export class UserService {
     private mailService: MailService,
   ) {}
 
-  async findInfo(username: object): Promise<UserEntity> {
-    return this.userRepository.findInfo(username);
+  async getListUser(): Promise<UserEntity[]> {
+    return this.userRepository.getAll();
   }
 
-  async updateInfo(username: object, param: UpdateDTO): Promise<UserEntity> {
-    return this.userRepository.updateInfo(username, param);
+  async findAccount(username: object): Promise<UserEntity> {
+    return this.userRepository.findAccount(username);
+  }
+
+  async updateAccount(username: object, param: UpdateDTO): Promise<UpdateDTO> {
+    return this.userRepository.updateAccount(username, param);
+  }
+
+  async deleteAccount(id: object) {
+    const account: any = await this.userRepository.deleteAccount(id);
+    console.log(account);
+    if (account.affected === 0) {
+      throw new HttpException('ID is invalid!', HttpStatus.BAD_REQUEST);
+    }
   }
 
   async forgotPassword(username: string) {
-    const userInfo = await this.userRepository.findInfo({ username });
+    const userInfo = await this.findAccount({ username });
     const activeCode = this.randomOTP.randomOTP();
     this.mailService.sendMail(userInfo.email, activeCode);
     const newPassword = await bcrypt.hash(
       activeCode,
       Number(process.env.PRIVATE_KEY),
     );
-    await this.userRepository.updateInfo(
+    await this.userRepository.updateAccount(
       { username },
       { password: newPassword },
     );
@@ -46,7 +58,7 @@ export class UserService {
   async changePassword(requestBody: ChangePasswordDTO, payload: Payload) {
     const oldPassword = requestBody.password;
     const newPassword = requestBody.newPassword;
-    const userInfo = await this.userRepository.findInfo({
+    const userInfo = await this.findAccount({
       username: payload.username,
     });
     const isMatch = await bcrypt.compare(oldPassword, userInfo.password);
@@ -66,7 +78,7 @@ export class UserService {
       requestBody.newPassword,
       Number(process.env.PRIVATE_KEY),
     );
-    return this.userRepository.updateInfo(
+    return this.userRepository.updateAccount(
       { username: userInfo.username },
       { password: newPasswordBcrypt },
     );

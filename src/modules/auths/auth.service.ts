@@ -61,7 +61,7 @@ export class AuthService {
         HttpStatus.BAD_REQUEST,
       );
     }
-    this.userRepository.updateInfo(
+    this.userRepository.updateAccount(
       { username: verifyDTO.username },
       { accountStatus: 'Active' },
     );
@@ -91,7 +91,7 @@ export class AuthService {
   }
 
   async validateUser(username: string, password: string): Promise<UserEntity> {
-    const userInfo = await this.userRepository.findInfo({ username });
+    const userInfo = await this.userRepository.findAccount({ username });
     if (userInfo === null) {
       throw new HttpException('Username is not exist!', HttpStatus.BAD_REQUEST);
     }

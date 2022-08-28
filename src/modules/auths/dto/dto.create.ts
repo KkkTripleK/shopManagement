@@ -19,13 +19,13 @@ export class CreateUserDto {
   @ApiProperty()
   @IsAlphanumeric()
   @IsString()
-  @Length(6, 12)
+  @Length(4, 12)
   username: string;
 
   @ApiProperty()
   @IsAlphanumeric()
   @IsString()
-  @Length(6, 12)
+  @Length(4, 12)
   password: string;
 
   @ApiProperty()
