@@ -21,6 +21,7 @@ import { UpdateDTO } from './dto/dto.update';
 import { UserEntity } from './user.entity';
 import { UserService } from './user.service';
 
+@ApiTags('User')
 @Controller('')
 export class UserController {
   constructor(
@@ -29,7 +30,6 @@ export class UserController {
     private authService: AuthService,
   ) {}
 
-  @ApiTags('User')
   @Get('user/info')
   @UseGuards(JwtAuthGuard)
   @UseGuards(RolesGuard)
@@ -43,9 +43,8 @@ export class UserController {
     });
   }
 
-  @ApiTags('User')
-  @UseGuards(JwtAuthGuard)
   @Patch('user/update')
+  @UseGuards(JwtAuthGuard)
   async updateAccount(
     @Body() param: UpdateDTO,
     @Headers() requestHeader: any,
@@ -59,16 +58,14 @@ export class UserController {
     );
   }
 
-  @ApiTags('User')
   @Post('user/forgot-password')
   async forgotPassword(@Body() requestBody: any): Promise<any> {
     await this.userService.forgotPassword(requestBody.username);
     return 'New password is sent to your email!';
   }
 
-  @ApiTags('User')
-  @UseGuards(JwtAuthGuard)
   @Post('user/change-password')
+  @UseGuards(JwtAuthGuard)
   async changePassword(
     @Body() requestBody: any,
     @Headers() requestHeader: any,
@@ -79,11 +76,10 @@ export class UserController {
     return this.userService.changePassword(requestBody, payload);
   }
 
-  @ApiTags('User')
+  @Delete('user')
   @UseGuards(JwtAuthGuard)
   @UseGuards(RolesGuard)
   @Roles('Admin', 'Member')
-  @Delete('user')
   async deleteAccount(
     @Body() requestBody: DeleteAccount,
     @Headers() requestHeader: any,
@@ -99,7 +95,6 @@ export class UserController {
     return 'Delete account successful!';
   }
 
-  @ApiTags('Admin')
   @Get('/admin/list-account')
   @UseGuards(JwtAuthGuard)
   @UseGuards(RolesGuard)
@@ -108,7 +103,6 @@ export class UserController {
     return this.userService.getListUser();
   }
 
-  @ApiTags('Admin')
   @Get('/admin/account/:userID')
   @UseGuards(JwtAuthGuard)
   @UseGuards(RolesGuard)
@@ -117,7 +111,6 @@ export class UserController {
     return await this.userService.findAccount({ userID });
   }
 
-  @ApiTags('Admin')
   @Delete('/admin/account/:userID')
   @UseGuards(JwtAuthGuard)
   @UseGuards(RolesGuard)

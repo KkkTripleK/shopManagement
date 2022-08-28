@@ -1,13 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsOptional, IsString } from 'class-validator';
-import { Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity } from 'typeorm';
 
 @Entity()
-export class CreateProductDto {
-  @ApiProperty()
-  @PrimaryGeneratedColumn()
-  productID: string;
-
+export class UpdateProductDto {
   @ApiProperty()
   @IsString()
   @IsOptional()
@@ -15,7 +11,8 @@ export class CreateProductDto {
 
   @ApiProperty()
   @IsString()
-  name: string;
+  @IsOptional()
+  name?: string;
 
   @ApiProperty()
   @IsString()
@@ -24,11 +21,13 @@ export class CreateProductDto {
 
   @ApiProperty()
   @IsString()
-  cost: string;
+  @IsOptional()
+  cost?: string;
 
   @ApiProperty()
   @IsString()
-  netPrice: string;
+  @IsOptional()
+  netPrice?: string;
 
   @ApiProperty()
   @IsString()
@@ -37,11 +36,13 @@ export class CreateProductDto {
 
   @ApiProperty()
   @IsString()
-  weight: string;
+  @IsOptional()
+  weight?: string;
 
   @ApiProperty()
   @IsString()
-  qtyInstock: string;
+  @IsOptional()
+  qtyInstock?: string;
 
   @ApiProperty()
   @IsString()
@@ -55,5 +56,6 @@ export class CreateProductDto {
 
   @ApiProperty()
   @IsString()
-  status: string;
+  @IsOptional()
+  status?: string;
 }

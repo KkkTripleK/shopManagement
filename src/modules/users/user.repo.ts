@@ -34,23 +34,6 @@ export class UserRepository {
     }
   }
 
-  // async validateUser(info: LoginDTO): Promise<UserEntity> {
-  //   const userInfo = await this.userRepo.findOne({
-  //     where: [{ username: info.username }],
-  //   });
-  //   if (userInfo === null) {
-  //     throw new HttpException('Username is not exist!', HttpStatus.BAD_REQUEST);
-  //   }
-  //   const isMatch = await bcrypt.compare(info.password, userInfo.password);
-  //   if (!isMatch) {
-  //     throw new HttpException(
-  //       'Password is not correct!',
-  //       HttpStatus.BAD_REQUEST,
-  //     );
-  //   }
-  //   return userInfo;
-  // }
-
   async deleteAccount(id: object): Promise<object> {
     return this.userRepo.delete(id);
   }
@@ -72,12 +55,28 @@ export class UserRepository {
     const username = createUserDto.username;
     return this.userRepo.count({ where: [{ username }] });
   }
-
-  // async forgotPassword(username) {
-  //   const userInfo = await this.showInfo(username);
-
-  // }
 }
+// async validateUser(info: LoginDTO): Promise<UserEntity> {
+//   const userInfo = await this.userRepo.findOne({
+//     where: [{ username: info.username }],
+//   });
+//   if (userInfo === null) {
+//     throw new HttpException('Username is not exist!', HttpStatus.BAD_REQUEST);
+//   }
+//   const isMatch = await bcrypt.compare(info.password, userInfo.password);
+//   if (!isMatch) {
+//     throw new HttpException(
+//       'Password is not correct!',
+//       HttpStatus.BAD_REQUEST,
+//     );
+//   }
+//   return userInfo;
+// }
+
+// async forgotPassword(username) {
+//   const userInfo = await this.showInfo(username);
+
+// }
 
 //   async getUserByID(id: number): Promise<User> {
 //     const found = await this.userRepo.findOne(id);

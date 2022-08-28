@@ -68,10 +68,6 @@ export class CategoryController {
     return 'Delete category successful!';
   }
 
-  // @UseInterceptors(FileInterceptor('file'))
-  // uploadFile(@UploadedFile() file: Express.Multer.File) {
-  //   console.log(file);
-  // }
   @UseGuards(JwtAuthGuard)
   @UseGuards(RolesGuard)
   @Roles('Admin')
@@ -112,4 +108,9 @@ export class CategoryController {
 //   file: Express.Multer.File,
 // ) {
 //   return file;
+// }
+
+// @UseInterceptors(FileInterceptor('file'))
+// uploadFile(@UploadedFile() file: Express.Multer.File) {
+//   console.log(file);
 // }

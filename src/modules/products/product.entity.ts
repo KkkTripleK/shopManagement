@@ -5,22 +5,22 @@ export class ProductEntity extends BaseEntity {
   @PrimaryGeneratedColumn()
   productID: string;
 
-  @Column()
+  @Column({ nullable: true })
   categoryID: string;
 
   @Column({ nullable: true })
   name: string;
 
-  @Column()
+  @Column({ nullable: true })
   barcode: string;
 
-  @Column()
+  @Column({ select: false })
   cost: string;
 
   @Column()
   netPrice: string;
 
-  @Column()
+  @Column({ nullable: true })
   salePrice: string;
 
   @Column()
@@ -28,6 +28,9 @@ export class ProductEntity extends BaseEntity {
 
   @Column()
   qtyInstock: string;
+
+  @Column({ nullable: true })
+  qtyRemaining: string;
 
   @Column()
   description: string;
