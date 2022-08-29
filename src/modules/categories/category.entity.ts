@@ -16,4 +16,7 @@ export class CategoryEntity extends BaseEntity {
 
   @Column()
   position: string;
+
+  // @OneToMany(() => ProductEntity, (productEntity) => productEntity.categoryID)
+  // productEntity: ProductEntity;
 }

@@ -9,7 +9,7 @@ import {
   // eslint-disable-next-line prettier/prettier
   UseGuards
 } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { Roles } from '../decorators/decorator.roles';
 import { JwtAuthGuard } from '../guards/guard.jwt';
 import { RolesGuard } from '../guards/guard.roles';
@@ -18,6 +18,7 @@ import { UpdateProductDto } from './dto/dto.update.dto';
 import { ProductEntity } from './product.entity';
 import { ProductService } from './product.service';
 
+@ApiBearerAuth()
 @ApiTags('Product')
 @Controller()
 export class ProductController {

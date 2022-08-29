@@ -14,7 +14,7 @@ import {
   UseInterceptors
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { Roles } from '../decorators/decorator.roles';
 import { JwtAuthGuard } from '../guards/guard.jwt';
 import { RolesGuard } from '../guards/guard.roles';
@@ -23,16 +23,19 @@ import { CategoryService } from './category.service';
 import { CreateCategoryDto } from './dto/dto.create';
 import { UpdateCategoryDto } from './dto/dto.update';
 
+@ApiBearerAuth()
 @ApiTags('Category')
 @Controller()
 export class CategoryController {
   constructor(private cateService: CategoryService) {}
 
+  @ApiBearerAuth()
   @Get('category/all')
   async getList() {
     return this.cateService.getList();
   }
 
+  @ApiBearerAuth()
   @Get('category/:categoryID')
   async findCategoryByID(@Param('categoryID') categoryID: string) {
     return this.cateService.findCategoryByID({ categoryID });

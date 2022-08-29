@@ -10,7 +10,7 @@ import {
   // eslint-disable-next-line prettier/prettier
   UseGuards
 } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { VerifyToken } from 'src/utils/util.verifyToken';
 import { AuthService } from '../auths/auth.service';
 import { Roles } from '../decorators/decorator.roles';
@@ -21,6 +21,7 @@ import { UpdateDTO } from './dto/dto.update';
 import { UserEntity } from './user.entity';
 import { UserService } from './user.service';
 
+@ApiBearerAuth()
 @ApiTags('User')
 @Controller('')
 export class UserController {
