@@ -14,6 +14,8 @@ import { JwtStrategy } from '../strategies/strategy.guard.jwt';
 import { VerificationEntity } from '../verifications/verification.entity';
 import { VerificationRepository } from '../verifications/verification.repo';
 import { VerificationService } from '../verifications/verification.service';
+import { ChangePasswordDto } from './dto/dto.changePassword';
+import { UpdateDto } from './dto/dto.update';
 import { UserController } from './user.controller';
 import { UserEntity } from './user.entity';
 import { UserRepository } from './user.repo';
@@ -36,6 +38,8 @@ import { UserService } from './user.service';
     RandomOTP,
     MailService,
     CreateUserDto,
+    ChangePasswordDto,
+    UpdateDto,
     JwtStrategy,
     AuthService,
     VerificationService,

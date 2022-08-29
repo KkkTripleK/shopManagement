@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { MulterModule } from '@nestjs/platform-express';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { VerifyToken } from 'src/utils/util.verifyToken';
 import { typeOrmConfig } from '../../configs/config.typeorm';
@@ -14,6 +15,9 @@ import { ProductService } from './product.service';
   imports: [
     TypeOrmModule.forRoot(typeOrmConfig),
     TypeOrmModule.forFeature([ProductEntity, UserEntity]),
+    MulterModule.register({
+      dest: './src/assets/imgUpload/products',
+    }),
   ],
   controllers: [ProductController],
   providers: [

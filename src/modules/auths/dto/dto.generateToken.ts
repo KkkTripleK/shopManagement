@@ -3,12 +3,8 @@ import { IsString } from 'class-validator';
 import { Entity } from 'typeorm';
 
 @Entity()
-export class ChangePasswordDto {
+export class GenerateTokenDto {
   @ApiProperty()
   @IsString()
-  password: string;
-
-  @ApiProperty()
-  @IsString()
-  newPassword: string;
+  refreshToken: string;
 }

@@ -3,9 +3,7 @@ import {
   Controller,
   Delete,
   Get,
-  HttpStatus,
   Param,
-  ParseFilePipeBuilder,
   Patch,
   Post,
   UploadedFile,
@@ -15,9 +13,9 @@ import {
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { multerOptions } from '../../utils/util.multer';
 import { Roles } from '../decorators/decorator.roles';
-import { JwtAuthGuard } from '../guards/guard.jwt';
-import { RolesGuard } from '../guards/guard.roles';
+import { JWTandRolesGuard } from '../guards/guard.roles';
 import { CategoryEntity } from './category.entity';
 import { CategoryService } from './category.service';
 import { CreateCategoryDto } from './dto/dto.create';
@@ -29,21 +27,18 @@ import { UpdateCategoryDto } from './dto/dto.update';
 export class CategoryController {
   constructor(private cateService: CategoryService) {}
 
-  @ApiBearerAuth()
   @Get('category/all')
   async getList() {
     return this.cateService.getList();
   }
 
-  @ApiBearerAuth()
   @Get('category/:categoryID')
   async findCategoryByID(@Param('categoryID') categoryID: string) {
     return this.cateService.findCategoryByID({ categoryID });
   }
 
-  @UseGuards(JwtAuthGuard)
-  @UseGuards(RolesGuard)
-  @Roles('Admin')
+  @UseGuards(JWTandRolesGuard)
+  @Roles('admin')
   @Post('admin/category/create')
   async createNewCategory(
     @Body() createCategoryDto: CreateCategoryDto,
@@ -51,9 +46,8 @@ export class CategoryController {
     return this.cateService.createNewCategory(createCategoryDto);
   }
 
-  @UseGuards(JwtAuthGuard)
-  @UseGuards(RolesGuard)
-  @Roles('Admin')
+  @UseGuards(JWTandRolesGuard)
+  @Roles('admin')
   @Patch('admin/category/:categoryID')
   async updateCategoryInfo(
     @Param('categoryID') categoryID: string,
@@ -62,58 +56,19 @@ export class CategoryController {
     return this.cateService.updateCategoryInfo({ categoryID }, requestBody);
   }
 
-  @UseGuards(JwtAuthGuard)
-  @UseGuards(RolesGuard)
-  @Roles('Admin')
+  @UseGuards(JWTandRolesGuard)
+  @Roles('admin')
   @Delete('admin/category/:categoryID')
   async deleteCategoryByID(@Param('categoryID') categoryID: string) {
     await this.cateService.deleteCategoryByID({ categoryID });
     return 'Delete category successful!';
   }
 
-  @UseGuards(JwtAuthGuard)
-  @UseGuards(RolesGuard)
-  @Roles('Admin')
+  @UseGuards(JWTandRolesGuard)
+  @Roles('admin')
   @Post('admin/category/upload-banner')
-  @UseInterceptors(FileInterceptor('Filee'))
-  uploadFileAndPassValidation(
-    @UploadedFile(
-      new ParseFilePipeBuilder()
-        .addFileTypeValidator({
-          fileType: '.jpeg',
-        })
-        .addMaxSizeValidator({
-          maxSize: 4000000,
-        })
-        .build({
-          errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY,
-        }),
-    )
-    file: Express.Multer.File,
-  ) {
-    return {
-      file: file,
-    };
+  @UseInterceptors(FileInterceptor('file', multerOptions))
+  async upload(@UploadedFile() file) {
+    return file;
   }
 }
-
-// @Post('admin/category/file')
-// @UseInterceptors(FileInterceptor('File'))
-// uploadFile(
-//   @UploadedFile(
-//     new ParseFilePipe({
-//       validators: [
-//         new MaxFileSizeValidator({ maxSize: 4000000 }),
-//         new FileTypeValidator({ fileType: '.jpg' }),
-//       ],
-//     }),
-//   )
-//   file: Express.Multer.File,
-// ) {
-//   return file;
-// }
-
-// @UseInterceptors(FileInterceptor('file'))
-// uploadFile(@UploadedFile() file: Express.Multer.File) {
-//   console.log(file);
-// }

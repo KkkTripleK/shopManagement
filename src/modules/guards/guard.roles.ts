@@ -11,7 +11,7 @@ import { VerifyToken } from 'src/utils/util.verifyToken';
 import { UserRepository } from '../users/user.repo';
 
 @Injectable()
-export class RolesGuard implements CanActivate {
+export class JWTandRolesGuard implements CanActivate {
   constructor(
     private reflector: Reflector,
     private verifyToken: VerifyToken,
@@ -29,9 +29,16 @@ export class RolesGuard implements CanActivate {
       const userInfo = await this.userRepo.findAccount({
         username: payload.username,
       });
+      if (userInfo === null) {
+        throw new HttpException('Token is invalid!', HttpStatus.BAD_REQUEST);
+      }
+      request.userInfo = { username: payload.username };
       return requiredRoles.includes(userInfo.role);
     } catch (error) {
-      throw new HttpException('Token is invalid!', HttpStatus.BAD_REQUEST);
+      throw new HttpException(
+        'Token is invalid or expired!',
+        HttpStatus.BAD_REQUEST,
+      );
     }
   }
 }

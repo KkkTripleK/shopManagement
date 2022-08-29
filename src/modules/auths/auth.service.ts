@@ -2,6 +2,7 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config/dist/config.service';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
+import { userStatus } from 'src/commons/common.enum';
 import { RandomOTP } from 'src/utils/util.random';
 import { VerifyToken } from 'src/utils/util.verifyToken';
 import { CacheService } from '../cache/cache.service';
@@ -63,7 +64,7 @@ export class AuthService {
     }
     this.userRepository.updateAccount(
       { username: verifyDTO.username },
-      { accountStatus: 'Active' },
+      { accountStatus: userStatus.ACTIVE },
     );
   }
 

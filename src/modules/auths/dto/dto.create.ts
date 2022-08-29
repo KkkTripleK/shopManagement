@@ -3,18 +3,20 @@ import {
   IsAlpha,
   IsAlphanumeric,
   IsEmail,
+  IsEnum,
   IsOptional,
   IsString,
   // eslint-disable-next-line prettier/prettier
   Length
 } from 'class-validator';
-import { Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { userGender, userRole, userStatus } from 'src/commons/common.enum';
+import { Entity } from 'typeorm';
 
 @Entity()
 export class CreateUserDto {
-  @ApiProperty()
-  @PrimaryGeneratedColumn()
-  id: string;
+  // @ApiProperty()
+  // @PrimaryGeneratedColumn()
+  // id: string;
 
   @ApiProperty()
   @IsAlphanumeric()
@@ -40,9 +42,9 @@ export class CreateUserDto {
   fullName: string;
 
   @ApiProperty()
-  @IsString()
   @IsOptional()
-  gender?: string;
+  @IsEnum(userGender)
+  gender: userGender;
 
   @ApiProperty()
   @IsString()
@@ -50,15 +52,20 @@ export class CreateUserDto {
   age: string;
 
   @IsString()
+  @IsEnum(userStatus)
   @IsOptional()
-  accountStatus: string;
+  accountStatus?: userStatus;
 
   @IsString()
+  @IsEnum(userRole)
   @IsOptional()
-  isAdmin: string;
+  role?: userRole;
 
   @ApiProperty()
   @IsString()
   @IsOptional()
   address: string;
+
+  // @ApiQuery({ name: 'role', enum: userRole })
+  // async filterByRole(@Query('role') role = userRole.MEMBER) {}
 }

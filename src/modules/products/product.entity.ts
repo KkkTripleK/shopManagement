@@ -2,9 +2,11 @@ import {
   BaseEntity,
   Column,
   Entity,
+  ManyToOne,
   // eslint-disable-next-line prettier/prettier
   PrimaryGeneratedColumn
 } from 'typeorm';
+import { CategoryEntity } from '../categories/category.entity';
 
 @Entity('Products')
 export class ProductEntity extends BaseEntity {
@@ -44,6 +46,6 @@ export class ProductEntity extends BaseEntity {
   @Column()
   status: string;
 
-  // @ManyToOne(() => CategoryEntity, (categoryEntity) => categoryEntity.productID)
-  // categoryEntity: CategoryEntity;
+  @ManyToOne(() => CategoryEntity, (categoryEntity) => categoryEntity.product)
+  categoryEntity: CategoryEntity;
 }

@@ -1,9 +1,10 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsAlpha, IsOptional, IsString, Length } from 'class-validator';
+import { IsAlpha, IsEnum, IsOptional, IsString, Length } from 'class-validator';
+import { userGender, userStatus } from 'src/commons/common.enum';
 import { Entity } from 'typeorm';
 
 @Entity()
-export class UpdateDTO {
+export class UpdateDto {
   @ApiProperty()
   @IsString()
   @IsOptional()
@@ -17,9 +18,9 @@ export class UpdateDTO {
   fullName?: string;
 
   @ApiProperty()
-  @IsString()
   @IsOptional()
-  gender?: string;
+  @IsEnum(userGender)
+  gender?: userGender;
 
   @ApiProperty()
   @IsString()
@@ -27,9 +28,9 @@ export class UpdateDTO {
   age?: string;
 
   @ApiProperty()
-  @IsString()
+  @IsEnum(userStatus)
   @IsOptional()
-  accountStatus?: string;
+  accountStatus?: userStatus;
 
   @ApiProperty()
   @IsString()

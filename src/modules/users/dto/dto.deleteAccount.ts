@@ -3,7 +3,7 @@ import { IsString } from 'class-validator';
 import { Entity } from 'typeorm';
 
 @Entity()
-export class DeleteAccount {
+export class DeleteAccountDto {
   @ApiProperty()
   @IsString()
   password: string;

@@ -1,3 +1,4 @@
+import { userGender, userRole, userStatus } from 'src/commons/common.enum';
 import { BaseEntity, Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity('Users')
@@ -17,18 +18,30 @@ export class UserEntity extends BaseEntity {
   @Column()
   fullName: string;
 
-  @Column({ nullable: true })
-  gender: string;
+  @Column({
+    type: 'enum',
+    enum: userGender,
+    default: userGender.MALE,
+  })
+  gender: userGender;
 
   @Column({ nullable: true })
   age: string;
 
-  @Column({ nullable: true, default: 'Not Active' })
-  accountStatus: string;
-
-  @Column({ nullable: true, default: 'Member' })
-  role: string;
+  @Column({
+    type: 'enum',
+    enum: userRole,
+    default: userRole.MEMBER,
+  })
+  role: userRole;
 
   @Column()
   address: string;
+
+  @Column({
+    type: 'enum',
+    enum: userStatus,
+    default: userStatus.NOTACTIVE,
+  })
+  accountStatus: userStatus;
 }

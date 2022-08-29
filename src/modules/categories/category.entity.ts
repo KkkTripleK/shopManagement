@@ -1,4 +1,12 @@
-import { BaseEntity, Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  BaseEntity,
+  Column,
+  Entity,
+  OneToMany,
+  // eslint-disable-next-line prettier/prettier
+  PrimaryGeneratedColumn
+} from 'typeorm';
+import { ProductEntity } from '../products/product.entity';
 
 @Entity('Categories')
 export class CategoryEntity extends BaseEntity {
@@ -17,6 +25,6 @@ export class CategoryEntity extends BaseEntity {
   @Column()
   position: string;
 
-  // @OneToMany(() => ProductEntity, (productEntity) => productEntity.categoryID)
-  // productEntity: ProductEntity;
+  @OneToMany(() => ProductEntity, (productEntity) => productEntity.categoryID)
+  product: ProductEntity;
 }

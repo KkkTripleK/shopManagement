@@ -1,12 +1,11 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
-import { Payload } from 'src/utils/dto/dto.verifyToken';
 import { RandomOTP } from 'src/utils/util.random';
 import { CreateUserDto } from '../auths/dto/dto.create';
 import { CacheService } from '../cache/cache.service';
 import { MailService } from '../email/email.service';
-import { ChangePasswordDTO } from './dto/dto.changePassword';
-import { UpdateDTO } from './dto/dto.update';
+import { ChangePasswordDto } from './dto/dto.changePassword';
+import { UpdateDto } from './dto/dto.update';
 import { UserEntity } from './user.entity';
 import { UserRepository } from './user.repo';
 
@@ -18,6 +17,8 @@ export class UserService {
     private randomOTP: RandomOTP,
     private cacheService: CacheService,
     private mailService: MailService,
+    private changePasswordDto: ChangePasswordDto,
+    private updateDto: UpdateDto,
   ) {}
 
   async getListUser(): Promise<UserEntity[]> {
@@ -28,7 +29,7 @@ export class UserService {
     return this.userRepository.findAccount(username);
   }
 
-  async updateAccount(username: object, param: UpdateDTO): Promise<UpdateDTO> {
+  async updateAccount(username: object, param: UpdateDto): Promise<UpdateDto> {
     return this.userRepository.updateAccount(username, param);
   }
 
@@ -55,12 +56,11 @@ export class UserService {
     await this.cacheService.del(`users:${username}:refreshToken`);
   }
 
-  async changePassword(requestBody: ChangePasswordDTO, payload: Payload) {
+  async changePassword(requestBody: ChangePasswordDto, username: object) {
     const oldPassword = requestBody.password;
     const newPassword = requestBody.newPassword;
-    const userInfo = await this.findAccount({
-      username: payload.username,
-    });
+    const userInfo = await this.findAccount(username);
+    console.log(userInfo);
     const isMatch = await bcrypt.compare(oldPassword, userInfo.password);
     if (!isMatch) {
       throw new HttpException(

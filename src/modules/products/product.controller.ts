@@ -6,13 +6,16 @@ import {
   Param,
   Patch,
   Post,
+  UploadedFile,
+  UseGuards,
   // eslint-disable-next-line prettier/prettier
-  UseGuards
+  UseInterceptors
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { multerOptions } from '../../utils/util.multer';
 import { Roles } from '../decorators/decorator.roles';
-import { JwtAuthGuard } from '../guards/guard.jwt';
-import { RolesGuard } from '../guards/guard.roles';
+import { JWTandRolesGuard } from '../guards/guard.roles';
 import { CreateProductDto } from './dto/dto.create.dto';
 import { UpdateProductDto } from './dto/dto.update.dto';
 import { ProductEntity } from './product.entity';
@@ -37,17 +40,15 @@ export class ProductController {
   }
 
   @Get('admin/product/all')
-  @UseGuards(JwtAuthGuard)
-  @UseGuards(RolesGuard)
-  @Roles('Admin')
+  @UseGuards(JWTandRolesGuard)
+  @Roles('admin')
   async adminShowListProduct(): Promise<ProductEntity[]> {
     return this.productService.adminShowListProduct();
   }
 
   @Get('/admin/product/:productID')
-  @UseGuards(JwtAuthGuard)
-  @UseGuards(RolesGuard)
-  @Roles('Admin')
+  @UseGuards(JWTandRolesGuard)
+  @Roles('admin')
   async adminShowProductByID(
     @Param('productID') productID: string,
   ): Promise<ProductEntity> {
@@ -55,9 +56,8 @@ export class ProductController {
   }
 
   @Post('admin/product/create')
-  @UseGuards(JwtAuthGuard)
-  @UseGuards(RolesGuard)
-  @Roles('Admin')
+  @UseGuards(JWTandRolesGuard)
+  @Roles('admin')
   async createNewProduct(
     @Body() requestBody: CreateProductDto,
   ): Promise<ProductEntity> {
@@ -65,9 +65,8 @@ export class ProductController {
   }
 
   @Patch('admin/product/:productID')
-  @UseGuards(JwtAuthGuard)
-  @UseGuards(RolesGuard)
-  @Roles('Admin')
+  @UseGuards(JWTandRolesGuard)
+  @Roles('admin')
   async updateProductByID(
     @Param('productID') productID: string,
     @Body() requestBody: UpdateProductDto,
@@ -76,19 +75,18 @@ export class ProductController {
   }
 
   @Delete('admin/product/:productID')
-  @UseGuards(JwtAuthGuard)
-  @UseGuards(RolesGuard)
-  @Roles('Admin')
+  @UseGuards(JWTandRolesGuard)
+  @Roles('admin')
   async deleteProductByID(@Param('productID') productID: string) {
     await this.productService.deleteProductByID(productID);
     return 'Delete product successful!';
   }
 
   @Post('admin/product/picture')
-  @UseGuards(JwtAuthGuard)
-  @UseGuards(RolesGuard)
-  @Roles('Admin')
-  async uploadPictureForProduct() {
-    //
+  @UseGuards(JWTandRolesGuard)
+  @Roles('admin')
+  @UseInterceptors(FileInterceptor('file', multerOptions))
+  async upload(@UploadedFile() file) {
+    return file;
   }
 }

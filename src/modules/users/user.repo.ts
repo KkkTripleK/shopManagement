@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
 import { Repository } from 'typeorm';
 import { CreateUserDto } from '../auths/dto/dto.create';
-import { UpdateDTO } from './dto/dto.update';
+import { UpdateDto } from './dto/dto.update';
 import { UserEntity } from './user.entity';
 
 @Injectable()
@@ -38,7 +38,7 @@ export class UserRepository {
     return this.userRepo.delete(id);
   }
 
-  async updateAccount(username: object, param: UpdateDTO): Promise<UserEntity> {
+  async updateAccount(username: object, param: UpdateDto): Promise<UserEntity> {
     const info = await this.userRepo.findOneBy(username);
     for (const key in param) {
       info[key] = param[key];
@@ -86,7 +86,7 @@ export class UserRepository {
 //     return found;
 //   }
 // @Patch('/info')
-// async updateInfo(@Body() param: UpdateDTO): Promise<UserEntity> {
+// async updateInfo(@Body() param: UpdateDto): Promise<UserEntity> {
 //   const username = 'hoaNK97122';
 //   console.log(param);
 //   return await this.authService.updateInfo({ username }, param);
@@ -98,7 +98,7 @@ export class UserRepository {
 // }
 
 // @Patch('update')
-// update(@Body() param: UpdateDTO): Promise<UpdateDTO> {
+// update(@Body() param: UpdateDto): Promise<UpdateDto> {
 //   console.log(param);
 //   return this.authService.updateInfo({ id: '10' }, param);
 // }

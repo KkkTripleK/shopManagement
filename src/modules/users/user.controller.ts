@@ -7,17 +7,21 @@ import {
   Param,
   Patch,
   Post,
+  Req,
   // eslint-disable-next-line prettier/prettier
   UseGuards
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { HeadersObject } from '@nestjs/swagger/dist/interfaces/open-api-spec.interface';
 import { VerifyToken } from 'src/utils/util.verifyToken';
 import { AuthService } from '../auths/auth.service';
 import { Roles } from '../decorators/decorator.roles';
 import { JwtAuthGuard } from '../guards/guard.jwt';
-import { RolesGuard } from '../guards/guard.roles';
-import { DeleteAccount } from './dto/dto.deleteAccount';
-import { UpdateDTO } from './dto/dto.update';
+import { JWTandRolesGuard } from '../guards/guard.roles';
+import { ChangePasswordDto } from './dto/dto.changePassword';
+import { DeleteAccountDto } from './dto/dto.deleteAccount';
+import { ForgotPasswordDto } from './dto/dto.forgotPassword';
+import { UpdateDto } from './dto/dto.update';
 import { UserEntity } from './user.entity';
 import { UserService } from './user.service';
 
@@ -32,23 +36,17 @@ export class UserController {
   ) {}
 
   @Get('user/info')
-  @UseGuards(JwtAuthGuard)
-  @UseGuards(RolesGuard)
-  @Roles('Admin', 'Member')
-  async findInfo(@Headers() requestHeader: any): Promise<UserEntity> {
-    const payload = await this.verifyToken.verifyJWT(
-      requestHeader.authorization,
-    );
-    return await this.userService.findAccount({
-      username: payload.username,
-    });
+  @UseGuards(JWTandRolesGuard)
+  @Roles('admin', 'member')
+  async findInfo(@Req() req: any): Promise<UserEntity> {
+    return this.userService.findAccount(req.userInfo);
   }
 
   @Patch('user/update')
   @UseGuards(JwtAuthGuard)
   async updateAccount(
-    @Body() param: UpdateDTO,
-    @Headers() requestHeader: any,
+    @Body() param: UpdateDto,
+    @Headers() requestHeader: HeadersObject,
   ): Promise<any> {
     const payload = await this.verifyToken.verifyJWT(
       requestHeader.authorization,
@@ -60,7 +58,7 @@ export class UserController {
   }
 
   @Post('user/forgot-password')
-  async forgotPassword(@Body() requestBody: any): Promise<any> {
+  async forgotPassword(@Body() requestBody: ForgotPasswordDto): Promise<any> {
     await this.userService.forgotPassword(requestBody.username);
     return 'New password is sent to your email!';
   }
@@ -68,22 +66,18 @@ export class UserController {
   @Post('user/change-password')
   @UseGuards(JwtAuthGuard)
   async changePassword(
-    @Body() requestBody: any,
-    @Headers() requestHeader: any,
+    @Body() requestBody: ChangePasswordDto,
+    @Req() req: any,
   ) {
-    const payload = await this.verifyToken.verifyJWT(
-      requestHeader.authorization,
-    );
-    return this.userService.changePassword(requestBody, payload);
+    return this.userService.changePassword(requestBody, req.userInfo);
   }
 
   @Delete('user')
-  @UseGuards(JwtAuthGuard)
-  @UseGuards(RolesGuard)
-  @Roles('Admin', 'Member')
+  @UseGuards(JWTandRolesGuard)
+  @Roles('admin', 'member')
   async deleteAccount(
-    @Body() requestBody: DeleteAccount,
-    @Headers() requestHeader: any,
+    @Body() requestBody: DeleteAccountDto,
+    @Headers() requestHeader: HeadersObject,
   ) {
     const payload = await this.verifyToken.verifyJWT(
       requestHeader.authorization,
@@ -97,25 +91,22 @@ export class UserController {
   }
 
   @Get('/admin/list-account')
-  @UseGuards(JwtAuthGuard)
-  @UseGuards(RolesGuard)
-  @Roles('Admin')
+  @UseGuards(JWTandRolesGuard)
+  @Roles('admin')
   async showList() {
     return this.userService.getListUser();
   }
 
   @Get('/admin/account/:userID')
-  @UseGuards(JwtAuthGuard)
-  @UseGuards(RolesGuard)
-  @Roles('Admin')
+  @UseGuards(JWTandRolesGuard)
+  @Roles('admin')
   async showUserByID(@Param('userID') userID: string) {
     return await this.userService.findAccount({ userID });
   }
 
   @Delete('/admin/account/:userID')
-  @UseGuards(JwtAuthGuard)
-  @UseGuards(RolesGuard)
-  @Roles('Admin')
+  @UseGuards(JWTandRolesGuard)
+  @Roles('admin')
   async deleteUserByID(@Param('userID') userID: string) {
     await this.userService.deleteAccount({ userID });
     return 'Delete account successful!';

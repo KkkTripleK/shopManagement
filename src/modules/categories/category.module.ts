@@ -15,9 +15,7 @@ import { CategoryService } from './category.service';
   imports: [
     TypeOrmModule.forRoot(typeOrmConfig),
     TypeOrmModule.forFeature([CategoryEntity, UserEntity]),
-    MulterModule.register({
-      dest: './src/assets/imgUpload',
-    }),
+    MulterModule,
   ],
   controllers: [CategoryController],
   providers: [
