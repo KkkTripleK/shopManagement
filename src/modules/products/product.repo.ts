@@ -23,6 +23,7 @@ export class ProductRepository {
     return this.productRepo.find({
       relations: {
         category: true,
+        pictures: true,
       },
     });
   }
@@ -31,12 +32,20 @@ export class ProductRepository {
     const product = await this.productRepo.manager
       .createQueryBuilder(ProductEntity, 'product')
       .select(['product', 'product.cost'])
+      .leftJoinAndSelect('product.category', 'category')
+      .leftJoinAndSelect('product.pictures', 'pictures')
       .getMany();
     return product;
   }
 
   async showProductByID(id: object): Promise<ProductEntity> {
-    return this.productRepo.findOne({ where: [id] });
+    return this.productRepo.findOne({
+      where: [id],
+      relations: {
+        category: true,
+        pictures: true,
+      },
+    });
   }
 
   async adminShowProductByID(id: object): Promise<ProductEntity> {
@@ -44,6 +53,7 @@ export class ProductRepository {
       .createQueryBuilder(ProductEntity, 'product')
       .select(['product', 'product.cost'])
       .leftJoinAndSelect('product.category', 'category')
+      .leftJoinAndSelect('product.pictures', 'pictures')
       .where('product.id = :id', id)
       .getOne();
     if (product === null) {
