@@ -6,7 +6,7 @@ import { v4 as uuid } from 'uuid';
 
 // Multer configuration
 export const multerConfig = {
-  dest: './src/assets/imgUpload/categories',
+  dest: './src/assets/image',
 };
 
 // Multer upload options

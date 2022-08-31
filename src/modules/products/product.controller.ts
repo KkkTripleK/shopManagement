@@ -6,14 +6,9 @@ import {
   Param,
   Patch,
   Post,
-  UploadedFile,
   UseGuards,
-  // eslint-disable-next-line prettier/prettier
-  UseInterceptors
 } from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { multerOptions } from '../../utils/util.multer';
 import { Roles } from '../decorators/decorator.roles';
 import { JWTandRolesGuard } from '../guards/guard.roles';
 import { CreateProductDto } from './dto/dto.create.dto';
@@ -80,13 +75,5 @@ export class ProductController {
   async deleteProductByID(@Param('productID') productID: string) {
     await this.productService.deleteProductByID(productID);
     return 'Delete product successful!';
-  }
-
-  @Post('admin/product/picture')
-  @UseGuards(JWTandRolesGuard)
-  @Roles('admin')
-  @UseInterceptors(FileInterceptor('file', multerOptions))
-  async upload(@UploadedFile() file) {
-    return file;
   }
 }

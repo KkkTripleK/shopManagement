@@ -6,7 +6,7 @@ import { Entity, PrimaryGeneratedColumn } from 'typeorm';
 export class CreateProductDto {
   @ApiProperty()
   @PrimaryGeneratedColumn()
-  productID: string;
+  id: string;
 
   @ApiProperty()
   @IsString()

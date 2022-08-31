@@ -3,18 +3,17 @@ import {
   Column,
   Entity,
   ManyToOne,
+  OneToMany,
   // eslint-disable-next-line prettier/prettier
-  PrimaryGeneratedColumn
+  PrimaryGeneratedColumn,
 } from 'typeorm';
 import { CategoryEntity } from '../categories/category.entity';
+import { PictureEntity } from '../picture/picture.entity';
 
 @Entity('Products')
 export class ProductEntity extends BaseEntity {
   @PrimaryGeneratedColumn()
-  productID: string;
-
-  @Column({ nullable: true })
-  categoryID: string;
+  id: string;
 
   @Column({ nullable: true })
   name: string;
@@ -46,6 +45,9 @@ export class ProductEntity extends BaseEntity {
   @Column()
   status: string;
 
-  @ManyToOne(() => CategoryEntity, (categoryEntity) => categoryEntity.product)
-  categoryEntity: CategoryEntity;
+  @ManyToOne(() => CategoryEntity, (category) => category.products)
+  category: CategoryEntity;
+
+  @OneToMany(() => PictureEntity, (picture) => picture.product)
+  pictures: PictureEntity[];
 }

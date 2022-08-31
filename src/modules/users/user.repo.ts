@@ -46,8 +46,8 @@ export class UserRepository {
     return this.userRepo.save(info);
   }
 
-  async findAccount(username: object): Promise<UserEntity> {
-    const userInfo = await this.userRepo.findOne({ where: [username] });
+  async findAccount(param: object): Promise<UserEntity> {
+    const userInfo = await this.userRepo.findOne({ where: [param] });
     return userInfo;
   }
 

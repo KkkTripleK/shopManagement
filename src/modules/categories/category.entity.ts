@@ -3,15 +3,14 @@ import {
   Column,
   Entity,
   OneToMany,
-  // eslint-disable-next-line prettier/prettier
-  PrimaryGeneratedColumn
+  PrimaryGeneratedColumn,
 } from 'typeorm';
 import { ProductEntity } from '../products/product.entity';
 
 @Entity('Categories')
 export class CategoryEntity extends BaseEntity {
   @PrimaryGeneratedColumn()
-  categoryID: string;
+  id: string;
 
   @Column()
   name: string;
@@ -25,6 +24,9 @@ export class CategoryEntity extends BaseEntity {
   @Column()
   position: string;
 
-  @OneToMany(() => ProductEntity, (productEntity) => productEntity.categoryID)
-  product: ProductEntity;
+  @OneToMany(() => ProductEntity, (product) => product.category)
+  products: ProductEntity[];
 }
+// @ManyToOne(() => CategoryEntity)
+// @JoinColumn({ name: 'fkCategoryId' })
+// category: CategoryEntity;

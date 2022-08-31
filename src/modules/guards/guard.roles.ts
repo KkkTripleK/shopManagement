@@ -4,7 +4,7 @@ import {
   HttpException,
   HttpStatus,
   // eslint-disable-next-line prettier/prettier
-  Injectable
+  Injectable,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { VerifyToken } from 'src/utils/util.verifyToken';

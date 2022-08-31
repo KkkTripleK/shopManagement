@@ -9,7 +9,7 @@ import {
   Post,
   Req,
   // eslint-disable-next-line prettier/prettier
-  UseGuards
+  UseGuards,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { HeadersObject } from '@nestjs/swagger/dist/interfaces/open-api-spec.interface';
@@ -97,11 +97,11 @@ export class UserController {
     return this.userService.getListUser();
   }
 
-  @Get('/admin/account/:userID')
+  @Get('/admin/account/:id')
   @UseGuards(JWTandRolesGuard)
   @Roles('admin')
-  async showUserByID(@Param('userID') userID: string) {
-    return await this.userService.findAccount({ userID });
+  async showUserByID(@Param('id') id: string) {
+    return await this.userService.findAccount({ id });
   }
 
   @Delete('/admin/account/:userID')

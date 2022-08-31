@@ -30,35 +30,31 @@ export class ProductRepository {
     return product;
   }
 
-  async showProductByID(productID: object): Promise<ProductEntity> {
-    return this.productRepo.findOne({ where: [productID] });
+  async showProductByID(id: object): Promise<ProductEntity> {
+    return this.productRepo.findOne({ where: [id] });
   }
 
-  async adminShowProductByID(productID: object): Promise<ProductEntity> {
+  async adminShowProductByID(id: object): Promise<ProductEntity> {
     const product = await this.productRepo.manager
       .createQueryBuilder(ProductEntity, 'product')
       .select(['product', 'product.cost'])
-      .where('product.productID = :productID', productID)
+      .where('product.id = :id', id)
       .getOne();
     if (product === null) {
-      throw new HttpException('ProductID is invalid!', HttpStatus.BAD_REQUEST);
+      throw new HttpException('id is invalid!', HttpStatus.BAD_REQUEST);
     }
     return product;
   }
 
-  async updateProductByID(productID: string, requestBody: UpdateProductDto) {
-    const productInfo = await this.adminShowProductByID({ productID });
+  async updateProductByID(id: string, requestBody: UpdateProductDto) {
+    const productInfo = await this.adminShowProductByID({ id });
     for (const key in requestBody) {
       productInfo[key] = requestBody[key];
     }
     return this.productRepo.save(productInfo);
   }
 
-  async deleteProductByID(productID: string) {
-    return this.productRepo.delete({ productID });
-  }
-
-  async uploadPictureForProduct() {
-    //
+  async deleteProductByID(id: string) {
+    return this.productRepo.delete({ id });
   }
 }

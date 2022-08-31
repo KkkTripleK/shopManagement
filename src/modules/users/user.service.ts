@@ -25,8 +25,19 @@ export class UserService {
     return this.userRepository.getAll();
   }
 
-  async findAccount(username: object): Promise<UserEntity> {
-    return this.userRepository.findAccount(username);
+  async findAccount(param: object): Promise<UserEntity> {
+    try {
+      const result = await this.userRepository.findAccount(param);
+      if (result === null) {
+        throw new HttpException(
+          'Can not find account!',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+      return result;
+    } catch (error) {
+      throw new HttpException('Can not find account!', HttpStatus.BAD_REQUEST);
+    }
   }
 
   async updateAccount(username: object, param: UpdateDto): Promise<UpdateDto> {

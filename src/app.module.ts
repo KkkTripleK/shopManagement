@@ -2,6 +2,7 @@ import { MailerModule } from '@nestjs-modules/mailer';
 import { Module } from '@nestjs/common';
 import { AuthModule } from './modules/auths/auth.module';
 import { CategoryModule } from './modules/categories/category.module';
+import { PictureModule } from './modules/picture/picture.module';
 import { ProductModule } from './modules/products/product.module';
 import { UserModule } from './modules/users/user.module';
 
@@ -11,6 +12,7 @@ import { UserModule } from './modules/users/user.module';
     UserModule,
     CategoryModule,
     ProductModule,
+    PictureModule,
     MailerModule,
     MailerModule.forRoot({
       transport: {

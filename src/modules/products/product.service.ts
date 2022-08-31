@@ -43,8 +43,4 @@ export class ProductService {
       throw new HttpException('ProductID is invalid!', HttpStatus.BAD_REQUEST);
     }
   }
-
-  async uploadPictureForProduct() {
-    //
-  }
 }

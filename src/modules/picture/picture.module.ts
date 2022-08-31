@@ -1,27 +1,29 @@
 import { Module } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { MulterModule } from '@nestjs/platform-express';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { VerifyToken } from 'src/utils/util.verifyToken';
 import { typeOrmConfig } from '../../configs/config.typeorm';
 import { UserEntity } from '../users/user.entity';
 import { UserRepository } from '../users/user.repo';
-import { ProductController } from './product.controller';
-import { ProductEntity } from './product.entity';
-import { ProductRepository } from './product.repo';
-import { ProductService } from './product.service';
+import { PictureController } from './picture.controller';
+import { PictureEntity } from './picture.entity';
+import { PictureRepository } from './picture.repository';
+import { PictureService } from './picture.service';
 
 @Module({
   imports: [
     TypeOrmModule.forRoot(typeOrmConfig),
-    TypeOrmModule.forFeature([ProductEntity, UserEntity]),
+    TypeOrmModule.forFeature([UserEntity, PictureEntity]),
+    MulterModule,
   ],
-  controllers: [ProductController],
+  controllers: [PictureController],
   providers: [
-    ProductService,
-    ProductRepository,
+    PictureService,
     VerifyToken,
     JwtService,
     UserRepository,
+    PictureRepository,
   ],
 })
-export class ProductModule {}
+export class PictureModule {}
