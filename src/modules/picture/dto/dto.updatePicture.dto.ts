@@ -6,9 +6,5 @@ import { Entity } from 'typeorm';
 export class UpdatePictureDto {
   @ApiProperty()
   @IsString()
-  id: string;
-
-  @ApiProperty()
-  @IsString()
   filename: string;
 }

@@ -16,8 +16,8 @@ export class PictureRepository {
     return this.pictureRepo.save(pictureInfo);
   }
 
-  async updatePicture(pictureInfo: UpdatePictureDto) {
-    const info = await this.showPictureByID(pictureInfo.id);
+  async updatePicture(pictureId, pictureInfo: UpdatePictureDto) {
+    const info = await this.showPictureByID(pictureId);
     if (info === null) {
       throw new HttpException('PictureID is invalid!', HttpStatus.BAD_REQUEST);
     }

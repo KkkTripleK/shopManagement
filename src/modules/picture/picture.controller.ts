@@ -48,14 +48,19 @@ export class PictureController {
     return this.pictureService.uploadPicture(file, requestBody);
   }
 
-  @Patch('admin/picture')
+  @Patch('admin/picture/:pictureId')
   @UseGuards(JWTandRolesGuard)
   @Roles('admin')
-  async updatePicture(@Body() requestBody: UpdatePictureDto) {
-    return this.pictureService.updatePicture(requestBody);
+  async updatePicture(
+    @Body() requestBody: UpdatePictureDto,
+    @Param('pictureId') pictureId: string,
+  ) {
+    return this.pictureService.updatePicture(pictureId, requestBody);
   }
 
   @Delete('admin/picture/:pictureId')
+  @UseGuards(JWTandRolesGuard)
+  @Roles('admin')
   async deletePictureByID(@Param('pictureId') pictureId: string) {
     return this.pictureService.deletePicture(pictureId);
   }

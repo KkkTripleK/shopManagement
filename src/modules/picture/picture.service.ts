@@ -1,13 +1,24 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import * as fs from 'fs';
+import { ProductRepository } from '../products/product.repo';
 import { UpdatePictureDto } from './dto/dto.updatePicture.dto';
 import { PictureRepository } from './picture.repository';
 
 @Injectable()
 export class PictureService {
-  constructor(private pictureRepo: PictureRepository) {
-    //
-  }
+  constructor(
+    private pictureRepo: PictureRepository,
+    private productRepo: ProductRepository,
+  ) {}
+
   async uploadPicture(file, requestBody) {
+    const productInfo = await this.productRepo.showProductByID({
+      id: requestBody.productId,
+    });
+    if (productInfo === null) {
+      this.deletePictureFromAssets(file.path);
+      throw new HttpException('ProductId is invalid!', HttpStatus.BAD_REQUEST);
+    }
     return this.pictureRepo.uploadPicture({
       filename: file.filename,
       path: file.path,
@@ -15,8 +26,12 @@ export class PictureService {
     });
   }
 
-  async updatePicture(param: UpdatePictureDto) {
-    return this.pictureRepo.updatePicture(param);
+  async deletePictureFromAssets(path: string) {
+    fs.unlinkSync(path);
+  }
+
+  async updatePicture(pictureId, param: UpdatePictureDto) {
+    return this.pictureRepo.updatePicture(pictureId, param);
   }
 
   async showPictureByProductID(productID: string) {
@@ -37,7 +52,6 @@ export class PictureService {
 
   async showPictureByID(pictureId: string) {
     const pictureInfo = await this.pictureRepo.showPictureByID(pictureId);
-    console.log(pictureInfo);
     if (pictureInfo === null) {
       throw new HttpException('PictureId is invalid!', HttpStatus.BAD_REQUEST);
     }
@@ -45,8 +59,13 @@ export class PictureService {
   }
 
   async deletePicture(pictureId: string) {
-    const pictureInfo = await this.pictureRepo.deletePicture(pictureId);
-    if (pictureInfo.affected === 0) {
+    const pictureInfo = await this.showPictureByID(pictureId);
+    if (pictureInfo.path === null) {
+      throw new HttpException('PictureId is invalid!', HttpStatus.BAD_REQUEST);
+    }
+    await this.deletePictureFromAssets(pictureInfo.path);
+    const result = await this.pictureRepo.deletePicture(pictureId);
+    if (result.affected === 0) {
       throw new HttpException('PictureID is invalid!', HttpStatus.BAD_REQUEST);
     }
     return 'Delete picture successful!';
