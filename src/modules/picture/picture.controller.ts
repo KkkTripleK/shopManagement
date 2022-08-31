@@ -36,8 +36,7 @@ export class PictureController {
 
   @Get('picture/product/:productId')
   async showPictureByProductID(@Param('productId') productId: string) {
-    await this.pictureService.showPictureByProductID(productId);
-    return 'Delete picture successful!';
+    return this.pictureService.showPictureByProductID(productId);
   }
 
   @Post('admin/picture')
