@@ -1,4 +1,5 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { AddProductToCategoryDto } from './dto/dto.addToCategory.dto';
 import { CreateProductDto } from './dto/dto.create.dto';
 import { UpdateProductDto } from './dto/dto.update.dto';
 import { ProductEntity } from './product.entity';
@@ -31,16 +32,22 @@ export class ProductService {
   }
 
   async adminShowProductByID(productID: string): Promise<ProductEntity> {
-    return this.productRepository.adminShowProductByID({ productID });
+    return this.productRepository.adminShowProductByID({ id: productID });
   }
   async updateProductByID(productID: string, requestBody: UpdateProductDto) {
     return this.productRepository.updateProductByID(productID, requestBody);
   }
 
-  async deleteProductByID(productID: string) {
-    const result = await this.productRepository.deleteProductByID(productID);
-    if (result.affected === 0) {
-      throw new HttpException('ProductID is invalid!', HttpStatus.BAD_REQUEST);
-    }
+  async deactiveProductByID(productID: string) {
+    await this.productRepository.updateProductByID(productID, {
+      status: 'Deactive',
+    });
+  }
+
+  async addProductToCategory(requestBody: AddProductToCategoryDto) {
+    return this.productRepository.addProductToCategory(
+      requestBody.categoryId,
+      requestBody.productId,
+    );
   }
 }

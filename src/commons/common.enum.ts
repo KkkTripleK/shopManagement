@@ -17,7 +17,7 @@ export enum userRole {
 export enum productStatus {
   OUTSTOCK = 'Out stock',
   STOCK = 'Stock',
-  DELETED = 'Deactive',
+  DEACTIVE = 'Deactive',
 }
 
 export enum categoryStatus {

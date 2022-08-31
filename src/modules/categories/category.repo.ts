@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CategoryEntity } from './category.entity';
@@ -47,6 +47,9 @@ export class CategoryRepository {
         products: true,
       },
     });
+    if (categoryInfo === null) {
+      throw new HttpException('CategoryID is invalid!', HttpStatus.BAD_REQUEST);
+    }
     return categoryInfo;
   }
 }

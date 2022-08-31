@@ -1,3 +1,4 @@
+import { productStatus } from 'src/commons/common.enum';
 import {
   BaseEntity,
   Column,
@@ -42,8 +43,12 @@ export class ProductEntity extends BaseEntity {
   @Column()
   description: string;
 
-  @Column()
-  status: string;
+  @Column({
+    type: 'enum',
+    enum: productStatus,
+    default: productStatus.STOCK,
+  })
+  status: productStatus;
 
   @ManyToOne(() => CategoryEntity, (category) => category.products)
   category: CategoryEntity;

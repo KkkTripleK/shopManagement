@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsOptional, IsString } from 'class-validator';
+import { IsEnum, IsOptional, IsString } from 'class-validator';
+import { productStatus } from 'src/commons/common.enum';
 import { Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
@@ -54,6 +55,6 @@ export class CreateProductDto {
   description?: string;
 
   @ApiProperty()
-  @IsString()
-  status: string;
+  @IsEnum(productStatus)
+  status: productStatus;
 }

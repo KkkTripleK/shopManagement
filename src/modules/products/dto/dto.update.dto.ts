@@ -7,7 +7,7 @@ export class UpdateProductDto {
   @ApiProperty()
   @IsString()
   @IsOptional()
-  categoryID?: string;
+  id?: string;
 
   @ApiProperty()
   @IsString()

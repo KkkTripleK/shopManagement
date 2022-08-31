@@ -3,6 +3,8 @@ import { JwtService } from '@nestjs/jwt';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { VerifyToken } from 'src/utils/util.verifyToken';
 import { typeOrmConfig } from '../../configs/config.typeorm';
+import { CategoryEntity } from '../categories/category.entity';
+import { CategoryRepository } from '../categories/category.repo';
 import { UserEntity } from '../users/user.entity';
 import { UserRepository } from '../users/user.repo';
 import { ProductController } from './product.controller';
@@ -13,7 +15,7 @@ import { ProductService } from './product.service';
 @Module({
   imports: [
     TypeOrmModule.forRoot(typeOrmConfig),
-    TypeOrmModule.forFeature([ProductEntity, UserEntity]),
+    TypeOrmModule.forFeature([ProductEntity, UserEntity, CategoryEntity]),
   ],
   controllers: [ProductController],
   providers: [
@@ -22,6 +24,7 @@ import { ProductService } from './product.service';
     VerifyToken,
     JwtService,
     UserRepository,
+    CategoryRepository,
   ],
 })
 export class ProductModule {}

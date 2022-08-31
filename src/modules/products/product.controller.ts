@@ -11,6 +11,7 @@ import {
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { Roles } from '../decorators/decorator.roles';
 import { JWTandRolesGuard } from '../guards/guard.roles';
+import { AddProductToCategoryDto } from './dto/dto.addToCategory.dto';
 import { CreateProductDto } from './dto/dto.create.dto';
 import { UpdateProductDto } from './dto/dto.update.dto';
 import { ProductEntity } from './product.entity';
@@ -69,11 +70,18 @@ export class ProductController {
     return this.productService.updateProductByID(productID, requestBody);
   }
 
+  @Post('admin/product/addToCate')
+  @UseGuards(JWTandRolesGuard)
+  @Roles('admin')
+  async addProductToCategory(@Body() requestBody: AddProductToCategoryDto) {
+    return this.productService.addProductToCategory(requestBody);
+  }
+
   @Delete('admin/product/:productID')
   @UseGuards(JWTandRolesGuard)
   @Roles('admin')
-  async deleteProductByID(@Param('productID') productID: string) {
-    await this.productService.deleteProductByID(productID);
-    return 'Delete product successful!';
+  async deactiveProductByID(@Param('productID') productID: string) {
+    await this.productService.deactiveProductByID(productID);
+    return 'Deactive product successful!';
   }
 }
