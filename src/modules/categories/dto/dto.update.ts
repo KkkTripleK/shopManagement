@@ -6,7 +6,7 @@ import { Entity } from 'typeorm';
 export class UpdateCategoryDto {
   @ApiProperty()
   @IsString()
-  @Length(6, 12)
+  @Length(0, 12)
   @IsOptional()
   name?: string;
 

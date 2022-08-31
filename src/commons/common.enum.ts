@@ -13,3 +13,14 @@ export enum userRole {
   ADMIN = 'admin',
   MEMBER = 'member',
 }
+
+export enum productStatus {
+  OUTSTOCK = 'Out stock',
+  STOCK = 'Stock',
+  DELETED = 'Deactive',
+}
+
+export enum categoryStatus {
+  ACTIVE = 'Active',
+  DEACTIVE = 'Deactive',
+}

@@ -8,8 +8,7 @@ import {
   Post,
   UploadedFile,
   UseGuards,
-  // eslint-disable-next-line prettier/prettier
-  UseInterceptors
+  UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
@@ -34,7 +33,7 @@ export class CategoryController {
 
   @Get('category/:categoryID')
   async findCategoryByID(@Param('categoryID') categoryID: string) {
-    return this.cateService.findCategoryByID({ categoryID });
+    return this.cateService.findCategoryByID(categoryID);
   }
 
   @UseGuards(JWTandRolesGuard)
@@ -48,27 +47,27 @@ export class CategoryController {
 
   @UseGuards(JWTandRolesGuard)
   @Roles('admin')
+  @Post('admin/category/upload-banner')
+  @UseInterceptors(FileInterceptor('file', multerOptions))
+  async upload(@UploadedFile() file, @Body() requestBody: any) {
+    return this.cateService.uploadBanner(file, requestBody);
+  }
+
+  @UseGuards(JWTandRolesGuard)
+  @Roles('admin')
   @Patch('admin/category/:categoryID')
   async updateCategoryInfo(
     @Param('categoryID') categoryID: string,
     @Body() requestBody: UpdateCategoryDto,
   ) {
-    return this.cateService.updateCategoryInfo({ categoryID }, requestBody);
+    return this.cateService.updateCategoryInfo(categoryID, requestBody);
   }
 
   @UseGuards(JWTandRolesGuard)
   @Roles('admin')
   @Delete('admin/category/:categoryID')
-  async deleteCategoryByID(@Param('categoryID') categoryID: string) {
-    await this.cateService.deleteCategoryByID({ categoryID });
-    return 'Delete category successful!';
-  }
-
-  @UseGuards(JWTandRolesGuard)
-  @Roles('admin')
-  @Post('admin/category/upload-banner')
-  @UseInterceptors(FileInterceptor('file', multerOptions))
-  async upload(@UploadedFile() file) {
-    return file;
+  async deactiveCategoryByID(@Param('categoryID') categoryID: string) {
+    await this.cateService.deactiveCategoryByID(categoryID);
+    return 'Status of Category is deactive!';
   }
 }

@@ -19,68 +19,34 @@ export class CategoryRepository {
   async getList(): Promise<CategoryEntity[]> {
     const listCategory = await this.cateRepo.manager
       .createQueryBuilder(CategoryEntity, 'category')
+      .leftJoinAndSelect('category.products', 'photo')
       .orderBy('position')
       .getMany();
     return listCategory;
   }
 
-  async deleteByID(categoryID: object): Promise<any> {
-    this.cateRepo.delete(categoryID);
+  async deleteByID(id: string): Promise<any> {
+    this.cateRepo.delete({ id });
   }
 
   async updateCategoryInfo(
-    categoryID: object,
+    id: string,
     param: UpdateCategoryDto,
   ): Promise<CategoryEntity> {
-    const categoryInfo = await this.cateRepo.findOneBy(categoryID);
+    const categoryInfo = await this.cateRepo.findOneBy({ id });
     for (const key in param) {
       categoryInfo[key] = param[key];
     }
     return this.cateRepo.save(categoryInfo);
   }
 
-  async findCategoryByID(categoryID: object): Promise<CategoryEntity> {
-    const categoryInfo = await this.cateRepo.findOne({ where: [categoryID] });
+  async findCategoryByID(id: string): Promise<CategoryEntity> {
+    const categoryInfo = await this.cateRepo.findOne({
+      where: [{ id }],
+      relations: {
+        products: true,
+      },
+    });
     return categoryInfo;
   }
 }
-
-//   async getUserByID(id: number): Promise<User> {
-//     const found = await this.cateRepo.findOne(id);
-//     if (!found) {
-//       throw new NotFoundException(`Can not find user ${id} `);
-//     }
-//     return found;
-//   }
-// @Patch('/info')
-// async updateInfo(@Body() param: UpdateDTO): Promise<UserEntity> {
-//   const username = 'hoaNK97122';
-//   console.log(param);
-//   return await this.authService.updateInfo({ username }, param);
-// }
-
-// @Delete('remove')
-// userDelete(@Body() removeID: DeleteUser): Promise<object> {
-//   return this.authService.deleteItem(removeID);
-// }
-
-// @Patch('update')
-// update(@Body() param: UpdateDTO): Promise<UpdateDTO> {
-//   console.log(param);
-//   return this.authService.updateInfo({ id: '10' }, param);
-// }
-
-// @Get('sendMail')
-// sendMail(): void {
-//   return this.mailService.example();
-// }
-
-// @Get(':id')
-// getUserByID(@Param('id') id: string): Promise<object> {
-//   return this.authService.getUserByID(id);
-// }
-
-// @Get('/:id')
-// getUserByID(@Param('id', ParseIntPipe) id: number): Promise<User> {
-//   return this.authService.getUserByID(id);
-// }

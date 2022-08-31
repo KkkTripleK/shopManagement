@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsOptional, IsString, Length } from 'class-validator';
+import { IsEnum, IsOptional, IsString, Length } from 'class-validator';
+import { categoryStatus } from 'src/commons/common.enum';
 import { Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
@@ -14,13 +15,9 @@ export class CreateCategoryDto {
   name: string;
 
   @ApiProperty()
-  @IsString()
+  @IsEnum(categoryStatus)
   @IsOptional()
-  banner?: string;
-
-  @ApiProperty()
-  @IsString()
-  status: string;
+  status?: categoryStatus;
 
   @ApiProperty()
   @IsString()

@@ -1,3 +1,4 @@
+import { categoryStatus } from 'src/commons/common.enum';
 import {
   BaseEntity,
   Column,
@@ -18,8 +19,12 @@ export class CategoryEntity extends BaseEntity {
   @Column({ nullable: true })
   banner: string;
 
-  @Column()
-  status: string;
+  @Column({
+    type: 'enum',
+    enum: categoryStatus,
+    default: categoryStatus.ACTIVE,
+  })
+  status: categoryStatus;
 
   @Column()
   position: string;
@@ -27,6 +32,3 @@ export class CategoryEntity extends BaseEntity {
   @OneToMany(() => ProductEntity, (product) => product.category)
   products: ProductEntity[];
 }
-// @ManyToOne(() => CategoryEntity)
-// @JoinColumn({ name: 'fkCategoryId' })
-// category: CategoryEntity;
