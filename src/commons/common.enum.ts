@@ -17,10 +17,10 @@ export enum userRole {
 export enum productStatus {
   OUTSTOCK = 'Out stock',
   STOCK = 'Stock',
-  DEACTIVE = 'Deactive',
+  INACTIVE = 'Inactive',
 }
 
 export enum categoryStatus {
   ACTIVE = 'Active',
-  DEACTIVE = 'Deactive',
+  INACTIVE = 'Inactive',
 }

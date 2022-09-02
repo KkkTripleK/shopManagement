@@ -1,7 +1,8 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
+import { IPaginationOptions, Pagination } from 'nestjs-typeorm-paginate';
+import { userStatus } from 'src/commons/common.enum';
 import { RandomOTP } from 'src/utils/util.random';
-import { CreateUserDto } from '../auths/dto/dto.create';
 import { CacheService } from '../cache/cache.service';
 import { MailService } from '../email/email.service';
 import { ChangePasswordDto } from './dto/dto.changePassword';
@@ -13,16 +14,15 @@ import { UserRepository } from './user.repo';
 export class UserService {
   constructor(
     private userRepository: UserRepository,
-    private createUserDto: CreateUserDto,
     private randomOTP: RandomOTP,
     private cacheService: CacheService,
-    private mailService: MailService,
-    private changePasswordDto: ChangePasswordDto,
-    private updateDto: UpdateDto,
+    private mailService: MailService, // private changePasswordDto: ChangePasswordDto, // private updateDto: UpdateDto, // private createUserDto: CreateUserDto,
   ) {}
 
-  async getListUser(): Promise<UserEntity[]> {
-    return this.userRepository.getAll();
+  async getListAccount(
+    options: IPaginationOptions,
+  ): Promise<Pagination<UserEntity>> {
+    return this.userRepository.getListAccount(options);
   }
 
   async findAccount(param: object): Promise<UserEntity> {
@@ -30,13 +30,16 @@ export class UserService {
       const result = await this.userRepository.findAccount(param);
       if (result === null) {
         throw new HttpException(
-          'Can not find account!',
+          'Can not find your account!',
           HttpStatus.BAD_REQUEST,
         );
       }
       return result;
     } catch (error) {
-      throw new HttpException('Can not find account!', HttpStatus.BAD_REQUEST);
+      throw new HttpException(
+        'Can not find your account!',
+        HttpStatus.BAD_REQUEST,
+      );
     }
   }
 
@@ -45,11 +48,9 @@ export class UserService {
   }
 
   async deleteAccount(id: object) {
-    const account: any = await this.userRepository.deleteAccount(id);
-    console.log(account);
-    if (account.affected === 0) {
-      throw new HttpException('ID is invalid!', HttpStatus.BAD_REQUEST);
-    }
+    await this.userRepository.updateAccount(id, {
+      accountStatus: userStatus.REMOVED,
+    });
   }
 
   async forgotPassword(username: string) {
@@ -71,7 +72,6 @@ export class UserService {
     const oldPassword = requestBody.password;
     const newPassword = requestBody.newPassword;
     const userInfo = await this.findAccount(username);
-    console.log(userInfo);
     const isMatch = await bcrypt.compare(oldPassword, userInfo.password);
     if (!isMatch) {
       throw new HttpException(
@@ -95,19 +95,3 @@ export class UserService {
     );
   }
 }
-
-//   async getUserByID(id: number): Promise<User> {
-//     const found = await this.userRepo.findOne(id);
-//     if (!found) {
-//       throw new NotFoundException(`Can not find user ${id} `);
-//     }
-//     return found;
-//   }
-//   async createUser(createUserDTO: CreateUserDto) {
-//     const { name, age } = createUserDTO;
-//     const user = new User();
-//     user.fullName = name;
-//     user.age = age;
-//     await user.save();
-//     return user;
-//   }

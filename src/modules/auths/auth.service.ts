@@ -77,7 +77,6 @@ export class AuthService {
       username,
       process.env.REFRESH_TOKEN_TTL,
     );
-    // this.verificationService.saveToken(username, accessToken, refreshToken);
     await this.cacheService.set(
       `users:${username}:accessToken`,
       accessToken,
@@ -91,8 +90,8 @@ export class AuthService {
     return [{ refreshToken, accessToken }];
   }
 
-  async validateUser(username: string, password: string): Promise<UserEntity> {
-    const userInfo = await this.userRepository.findAccount({ username });
+  async validateUser(username: object, password: string): Promise<UserEntity> {
+    const userInfo = await this.userRepository.findAccount(username);
     if (userInfo === null) {
       throw new HttpException('Username is not exist!', HttpStatus.BAD_REQUEST);
     }
@@ -145,24 +144,3 @@ export class AuthService {
     );
   }
 }
-// deleteItem(info: object): Promise<object> {
-//   return this.userRepo.delete(info);
-// }
-
-// async getUserByID(id: string): Promise<User> {
-//   const found = await this.userRepo.findOne({ where: { id } });
-//   if (!found) {
-//     throw new NotFoundException(`Can not find user ${id} `);
-//   }
-//   return found;
-// }
-// // End CRUD
-// const isMatch = await bcrypt.compare('passwordInput', user.password);
-
-//   async getUserByID(id: number): Promise<User> {
-//     const found = await this.userRepo.findOne(id);
-//     if (!found) {
-//       throw new NotFoundException(`Can not find user ${id} `);
-//     }
-//     return found;
-//   }

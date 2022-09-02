@@ -1,17 +1,22 @@
 import {
   Body,
   Controller,
+  DefaultValuePipe,
   Delete,
   Get,
   Param,
+  ParseIntPipe,
   Patch,
   Post,
+  Query,
   UploadedFile,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { Pagination } from 'nestjs-typeorm-paginate';
+import { userRole } from 'src/commons/common.enum';
 import { multerOptions } from '../../utils/util.multer';
 import { Roles } from '../decorators/decorator.roles';
 import { JWTandRolesGuard } from '../guards/guard.roles';
@@ -27,8 +32,15 @@ export class CategoryController {
   constructor(private cateService: CategoryService) {}
 
   @Get('category/all')
-  async getList() {
-    return this.cateService.getList();
+  async showList(
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page = 1,
+    @Query('limit', new DefaultValuePipe(3), ParseIntPipe) limit = 3,
+  ): Promise<Pagination<CategoryEntity>> {
+    return this.cateService.showList({
+      page,
+      limit,
+      route: `localhost:${process.env.PORT}/category/all`,
+    });
   }
 
   @Get('category/:categoryID')
@@ -37,7 +49,7 @@ export class CategoryController {
   }
 
   @UseGuards(JWTandRolesGuard)
-  @Roles('admin')
+  @Roles(userRole.ADMIN)
   @Post('admin/category/create')
   async createNewCategory(
     @Body() createCategoryDto: CreateCategoryDto,
@@ -46,7 +58,7 @@ export class CategoryController {
   }
 
   @UseGuards(JWTandRolesGuard)
-  @Roles('admin')
+  @Roles(userRole.ADMIN)
   @Post('admin/category/upload-banner')
   @UseInterceptors(FileInterceptor('file', multerOptions))
   async upload(@UploadedFile() file, @Body() requestBody: any) {
@@ -54,7 +66,7 @@ export class CategoryController {
   }
 
   @UseGuards(JWTandRolesGuard)
-  @Roles('admin')
+  @Roles(userRole.ADMIN)
   @Patch('admin/category/:categoryID')
   async updateCategoryInfo(
     @Param('categoryID') categoryID: string,
@@ -64,10 +76,10 @@ export class CategoryController {
   }
 
   @UseGuards(JWTandRolesGuard)
-  @Roles('admin')
+  @Roles(userRole.ADMIN)
   @Delete('admin/category/:categoryID')
-  async deactiveCategoryByID(@Param('categoryID') categoryID: string) {
-    await this.cateService.deactiveCategoryByID(categoryID);
-    return 'Status of Category is deactive!';
+  async inactiveCategoryByID(@Param('categoryID') categoryID: string) {
+    await this.cateService.inactiveCategoryByID(categoryID);
+    return `Status of categoryID ${categoryID} is Inactive!`;
   }
 }

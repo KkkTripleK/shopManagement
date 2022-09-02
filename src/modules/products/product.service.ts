@@ -1,4 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { IPaginationOptions, Pagination } from 'nestjs-typeorm-paginate';
+import { productStatus } from 'src/commons/common.enum';
 import { AddProductToCategoryDto } from './dto/dto.addToCategory.dto';
 import { CreateProductDto } from './dto/dto.create.dto';
 import { UpdateProductDto } from './dto/dto.update.dto';
@@ -12,19 +14,33 @@ export class ProductService {
   async createNewProduct(
     requestBody: CreateProductDto,
   ): Promise<ProductEntity> {
+    if (Number(requestBody.qtyRemaining) >= Number(requestBody.qtyInstock)) {
+      throw new HttpException(
+        'Quantity remaining can not be more then quantity instock!',
+        HttpStatus.BAD_REQUEST,
+      );
+    } else if (Number(requestBody.qtyRemaining) === 0) {
+      requestBody.status = productStatus.OUTSTOCK;
+    }
     return this.productRepository.createNewProduct(requestBody);
   }
 
-  async showListProduct(): Promise<ProductEntity[]> {
-    return this.productRepository.showListProduct();
+  async showListProduct(
+    options: IPaginationOptions,
+  ): Promise<Pagination<ProductEntity>> {
+    return this.productRepository.showListProduct(options);
   }
 
-  async adminShowListProduct(): Promise<ProductEntity[]> {
-    return this.productRepository.adminShowListProduct();
+  async adminShowListProduct(
+    options: IPaginationOptions,
+  ): Promise<Pagination<ProductEntity>> {
+    return this.productRepository.adminShowListProduct(options);
   }
 
   async showProductByID(productID: string): Promise<ProductEntity> {
-    const result = await this.productRepository.showProductByID({ productID });
+    const result = await this.productRepository.showProductByID({
+      id: productID,
+    });
     if (result === null) {
       throw new HttpException('ProductID is invalid!', HttpStatus.BAD_REQUEST);
     }
@@ -34,13 +50,14 @@ export class ProductService {
   async adminShowProductByID(productID: string): Promise<ProductEntity> {
     return this.productRepository.adminShowProductByID({ id: productID });
   }
+
   async updateProductByID(productID: string, requestBody: UpdateProductDto) {
     return this.productRepository.updateProductByID(productID, requestBody);
   }
 
-  async deactiveProductByID(productID: string) {
+  async inactiveProductByID(productID: string) {
     await this.productRepository.updateProductByID(productID, {
-      status: 'Deactive',
+      status: productStatus.INACTIVE,
     });
   }
 

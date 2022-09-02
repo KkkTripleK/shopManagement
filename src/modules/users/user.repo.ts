@@ -1,6 +1,11 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
+import {
+  IPaginationOptions,
+  paginate,
+  Pagination,
+} from 'nestjs-typeorm-paginate';
 import { Repository } from 'typeorm';
 import { CreateUserDto } from '../auths/dto/dto.create';
 import { UpdateDto } from './dto/dto.update';
@@ -13,8 +18,10 @@ export class UserRepository {
     private userRepo: Repository<UserEntity>,
   ) {}
 
-  getAll(): Promise<UserEntity[]> {
-    return this.userRepo.find();
+  async getListAccount(
+    options: IPaginationOptions,
+  ): Promise<Pagination<UserEntity>> {
+    return paginate<UserEntity>(this.userRepo, options);
   }
 
   async createUser(createUserDto: CreateUserDto): Promise<any> {
@@ -26,16 +33,11 @@ export class UserRepository {
       const newUserInfo = await this.userRepo.save(createUserDto);
       return newUserInfo;
     } catch (error) {
-      console.log(error);
       throw new HttpException(
         'Create new account failed!',
         HttpStatus.BAD_REQUEST,
       );
     }
-  }
-
-  async deleteAccount(id: object): Promise<object> {
-    return this.userRepo.delete(id);
   }
 
   async updateAccount(username: object, param: UpdateDto): Promise<UserEntity> {
@@ -56,64 +58,3 @@ export class UserRepository {
     return this.userRepo.count({ where: [{ username }] });
   }
 }
-// async validateUser(info: LoginDTO): Promise<UserEntity> {
-//   const userInfo = await this.userRepo.findOne({
-//     where: [{ username: info.username }],
-//   });
-//   if (userInfo === null) {
-//     throw new HttpException('Username is not exist!', HttpStatus.BAD_REQUEST);
-//   }
-//   const isMatch = await bcrypt.compare(info.password, userInfo.password);
-//   if (!isMatch) {
-//     throw new HttpException(
-//       'Password is not correct!',
-//       HttpStatus.BAD_REQUEST,
-//     );
-//   }
-//   return userInfo;
-// }
-
-// async forgotPassword(username) {
-//   const userInfo = await this.showInfo(username);
-
-// }
-
-//   async getUserByID(id: number): Promise<User> {
-//     const found = await this.userRepo.findOne(id);
-//     if (!found) {
-//       throw new NotFoundException(`Can not find user ${id} `);
-//     }
-//     return found;
-//   }
-// @Patch('/info')
-// async updateInfo(@Body() param: UpdateDto): Promise<UserEntity> {
-//   const username = 'hoaNK97122';
-//   console.log(param);
-//   return await this.authService.updateInfo({ username }, param);
-// }
-
-// @Delete('remove')
-// userDelete(@Body() removeID: DeleteUser): Promise<object> {
-//   return this.authService.deleteItem(removeID);
-// }
-
-// @Patch('update')
-// update(@Body() param: UpdateDto): Promise<UpdateDto> {
-//   console.log(param);
-//   return this.authService.updateInfo({ id: '10' }, param);
-// }
-
-// @Get('sendMail')
-// sendMail(): void {
-//   return this.mailService.example();
-// }
-
-// @Get(':id')
-// getUserByID(@Param('id') id: string): Promise<object> {
-//   return this.authService.getUserByID(id);
-// }
-
-// @Get('/:id')
-// getUserByID(@Param('id', ParseIntPipe) id: number): Promise<User> {
-//   return this.authService.getUserByID(id);
-// }

@@ -1,5 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import * as fs from 'fs';
+import { IPaginationOptions, Pagination } from 'nestjs-typeorm-paginate';
+import { CategoryEntity } from './category.entity';
 import { CategoryRepository } from './category.repo';
 import { CreateCategoryDto } from './dto/dto.create';
 import { UpdateCategoryDto } from './dto/dto.update';
@@ -12,8 +14,10 @@ export class CategoryService {
     await this.checkValidPosition(createCategoryDto.position);
     return this.cateRepo.createNewCategory(createCategoryDto);
   }
-  async getList() {
-    return this.cateRepo.getList();
+  async showList(
+    options?: IPaginationOptions,
+  ): Promise<Pagination<CategoryEntity>> {
+    return this.cateRepo.showList(options);
   }
 
   async updateCategoryInfo(categoryID: string, param: UpdateCategoryDto) {
@@ -27,20 +31,20 @@ export class CategoryService {
     return this.cateRepo.findCategoryByID(categoryID);
   }
 
-  async deactiveCategoryByID(categoryID: string) {
+  async inactiveCategoryByID(categoryID: string) {
     const checkExistCategoryID = await this.findCategoryByID(categoryID);
     if (!checkExistCategoryID) {
       throw new HttpException('CategoryID invalid!', HttpStatus.BAD_REQUEST);
     }
-    await this.cateRepo.updateCategoryInfo(categoryID, { status: 'Deactive' });
+    await this.cateRepo.updateCategoryInfo(categoryID, { status: 'Inactive' });
   }
 
   async checkValidPosition(position: string) {
-    const categoriesInfo = await this.getList();
+    const categoriesInfo = await this.cateRepo.getList();
     for (const category of categoriesInfo) {
       if (category.position === position) {
         throw new HttpException(
-          'The position is used!',
+          'The position is already used!',
           HttpStatus.BAD_REQUEST,
         );
       }

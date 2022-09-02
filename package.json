@@ -39,6 +39,7 @@
     "ior": "^0.0.2",
     "multer": "^1.4.5-lts.1",
     "mysql2": "^2.3.3",
+    "nestjs-typeorm-paginate": "^4.0.2",
     "nodemailer": "^6.7.8",
     "passport": "^0.6.0",
     "passport-jwt": "^4.0.0",

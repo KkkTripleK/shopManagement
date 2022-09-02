@@ -1,5 +1,11 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import {
+  IPaginationOptions,
+  paginate,
+  Pagination,
+} from 'nestjs-typeorm-paginate';
+import { productStatus } from 'src/commons/common.enum';
 import { Repository } from 'typeorm';
 import { CategoryRepository } from '../categories/category.repo';
 import { CreateProductDto } from './dto/dto.create.dto';
@@ -19,23 +25,27 @@ export class ProductRepository {
     return this.productRepo.save(requestBody);
   }
 
-  async showListProduct(): Promise<ProductEntity[]> {
-    return this.productRepo.find({
-      relations: {
-        category: true,
-        pictures: true,
-      },
+  async showListProduct(
+    options: IPaginationOptions,
+  ): Promise<Pagination<ProductEntity>> {
+    return paginate<ProductEntity>(this.productRepo, options, {
+      where: [
+        { status: productStatus.STOCK },
+        { status: productStatus.OUTSTOCK },
+      ],
+      relations: ['category', 'pictures'],
     });
   }
 
-  async adminShowListProduct(): Promise<ProductEntity[]> {
-    const product = await this.productRepo.manager
-      .createQueryBuilder(ProductEntity, 'product')
-      .select(['product', 'product.cost'])
+  async adminShowListProduct(
+    options: IPaginationOptions,
+  ): Promise<Pagination<ProductEntity>> {
+    const queryBuilder = this.productRepo
+      .createQueryBuilder('product')
       .leftJoinAndSelect('product.category', 'category')
       .leftJoinAndSelect('product.pictures', 'pictures')
-      .getMany();
-    return product;
+      .select(['product', 'product.cost', 'pictures', 'category']);
+    return paginate<ProductEntity>(queryBuilder, options);
   }
 
   async showProductByID(id: object): Promise<ProductEntity> {

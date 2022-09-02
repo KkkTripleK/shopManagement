@@ -2,11 +2,13 @@ import { productStatus } from 'src/commons/common.enum';
 import {
   BaseEntity,
   Column,
+  CreateDateColumn,
   Entity,
   ManyToOne,
   OneToMany,
   // eslint-disable-next-line prettier/prettier
   PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 import { CategoryEntity } from '../categories/category.entity';
 import { PictureEntity } from '../picture/picture.entity';
@@ -49,6 +51,18 @@ export class ProductEntity extends BaseEntity {
     default: productStatus.STOCK,
   })
   status: productStatus;
+
+  @CreateDateColumn({
+    default: `now()`,
+    nullable: false,
+  })
+  createAt: string;
+
+  @UpdateDateColumn({
+    default: `now()`,
+    nullable: true,
+  })
+  updateAt: string;
 
   @ManyToOne(() => CategoryEntity, (category) => category.products)
   category: CategoryEntity;

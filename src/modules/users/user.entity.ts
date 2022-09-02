@@ -1,5 +1,12 @@
 import { userGender, userRole, userStatus } from 'src/commons/common.enum';
-import { BaseEntity, Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  BaseEntity,
+  Column,
+  CreateDateColumn,
+  Entity,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 
 @Entity('Users')
 export class UserEntity extends BaseEntity {
@@ -44,4 +51,16 @@ export class UserEntity extends BaseEntity {
     default: userStatus.NOTACTIVE,
   })
   accountStatus: userStatus;
+
+  @CreateDateColumn({
+    default: `now()`,
+    nullable: false,
+  })
+  createAt: string;
+
+  @UpdateDateColumn({
+    default: `now()`,
+    nullable: true,
+  })
+  updateAt: string;
 }

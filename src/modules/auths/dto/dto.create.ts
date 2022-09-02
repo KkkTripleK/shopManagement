@@ -1,13 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
 import {
-  IsAlpha,
   IsAlphanumeric,
   IsEmail,
   IsEnum,
   IsOptional,
   IsString,
   // eslint-disable-next-line prettier/prettier
-  Length
+  Length,
 } from 'class-validator';
 import { userGender, userRole, userStatus } from 'src/commons/common.enum';
 import { Entity } from 'typeorm';
@@ -36,7 +35,6 @@ export class CreateUserDto {
   email: string;
 
   @ApiProperty()
-  @IsAlpha()
   @IsString()
   @Length(3, 20)
   fullName: string;

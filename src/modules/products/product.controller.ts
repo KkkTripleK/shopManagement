@@ -1,14 +1,19 @@
 import {
   Body,
   Controller,
+  DefaultValuePipe,
   Delete,
   Get,
   Param,
+  ParseIntPipe,
   Patch,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { Pagination } from 'nestjs-typeorm-paginate';
+import { userRole } from 'src/commons/common.enum';
 import { Roles } from '../decorators/decorator.roles';
 import { JWTandRolesGuard } from '../guards/guard.roles';
 import { AddProductToCategoryDto } from './dto/dto.addToCategory.dto';
@@ -24,8 +29,15 @@ export class ProductController {
   constructor(private productService: ProductService) {}
 
   @Get('product/all')
-  async showListProduct(): Promise<ProductEntity[]> {
-    return this.productService.showListProduct();
+  async showListProduct(
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page = 1,
+    @Query('limit', new DefaultValuePipe(3), ParseIntPipe) limit = 3,
+  ): Promise<Pagination<ProductEntity>> {
+    return this.productService.showListProduct({
+      page,
+      limit,
+      route: `localhost:${process.env.PORT}/admin/list-account`,
+    });
   }
 
   @Get('product/:productID')
@@ -37,14 +49,21 @@ export class ProductController {
 
   @Get('admin/product/all')
   @UseGuards(JWTandRolesGuard)
-  @Roles('admin')
-  async adminShowListProduct(): Promise<ProductEntity[]> {
-    return this.productService.adminShowListProduct();
+  @Roles(userRole.ADMIN)
+  async adminShowListProduct(
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page = 1,
+    @Query('limit', new DefaultValuePipe(3), ParseIntPipe) limit = 3,
+  ): Promise<Pagination<ProductEntity>> {
+    return this.productService.adminShowListProduct({
+      page,
+      limit,
+      route: `localhost:${process.env.PORT}/admin/list-account`,
+    });
   }
 
   @Get('/admin/product/:productID')
   @UseGuards(JWTandRolesGuard)
-  @Roles('admin')
+  @Roles(userRole.ADMIN)
   async adminShowProductByID(
     @Param('productID') productID: string,
   ): Promise<ProductEntity> {
@@ -53,7 +72,7 @@ export class ProductController {
 
   @Post('admin/product/create')
   @UseGuards(JWTandRolesGuard)
-  @Roles('admin')
+  @Roles(userRole.ADMIN)
   async createNewProduct(
     @Body() requestBody: CreateProductDto,
   ): Promise<ProductEntity> {
@@ -62,7 +81,7 @@ export class ProductController {
 
   @Patch('admin/product/:productID')
   @UseGuards(JWTandRolesGuard)
-  @Roles('admin')
+  @Roles(userRole.ADMIN)
   async updateProductByID(
     @Param('productID') productID: string,
     @Body() requestBody: UpdateProductDto,
@@ -72,16 +91,16 @@ export class ProductController {
 
   @Post('admin/product/addToCate')
   @UseGuards(JWTandRolesGuard)
-  @Roles('admin')
+  @Roles(userRole.ADMIN)
   async addProductToCategory(@Body() requestBody: AddProductToCategoryDto) {
     return this.productService.addProductToCategory(requestBody);
   }
 
   @Delete('admin/product/:productID')
   @UseGuards(JWTandRolesGuard)
-  @Roles('admin')
-  async deactiveProductByID(@Param('productID') productID: string) {
-    await this.productService.deactiveProductByID(productID);
-    return 'Deactive product successful!';
+  @Roles(userRole.ADMIN)
+  async inactiveProductByID(@Param('productID') productID: string) {
+    await this.productService.inactiveProductByID(productID);
+    return 'Inactive product successful!';
   }
 }

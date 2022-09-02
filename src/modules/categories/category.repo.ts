@@ -1,5 +1,11 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import {
+  IPaginationOptions,
+  paginate,
+  Pagination,
+} from 'nestjs-typeorm-paginate';
+import { categoryStatus } from 'src/commons/common.enum';
 import { Repository } from 'typeorm';
 import { CategoryEntity } from './category.entity';
 import { CreateCategoryDto } from './dto/dto.create';
@@ -16,12 +22,22 @@ export class CategoryRepository {
     return await this.cateRepo.save(createCategoryDto);
   }
 
-  async getList(): Promise<CategoryEntity[]> {
+  async showList(
+    options: IPaginationOptions,
+  ): Promise<Pagination<CategoryEntity>> {
     const listCategory = await this.cateRepo.manager
       .createQueryBuilder(CategoryEntity, 'category')
       .leftJoinAndSelect('category.products', 'photo')
-      .orderBy('position')
-      .getMany();
+      .where({ status: categoryStatus.ACTIVE })
+      .orderBy('position');
+    return paginate<CategoryEntity>(listCategory, options);
+  }
+
+  async getList(): Promise<CategoryEntity[]> {
+    const listCategory = await this.cateRepo.find({
+      where: [{ status: categoryStatus.ACTIVE }],
+    });
+    console.log(listCategory);
     return listCategory;
   }
 

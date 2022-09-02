@@ -1,18 +1,20 @@
 import {
   Body,
   Controller,
+  DefaultValuePipe,
   Delete,
   Get,
-  Headers,
   Param,
+  ParseIntPipe,
   Patch,
   Post,
+  Query,
   Req,
-  // eslint-disable-next-line prettier/prettier
   UseGuards,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { HeadersObject } from '@nestjs/swagger/dist/interfaces/open-api-spec.interface';
+import { Pagination } from 'nestjs-typeorm-paginate';
+import { userRole } from 'src/commons/common.enum';
 import { VerifyToken } from 'src/utils/util.verifyToken';
 import { AuthService } from '../auths/auth.service';
 import { Roles } from '../decorators/decorator.roles';
@@ -23,6 +25,7 @@ import { DeleteAccountDto } from './dto/dto.deleteAccount';
 import { ForgotPasswordDto } from './dto/dto.forgotPassword';
 import { UpdateDto } from './dto/dto.update';
 import { UserEntity } from './user.entity';
+import { UserRepository } from './user.repo';
 import { UserService } from './user.service';
 
 @ApiBearerAuth()
@@ -33,28 +36,20 @@ export class UserController {
     private userService: UserService,
     private verifyToken: VerifyToken,
     private authService: AuthService,
+    private userRepo: UserRepository,
   ) {}
 
   @Get('user/info')
   @UseGuards(JWTandRolesGuard)
-  @Roles('admin', 'member')
+  @Roles(userRole.ADMIN, userRole.MEMBER)
   async findInfo(@Req() req: any): Promise<UserEntity> {
     return this.userService.findAccount(req.userInfo);
   }
 
   @Patch('user/update')
   @UseGuards(JwtAuthGuard)
-  async updateAccount(
-    @Body() param: UpdateDto,
-    @Headers() requestHeader: HeadersObject,
-  ): Promise<any> {
-    const payload = await this.verifyToken.verifyJWT(
-      requestHeader.authorization,
-    );
-    return this.userService.updateAccount(
-      { username: payload.username },
-      param,
-    );
+  async updateAccount(@Body() param: UpdateDto, @Req() req: any): Promise<any> {
+    return this.userService.updateAccount(req.userInfo, param);
   }
 
   @Post('user/forgot-password')
@@ -74,41 +69,39 @@ export class UserController {
 
   @Delete('user')
   @UseGuards(JWTandRolesGuard)
-  @Roles('admin', 'member')
-  async deleteAccount(
-    @Body() requestBody: DeleteAccountDto,
-    @Headers() requestHeader: HeadersObject,
-  ) {
-    const payload = await this.verifyToken.verifyJWT(
-      requestHeader.authorization,
-    );
-    const info = await this.userService.findAccount({
-      username: payload.username,
-    });
-    await this.authService.validateUser(payload.username, requestBody.password);
-    await this.userService.deleteAccount({ id: info.id });
-    return 'Delete account successful!';
+  @Roles(userRole.ADMIN, userRole.MEMBER)
+  async deleteAccount(@Body() requestBody: DeleteAccountDto, @Req() req: any) {
+    await this.authService.validateUser(req.userInfo, requestBody.password);
+    await this.userService.deleteAccount(req.userInfo);
+    return 'The account have been change to Inactive status!';
   }
 
   @Get('/admin/list-account')
   @UseGuards(JWTandRolesGuard)
-  @Roles('admin')
-  async showList() {
-    return this.userService.getListUser();
+  @Roles(userRole.ADMIN)
+  async showList(
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page = 1,
+    @Query('limit', new DefaultValuePipe(3), ParseIntPipe) limit = 3,
+  ): Promise<Pagination<UserEntity>> {
+    return this.userService.getListAccount({
+      page,
+      limit,
+      route: `localhost:${process.env.PORT}/admin/list-account`,
+    });
   }
 
   @Get('/admin/account/:id')
   @UseGuards(JWTandRolesGuard)
-  @Roles('admin')
+  @Roles(userRole.ADMIN)
   async showUserByID(@Param('id') id: string) {
     return await this.userService.findAccount({ id });
   }
 
   @Delete('/admin/account/:userID')
   @UseGuards(JWTandRolesGuard)
-  @Roles('admin')
+  @Roles(userRole.ADMIN)
   async deleteUserByID(@Param('userID') userID: string) {
-    await this.userService.deleteAccount({ userID });
-    return 'Delete account successful!';
+    await this.userService.deleteAccount({ id: userID });
+    return 'The account have been change to Inactive status!';
   }
 }
