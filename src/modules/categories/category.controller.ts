@@ -14,7 +14,7 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
 import { Pagination } from 'nestjs-typeorm-paginate';
 import { userRole } from 'src/commons/common.enum';
 import { multerOptions } from '../../utils/util.multer';
@@ -23,6 +23,7 @@ import { JWTandRolesGuard } from '../guards/guard.roles';
 import { CategoryEntity } from './category.entity';
 import { CategoryService } from './category.service';
 import { CreateCategoryDto } from './dto/dto.create';
+import { uploadFileDto } from './dto/dto.fileUpload';
 import { UpdateCategoryDto } from './dto/dto.update';
 
 @ApiBearerAuth()
@@ -61,6 +62,11 @@ export class CategoryController {
   @Roles(userRole.ADMIN)
   @Post('admin/category/upload-banner')
   @UseInterceptors(FileInterceptor('file', multerOptions))
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    description: 'Banner',
+    type: uploadFileDto,
+  })
   async upload(@UploadedFile() file, @Body() requestBody: any) {
     return this.cateService.uploadBanner(file, requestBody);
   }

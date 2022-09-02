@@ -11,10 +11,11 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
 import { multerOptions } from '../../utils/util.multer';
 import { Roles } from '../decorators/decorator.roles';
 import { JWTandRolesGuard } from '../guards/guard.roles';
+import { uploadFileDto } from './dto/dto.fileUpload';
 import { UpdatePictureDto } from './dto/dto.updatePicture.dto';
 import { PictureService } from './picture.service';
 
@@ -43,6 +44,11 @@ export class PictureController {
   @UseGuards(JWTandRolesGuard)
   @Roles('admin')
   @UseInterceptors(FileInterceptor('file', multerOptions))
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    description: 'Banner',
+    type: uploadFileDto,
+  })
   async uploadPicture(@UploadedFile() file, @Body() requestBody: any) {
     return this.pictureService.uploadPicture(file, requestBody);
   }

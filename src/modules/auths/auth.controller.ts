@@ -4,10 +4,9 @@ import {
   Get,
   Headers,
   Post,
-  // eslint-disable-next-line prettier/prettier
-  UseGuards
+  UseGuards,
 } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBadRequestResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { HeadersObject } from '@nestjs/swagger/dist/interfaces/open-api-spec.interface';
 import { VerifyToken } from 'src/utils/util.verifyToken';
 import { MailService } from '../email/email.service';
@@ -40,6 +39,10 @@ export class AuthController {
   }
 
   @Post('login')
+  @ApiOkResponse()
+  @ApiBadRequestResponse({
+    description: 'Username or Password is not correct!',
+  })
   @UseGuards(ValidateAuthGuard)
   async userLogin(@Body() loginDTO: LoginDTO): Promise<object> {
     return this.authService.userLogin(loginDTO.username);
