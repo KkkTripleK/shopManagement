@@ -13,7 +13,7 @@ export class UserEntity extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: string;
 
-  @Column()
+  @Column({ unique: true })
   username: string;
 
   @Column()
@@ -51,6 +51,9 @@ export class UserEntity extends BaseEntity {
     default: userStatus.NOTACTIVE,
   })
   accountStatus: userStatus;
+
+  // @OneToMany(() => OrderEntity, (order) => order.user)
+  // orders: OrderEntity[];
 
   @CreateDateColumn({
     default: `now()`,

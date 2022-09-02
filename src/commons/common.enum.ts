@@ -24,3 +24,22 @@ export enum categoryStatus {
   ACTIVE = 'Active',
   INACTIVE = 'Inactive',
 }
+
+export enum orderPayment {
+  CASH = 'Cash',
+  MOMO = 'MoMo',
+  VNPAY = 'VNPay',
+}
+
+export enum orderStatus {
+  SHOPPING = 'Shopping',
+  ORDERED = 'Ordered',
+  SHIPPING = 'Shipping',
+  COMPLETED = 'Completed',
+  REMOVED = 'Removed',
+}
+
+export enum orderShipment {
+  GHN = 'Giao hang nhanh',
+  VIETTELPOST = 'ViettelPost',
+}
