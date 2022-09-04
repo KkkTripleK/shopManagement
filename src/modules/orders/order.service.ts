@@ -25,13 +25,16 @@ export class OrderService {
         fk_Username,
         orderId,
       );
-      if (orderInfo.id.length === 0) {
-        throw new HttpException('OrderID is invalid!', HttpStatus.BAD_REQUEST);
+      if (orderInfo === null) {
+        throw new HttpException(
+          'OrderID is invalid or has been removed!',
+          HttpStatus.BAD_REQUEST,
+        );
       }
       return orderInfo;
     } catch (error) {
       throw new HttpException(
-        'OrderID is not correct!',
+        'OrderID is invalid or has been removed!',
         HttpStatus.BAD_REQUEST,
       );
     }
@@ -81,11 +84,35 @@ export class OrderService {
     return this.orderRepo.createOrder(orderInfo);
   }
 
+  async orderConfirm(orderId: string, fk_Username: string) {
+    const orderInfo = await this.getOrderByIdAndUsername(orderId, fk_Username);
+    console.log(orderInfo);
+    if (orderInfo.totalProductPrice === 0) {
+      throw new HttpException(
+        "Order doesn't have any product!",
+        HttpStatus.BAD_REQUEST,
+      );
+    } else if (orderInfo.status === orderStatus.SHOPPING) {
+      throw new HttpException(
+        "Order doesn't have any product!",
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    return this.orderRepo.updateOrder(orderInfo, {
+      status: orderStatus.ORDERED,
+    });
+  }
+
   async updateOrder(orderId: string, param: object, fk_Username: string) {
-    const orderInfo = this.getOrderByIdAndUsername(orderId, fk_Username);
+    const orderInfo = await this.getOrderByIdAndUsername(orderId, fk_Username);
     if ((await orderInfo).status !== orderStatus.SHOPPING) {
       throw new HttpException(
         'The order is shipping, can not change the order info!',
+        HttpStatus.BAD_REQUEST,
+      );
+    } else if ((await orderInfo).status === orderStatus.REMOVED) {
+      throw new HttpException(
+        'The order has been removed!',
         HttpStatus.BAD_REQUEST,
       );
     }
@@ -98,7 +125,7 @@ export class OrderService {
       (await orderInfo).status == orderStatus.SHOPPING ||
       (await orderInfo).status == orderStatus.COMPLETED
     ) {
-      return this.orderRepo.updateOrder(orderInfo, {
+      return this.orderRepo.updateOrder(await orderInfo, {
         status: orderStatus.REMOVED,
       });
     } else if ((await orderInfo).status == orderStatus.REMOVED) {

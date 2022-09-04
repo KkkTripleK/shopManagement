@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   Param,
+  ParseUUIDPipe,
   Patch,
   Post,
   Req,
@@ -11,10 +12,11 @@ import {
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { userRole } from 'src/commons/common.enum';
-import { Roles } from '../decorators/decorator.roles';
-import { JwtAuthGuard } from '../guards/guard.jwt';
-import { JWTandRolesGuard } from '../guards/guard.roles';
+import { Roles } from '../../decorators/decorator.roles';
+import { JwtAuthGuard } from '../../guards/guard.jwt';
+import { JWTandRolesGuard } from '../../guards/guard.roles';
 import { createOrderDto } from './dto/dto.createOrder';
+import { orderConfirmDto } from './dto/dto.orderConfirm';
 import { updateOrderDto } from './dto/dto.updateOrder';
 import { OrderService } from './order.service';
 
@@ -27,24 +29,24 @@ export class OrderController {
   @Get('user/order/all')
   @UseGuards(JwtAuthGuard)
   async getListOrder(@Req() req: any) {
-    const fk_Username = req.userInfo.username;
-    return this.orderService.getListOrder(fk_Username);
+    const fk_User = req.userInfo.username;
+    return this.orderService.getListOrder(fk_User);
   }
 
   @Get('user/order/:orderId')
   @UseGuards(JwtAuthGuard)
   async getOrderByIdAndUsername(
-    @Param('orderId') orderId: string,
+    @Param('orderId', new ParseUUIDPipe()) orderId: string,
     @Req() req: any,
   ) {
-    const fk_Username = req.userInfo.username;
-    return this.orderService.getOrderByIdAndUsername(orderId, fk_Username);
+    const fk_User = req.userInfo.username;
+    return this.orderService.getOrderByIdAndUsername(orderId, fk_User);
   }
 
   @Post('user/order/create')
   @UseGuards(JwtAuthGuard)
   async createOrder(@Body() orderInfo: createOrderDto, @Req() req: any) {
-    orderInfo.fkUsername = req.userInfo.username;
+    orderInfo.fk_User = req.userInfo.username;
     return this.orderService.createOrder(orderInfo);
   }
 
@@ -55,15 +57,15 @@ export class OrderController {
     @Body() updateOrder: updateOrderDto,
     @Req() req: any,
   ) {
-    const fk_Username = req.userInfo.username;
-    return this.orderService.updateOrder(orderId, updateOrder, fk_Username);
+    const fk_User = req.userInfo.username;
+    return this.orderService.updateOrder(orderId, updateOrder, fk_User);
   }
 
   @Delete('user/order/:orderId')
   @UseGuards(JwtAuthGuard)
   async deleteOrder(@Param('orderId') orderId: string, @Req() req: any) {
-    const fk_Username = req.userInfo.username;
-    return this.orderService.deleteOrder(orderId, fk_Username);
+    const fk_User = req.userInfo.username;
+    return this.orderService.deleteOrder(orderId, fk_User);
   }
 
   @Get('admin/order/all')
@@ -85,5 +87,12 @@ export class OrderController {
   @Roles(userRole.ADMIN)
   async adminGetOrderByUsername(@Param('username') username: string) {
     return this.orderService.adminGetOrderByUsername(username);
+  }
+
+  @Post('user/order/confirm')
+  @UseGuards(JwtAuthGuard)
+  async orderConfirm(@Body() requestBody: orderConfirmDto, @Req() req: any) {
+    const fk_User = req.userInfo.username;
+    return this.orderService.orderConfirm(requestBody.id, fk_User);
   }
 }

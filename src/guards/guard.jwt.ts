@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 import {
   CanActivate,
   ExecutionContext,
@@ -7,7 +6,7 @@ import {
   Injectable,
 } from '@nestjs/common';
 import { VerifyToken } from 'src/utils/util.verifyToken';
-import { UserRepository } from '../users/user.repo';
+import { UserRepository } from '../modules/users/user.repo';
 
 @Injectable()
 export class JwtAuthGuard implements CanActivate {

@@ -14,8 +14,8 @@ import {
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { Pagination } from 'nestjs-typeorm-paginate';
 import { userRole } from 'src/commons/common.enum';
-import { Roles } from '../decorators/decorator.roles';
-import { JWTandRolesGuard } from '../guards/guard.roles';
+import { Roles } from '../../decorators/decorator.roles';
+import { JWTandRolesGuard } from '../../guards/guard.roles';
 import { AddProductToCategoryDto } from './dto/dto.addToCategory.dto';
 import { CreateProductDto } from './dto/dto.create.dto';
 import { UpdateProductDto } from './dto/dto.update.dto';

@@ -48,7 +48,7 @@ export class ProductRepository {
     return paginate<ProductEntity>(queryBuilder, options);
   }
 
-  async showProductByID(id: object): Promise<ProductEntity> {
+  async showProductByProductId(id: object): Promise<ProductEntity> {
     return this.productRepo.findOne({
       where: [id],
       relations: {

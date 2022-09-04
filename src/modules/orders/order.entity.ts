@@ -1,4 +1,8 @@
-import { orderPayment, orderStatus } from 'src/commons/common.enum';
+import {
+  orderPayment,
+  orderShipment,
+  orderStatus,
+} from 'src/commons/common.enum';
 import {
   BaseEntity,
   Column,
@@ -6,9 +10,11 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { OrderProductEntity } from '../orderProducts/orderProduct.entity';
 import { UserEntity } from '../users/user.entity';
 
 @Entity('Orders')
@@ -18,7 +24,7 @@ export class OrderEntity extends BaseEntity {
 
   @ManyToOne(() => UserEntity)
   @JoinColumn({
-    name: 'fk_Username',
+    name: 'fk_User',
     referencedColumnName: 'username',
   })
   fk_User: UserEntity;
@@ -26,6 +32,7 @@ export class OrderEntity extends BaseEntity {
   @Column()
   address: string;
 
+  //Regex
   @Column()
   phone: string;
 
@@ -36,11 +43,21 @@ export class OrderEntity extends BaseEntity {
   })
   payment: orderPayment;
 
-  @Column()
-  shipment: string;
+  @Column({ default: 0 })
+  totalProductPrice: number;
 
-  @Column({ nullable: true })
-  totalPrice: string;
+  @Column({
+    type: 'enum',
+    enum: orderShipment,
+    default: orderShipment.VIETTELPOST,
+  })
+  shipment: orderShipment;
+
+  @Column({ nullable: true, default: 0 })
+  shipmentPrice: number;
+
+  @Column({ nullable: true, default: 0 })
+  totalOrderPrice: number;
 
   @Column({
     type: 'enum',
@@ -48,6 +65,13 @@ export class OrderEntity extends BaseEntity {
     default: orderStatus.SHOPPING,
   })
   status: orderStatus;
+
+  @OneToMany(() => OrderProductEntity, (orderProduct) => orderProduct.fk_Order)
+  @JoinColumn({
+    name: 'fk_OrderProduct',
+    referencedColumnName: 'id',
+  })
+  fk_OrderProduct: OrderProductEntity[];
 
   @CreateDateColumn({
     default: `now()`,

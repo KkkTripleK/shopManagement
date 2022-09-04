@@ -12,9 +12,9 @@ import {
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
+import { Roles } from '../../decorators/decorator.roles';
+import { JWTandRolesGuard } from '../../guards/guard.roles';
 import { multerOptions } from '../../utils/util.multer';
-import { Roles } from '../decorators/decorator.roles';
-import { JWTandRolesGuard } from '../guards/guard.roles';
 import { uploadFileDto } from './dto/dto.fileUpload';
 import { UpdatePictureDto } from './dto/dto.updatePicture.dto';
 import { PictureService } from './picture.service';

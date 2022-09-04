@@ -12,7 +12,7 @@ export class PictureService {
   ) {}
 
   async uploadPicture(file, requestBody) {
-    const productInfo = await this.productRepo.showProductByID({
+    const productInfo = await this.productRepo.showProductByProductId({
       id: requestBody.productId,
     });
     if (productInfo === null) {

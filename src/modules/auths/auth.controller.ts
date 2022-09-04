@@ -9,8 +9,8 @@ import {
 import { ApiBadRequestResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { HeadersObject } from '@nestjs/swagger/dist/interfaces/open-api-spec.interface';
 import { VerifyToken } from 'src/utils/util.verifyToken';
+import { ValidateAuthGuard } from '../../guards/guard.validate';
 import { MailService } from '../email/email.service';
-import { ValidateAuthGuard } from '../guards/guard.validate';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from './dto/dto.create';
 import { GenerateTokenDto } from './dto/dto.generateToken';

@@ -8,7 +8,7 @@ import {
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { VerifyToken } from 'src/utils/util.verifyToken';
-import { UserRepository } from '../users/user.repo';
+import { UserRepository } from '../modules/users/user.repo';
 
 @Injectable()
 export class JWTandRolesGuard implements CanActivate {

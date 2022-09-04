@@ -16,7 +16,8 @@ export class OrderRepository {
     const listOrder = this.orderRepo
       .createQueryBuilder('order')
       .leftJoinAndSelect('order.fk_User', 'fk_User')
-      .select(['order'])
+      .leftJoinAndSelect('order.fk_OrderProduct', 'fk_OrderProduct')
+      .select(['order', 'fk_OrderProduct.id', 'fk_OrderProduct.totalPrice'])
       .where('fk_User.username LIKE :fk_Username', { fk_Username })
       .andWhere('order.status IN (:...status)', {
         status: [
@@ -89,7 +90,7 @@ export class OrderRepository {
       .createQueryBuilder('order')
       .leftJoinAndSelect('order.fk_User', 'fk_User')
       .select(['order', 'fk_User.username'])
-      .where('fk_User.username LIKE :fk_Username', { fk_Username })
+      .where('fk_User.username LIKE :username', { username: fk_Username })
       .andWhere('order.status IN (:...status)', {
         status: [
           orderStatus.SHOPPING,
@@ -106,8 +107,12 @@ export class OrderRepository {
     return this.orderRepo.save(orderInfo);
   }
 
-  async updateOrder(orderInfo: object, param: object) {
-    for (const key in orderInfo) {
+  async orderConfirm(orderInfo: createOrderDto) {
+    return this.orderRepo.save(orderInfo);
+  }
+
+  async updateOrder(orderInfo: OrderEntity, param: object) {
+    for (const key in param) {
       orderInfo[key] = param[key];
     }
     return this.orderRepo.save(orderInfo);

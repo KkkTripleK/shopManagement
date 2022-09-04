@@ -38,7 +38,7 @@ export class ProductService {
   }
 
   async showProductByID(productID: string): Promise<ProductEntity> {
-    const result = await this.productRepository.showProductByID({
+    const result = await this.productRepository.showProductByProductId({
       id: productID,
     });
     if (result === null) {

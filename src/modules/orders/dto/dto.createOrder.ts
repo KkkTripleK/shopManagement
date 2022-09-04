@@ -1,26 +1,24 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEnum, IsOptional, IsString, IsUUID } from 'class-validator';
+import { IsEnum, IsString, Matches } from 'class-validator';
 import { orderPayment, orderShipment } from 'src/commons/common.enum';
 import { UserEntity } from 'src/modules/users/user.entity';
+import { PHONE_REGEX } from 'src/utils/util.regex';
 import { Entity } from 'typeorm';
 
 @Entity()
 export class createOrderDto {
   @ApiProperty()
-  @IsUUID()
   id: string;
 
   @ApiProperty()
-  @IsOptional()
-  fkUsername?: UserEntity;
+  fk_User: UserEntity;
 
   @ApiProperty()
   @IsString()
   address: string;
 
-  //su dung Regex
   @ApiProperty()
-  @IsString()
+  @Matches(PHONE_REGEX)
   phone: string;
 
   @ApiProperty()
