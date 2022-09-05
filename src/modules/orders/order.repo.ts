@@ -91,7 +91,9 @@ export class OrderRepository {
       .createQueryBuilder('order')
       .leftJoinAndSelect('order.fk_User', 'fk_User')
       .select(['order', 'fk_User.username'])
-      .where('fk_User.username LIKE :username', { username: fk_Username })
+      .where('fk_User.username LIKE :username', {
+        username: `%${fk_Username}%`,
+      })
       .andWhere('order.status IN (:...status)', {
         status: [
           orderStatus.SHOPPING,

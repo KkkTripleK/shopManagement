@@ -5,6 +5,7 @@ import { VerifyToken } from 'src/utils/util.verifyToken';
 import { typeOrmConfig } from '../../configs/config.typeorm';
 import { CategoryEntity } from '../categories/category.entity';
 import { CategoryRepository } from '../categories/category.repo';
+import { OrderModule } from '../orders/order.module';
 import { UserEntity } from '../users/user.entity';
 import { UserRepository } from '../users/user.repo';
 import { ProductController } from './product.controller';
@@ -14,6 +15,7 @@ import { ProductService } from './product.service';
 
 @Module({
   imports: [
+    OrderModule,
     TypeOrmModule.forRoot(typeOrmConfig),
     TypeOrmModule.forFeature([ProductEntity, UserEntity, CategoryEntity]),
   ],
@@ -26,6 +28,6 @@ import { ProductService } from './product.service';
     UserRepository,
     CategoryRepository,
   ],
-  exports: [ProductService],
+  exports: [ProductService, ProductRepository],
 })
 export class ProductModule {}

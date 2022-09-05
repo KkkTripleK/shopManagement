@@ -10,7 +10,6 @@ import { OrderProductModule } from '../orderProducts/orderProduct.module';
 import { OrderProductRepository } from '../orderProducts/orderProduct.repo';
 import { ProductEntity } from '../products/product.entity';
 import { ProductRepository } from '../products/product.repo';
-import { ProductService } from '../products/product.service';
 import { UserEntity } from '../users/user.entity';
 import { UserRepository } from '../users/user.repo';
 import { OrderController } from './order.controller';
@@ -36,11 +35,10 @@ import { OrderService } from './order.service';
     OrderRepository,
     VerifyToken,
     JwtService,
-    ProductService,
     UserRepository,
-    ProductRepository,
     CategoryRepository,
     OrderProductRepository,
+    ProductRepository,
   ],
   exports: [OrderService],
 })

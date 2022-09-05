@@ -22,7 +22,7 @@ export class OrderProductService {
     private orderService: OrderService,
   ) {}
 
-  async addProductToOrder(
+  async createOrderProduct(
     orderProductInfo: createOrderProductDto,
     username: string,
   ): Promise<OrderProductEntity> {
@@ -52,9 +52,9 @@ export class OrderProductService {
       orderProductInfo.fk_Order.toString(),
       username,
     );
-    for (const orderProduct of listOrderProduct) {
+    for (const oldOrderProductInfo of listOrderProduct) {
       if (
-        Number(orderProduct.fk_Product.id) ===
+        Number(oldOrderProductInfo.fk_Product.id) ===
         Number(orderProductInfo.fk_Product)
       ) {
         /*
@@ -62,22 +62,23 @@ export class OrderProductService {
         */
         const productQty = await this.checkQtyRemain(
           productInfo,
-          Number(orderProductInfo.qty) + Number(orderProduct.qty),
+          Number(orderProductInfo.qty) + Number(oldOrderProductInfo.qty),
         );
-
         if (productQty > Number(productInfo.qtyRemaining)) {
           throw new HttpException(
             'Your order quantities is higher than quantity in stock!',
             HttpStatus.BAD_REQUEST,
           );
         }
-        orderProduct.qty = productQty.toString();
-        orderProduct.totalPrice = orderProduct.price * productQty;
-        // const newOrderProductPrice = orderProduct.price * orderQty;
-        orderInfo.totalProductPrice += orderProduct.totalPrice;
-        orderInfo.totalOrderPrice += orderProduct.totalPrice;
+        oldOrderProductInfo.qty = productQty.toString();
+        oldOrderProductInfo.totalPrice = oldOrderProductInfo.price * productQty;
+        orderInfo.totalProductPrice +=
+          oldOrderProductInfo.price * Number(orderProductInfo.qty);
+        orderInfo.totalOrderPrice +=
+          oldOrderProductInfo.price * Number(orderProductInfo.qty);
         await this.orderService.createOrder(orderInfo);
-        return this.orderProductRepo.addProductToOrder(orderProduct);
+        console.log(orderInfo.totalProductPrice);
+        return this.orderProductRepo.createOrderProduct(oldOrderProductInfo);
       }
     }
     /*
@@ -98,11 +99,11 @@ export class OrderProductService {
       orderInfo.shipmentPrice = 35000;
     }
     orderProductInfo.totalPrice = orderProductInfo.price * orderQty;
-    orderInfo.totalProductPrice = orderProductInfo.totalPrice;
+    orderInfo.totalProductPrice += orderProductInfo.totalPrice;
     orderInfo.totalOrderPrice =
       orderInfo.totalProductPrice + orderInfo.shipmentPrice;
     await this.orderService.createOrder(orderInfo);
-    return this.orderProductRepo.addProductToOrder(orderProductInfo);
+    return this.orderProductRepo.createOrderProduct(orderProductInfo);
   }
 
   async getListProductByOrderId(
@@ -153,7 +154,7 @@ export class OrderProductService {
     */
     orderProductInfo.qty = newQty;
     orderProductInfo.totalPrice = Number(newQty) * orderProductInfo.price;
-    await this.orderProductRepo.addProductToOrder(orderProductInfo);
+    await this.orderProductRepo.createOrderProduct(orderProductInfo);
     /*
       Save new Data to OrderTable
     */
@@ -192,7 +193,7 @@ export class OrderProductService {
     return orderQty;
   }
 
-  async deleteProductInOrder(orderProductId: string, username: string) {
+  async deleteOrderProductInOrder(orderProductId: string, username: string) {
     const orderProductInfo = await this.orderProductRepo.showOrderProduct(
       orderProductId,
     );
@@ -207,11 +208,23 @@ export class OrderProductService {
       username,
     );
     orderInfo.totalProductPrice -= orderProductInfo.totalPrice;
+    orderInfo.totalOrderPrice -= orderProductInfo.totalPrice;
+    if (orderInfo.totalProductPrice === 0) {
+      orderInfo.shipmentPrice = 0;
+    }
     if (orderInfo.fk_OrderProduct === undefined) {
       throw new HttpException('List order-product is empty!', HttpStatus.OK);
     }
     await this.orderService.createOrder(orderInfo);
     this.orderProductRepo.deleteProductInOrder(orderProductId);
     return 'Delete successful!';
+  }
+
+  async getListOrderProductByProductId(productId: string) {
+    return this.orderProductRepo.getListOrderProductByProductId(productId);
+  }
+
+  async updateOrderProduct(orderProductInfo: createOrderProductDto) {
+    return this.orderProductRepo.createOrderProduct(orderProductInfo);
   }
 }

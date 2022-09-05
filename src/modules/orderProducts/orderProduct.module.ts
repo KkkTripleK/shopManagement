@@ -35,14 +35,14 @@ import { OrderProductService } from './orderProduct.service';
   providers: [
     VerifyToken,
     JwtService,
-    OrderService,
     UserRepository,
     OrderProductRepository,
     ProductRepository,
     CategoryRepository,
     ProductService,
-    OrderRepository,
     OrderProductService,
+    OrderService,
+    OrderRepository,
   ],
   exports: [OrderProductService],
 })

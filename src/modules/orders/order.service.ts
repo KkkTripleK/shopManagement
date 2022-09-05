@@ -1,7 +1,8 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { orderStatus } from 'src/commons/common.enum';
 import { OrderProductService } from '../orderProducts/orderProduct.service';
-import { ProductService } from '../products/product.service';
+import { ProductEntity } from '../products/product.entity';
+import { ProductRepository } from '../products/product.repo';
 import { createOrderDto } from './dto/dto.createOrder';
 import { OrderEntity } from './order.entity';
 import { OrderRepository } from './order.repo';
@@ -10,8 +11,7 @@ import { OrderRepository } from './order.repo';
 export class OrderService {
   constructor(
     private orderRepo: OrderRepository,
-    private productService: ProductService,
-    //@Inject(forwardRef(() => OrderProductService))
+    private productRepo: ProductRepository,
     private orderProductService: OrderProductService,
   ) {}
 
@@ -93,6 +93,9 @@ export class OrderService {
 
   async orderConfirm(orderId: string, fk_Username: string) {
     const orderInfo = await this.getOrderByIdAndUsername(orderId, fk_Username);
+    /*
+     ** Check total value of order
+     */
     if (orderInfo.totalProductPrice === 0) {
       throw new HttpException(
         "Order doesn't have any product!",
@@ -104,17 +107,16 @@ export class OrderService {
         HttpStatus.BAD_REQUEST,
       );
     }
-    // show list product by orderId
+    /*
+     ** show list product by orderId
+     */
     const listOrderProductInfo =
       await this.orderProductService.getListProductByOrderId(
         orderId,
         fk_Username,
       );
     for (const orderProductInfo of listOrderProductInfo) {
-      console.log(orderProductInfo.qty);
-      const productInfo = await this.productService.showProductByID(
-        orderProductInfo.fk_Product.id,
-      );
+      const productInfo = orderProductInfo.fk_Product;
       if (productInfo.qtyRemaining < orderProductInfo.qty) {
         throw new HttpException(
           'The qty instock is not enouch!',
@@ -124,7 +126,7 @@ export class OrderService {
       productInfo.qtyRemaining = String(
         Number(productInfo.qtyRemaining) - Number(orderProductInfo.qty),
       );
-      await this.productService.createNewProduct(productInfo);
+      await this.productRepo.createNewProduct(productInfo);
     }
     return this.orderRepo.updateOrder(orderInfo, {
       status: orderStatus.ORDERED,
@@ -167,5 +169,30 @@ export class OrderService {
         HttpStatus.BAD_REQUEST,
       );
     }
+  }
+
+  async updateOrderInfoByProduct(productInfo: ProductEntity) {
+    // find all OrderProduct have ProductId
+    const listOrderProductInfo =
+      await this.orderProductService.getListOrderProductByProductId(
+        productInfo.id,
+      );
+    for (const orderProductInfo of listOrderProductInfo) {
+      // const oldOrderProductTotalPrice = Number(orderProductInfo.totalPrice);
+      // new price
+      orderProductInfo.price = Number(productInfo.netPrice);
+      //difference between oldPrice and newPrice
+      const differencePrice =
+        orderProductInfo.price * Number(orderProductInfo.qty) -
+        Number(orderProductInfo.totalPrice);
+      // save differencePrice to DB
+      orderProductInfo.totalPrice += differencePrice;
+      // save new data to orderProductInfo
+      await this.orderProductService.updateOrderProduct(orderProductInfo);
+      orderProductInfo.fk_Order.totalProductPrice += differencePrice;
+      orderProductInfo.fk_Order.totalOrderPrice += differencePrice;
+      await this.orderRepo.createOrder(orderProductInfo.fk_Order);
+    }
+    return { listOrderProductInfo };
   }
 }

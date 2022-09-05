@@ -1,6 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { IPaginationOptions, Pagination } from 'nestjs-typeorm-paginate';
 import { productStatus } from 'src/commons/common.enum';
+import { OrderService } from '../orders/order.service';
 import { AddProductToCategoryDto } from './dto/dto.addToCategory.dto';
 import { CreateProductDto } from './dto/dto.create.dto';
 import { UpdateProductDto } from './dto/dto.update.dto';
@@ -9,7 +10,10 @@ import { ProductRepository } from './product.repo';
 
 @Injectable()
 export class ProductService {
-  constructor(private productRepository: ProductRepository) {}
+  constructor(
+    private productRepository: ProductRepository,
+    private orderService: OrderService,
+  ) {}
 
   async createNewProduct(
     requestBody: CreateProductDto,
@@ -52,7 +56,11 @@ export class ProductService {
   }
 
   async updateProductByID(productID: string, requestBody: UpdateProductDto) {
-    return this.productRepository.updateProductByID(productID, requestBody);
+    const productInfo = await this.productRepository.updateProductByID(
+      productID,
+      requestBody,
+    );
+    await this.orderService.updateOrderInfoByProduct(productInfo);
   }
 
   async inactiveProductByID(productID: string) {

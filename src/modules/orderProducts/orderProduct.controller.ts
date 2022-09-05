@@ -56,7 +56,7 @@ export class OrderProductController {
     @Body() requestBody: createOrderProductDto,
     @Req() req: any,
   ): Promise<OrderProductEntity> {
-    return this.orderProductService.addProductToOrder(
+    return this.orderProductService.createOrderProduct(
       requestBody,
       req.userInfo.username,
     );
@@ -78,11 +78,11 @@ export class OrderProductController {
 
   @Delete('user/order-product/:orderProductId')
   @UseGuards(JwtAuthGuard)
-  async deleteProductInOrder(
+  async deleteOrderProductInOrder(
     @Param('orderProductId') orderProductId: string,
     @Req() req: any,
   ) {
-    return this.orderProductService.deleteProductInOrder(
+    return this.orderProductService.deleteOrderProductInOrder(
       orderProductId,
       req.userInfo.username,
     );

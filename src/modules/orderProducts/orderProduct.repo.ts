@@ -21,7 +21,7 @@ export class OrderProductRepository {
     });
   }
 
-  async addProductToOrder(
+  async createOrderProduct(
     requestBody: createOrderProductDto,
   ): Promise<OrderProductEntity> {
     return this.orderProductRepo.save(requestBody);
@@ -37,16 +37,27 @@ export class OrderProductRepository {
       .getMany();
     return result;
   }
+
   async updateProductInOrder(
     orderProductInfo: OrderProductEntity,
     newQty: string,
   ) {
     orderProductInfo.qty = newQty;
     return orderProductInfo;
-    //return this.orderProductRepo.save(orderProductInfo);
   }
 
   async deleteProductInOrder(orderProductId: string) {
     return this.orderProductRepo.delete({ id: orderProductId });
+  }
+
+  async getListOrderProductByProductId(productId: string) {
+    const result = this.orderProductRepo
+      .createQueryBuilder('orderProduct')
+      .leftJoinAndSelect('orderProduct.fk_Product', 'fk_Product')
+      .leftJoinAndSelect('orderProduct.fk_Order', 'fk_Order')
+      .where('fk_Product.id = :productId', { productId })
+      .select(['orderProduct', 'fk_Product', 'fk_Order'])
+      .getMany();
+    return result;
   }
 }
