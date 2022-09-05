@@ -3,7 +3,6 @@ import {
   ExecutionContext,
   HttpException,
   HttpStatus,
-  // eslint-disable-next-line prettier/prettier
   Injectable,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
@@ -25,7 +24,9 @@ export class JWTandRolesGuard implements CanActivate {
         context.getHandler(),
       );
       const request = context.switchToHttp().getRequest();
-      const payload = await this.verifyToken.verifyJWT(request.rawHeaders[1]);
+      const payload = await this.verifyToken.verifyJWT(
+        request.get('Authorization'),
+      );
       const userInfo = await this.userRepo.findAccount({
         username: payload.username,
       });

@@ -14,7 +14,14 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiBearerAuth, ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBadRequestResponse,
+  ApiBearerAuth,
+  ApiBody,
+  ApiConsumes,
+  ApiOkResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { Pagination } from 'nestjs-typeorm-paginate';
 import { userRole } from 'src/commons/common.enum';
 import { Roles } from '../../decorators/decorator.roles';
@@ -45,22 +52,27 @@ export class CategoryController {
   }
 
   @Get('category/:categoryID')
+  @ApiOkResponse()
+  @ApiBadRequestResponse()
   async findCategoryByID(@Param('categoryID') categoryID: string) {
     return this.cateService.findCategoryByID(categoryID);
   }
 
+  @Post('admin/category/create')
   @UseGuards(JWTandRolesGuard)
   @Roles(userRole.ADMIN)
-  @Post('admin/category/create')
+  @ApiConsumes('multipart/form-data')
+  @ApiOkResponse()
+  @ApiBadRequestResponse()
   async createNewCategory(
     @Body() createCategoryDto: CreateCategoryDto,
   ): Promise<CategoryEntity> {
     return this.cateService.createNewCategory(createCategoryDto);
   }
 
+  @Post('admin/category/upload-banner')
   @UseGuards(JWTandRolesGuard)
   @Roles(userRole.ADMIN)
-  @Post('admin/category/upload-banner')
   @UseInterceptors(FileInterceptor('file', multerOptions))
   @ApiConsumes('multipart/form-data')
   @ApiBody({
@@ -71,9 +83,12 @@ export class CategoryController {
     return this.cateService.uploadBanner(file, requestBody);
   }
 
+  @Patch('admin/category/:categoryID')
   @UseGuards(JWTandRolesGuard)
   @Roles(userRole.ADMIN)
-  @Patch('admin/category/:categoryID')
+  @ApiConsumes('multipart/form-data')
+  @ApiOkResponse()
+  @ApiBadRequestResponse()
   async updateCategoryInfo(
     @Param('categoryID') categoryID: string,
     @Body() requestBody: UpdateCategoryDto,
@@ -81,9 +96,12 @@ export class CategoryController {
     return this.cateService.updateCategoryInfo(categoryID, requestBody);
   }
 
+  @Delete('admin/category/:categoryID')
   @UseGuards(JWTandRolesGuard)
   @Roles(userRole.ADMIN)
-  @Delete('admin/category/:categoryID')
+  @ApiConsumes('multipart/form-data')
+  @ApiOkResponse()
+  @ApiBadRequestResponse()
   async inactiveCategoryByID(@Param('categoryID') categoryID: string) {
     await this.cateService.inactiveCategoryByID(categoryID);
     return `Status of categoryID ${categoryID} is Inactive!`;

@@ -24,7 +24,7 @@ export class JwtAuthGuard implements CanActivate {
       });
       if (userInfo === null) {
         throw new HttpException(
-          'Token is invalid or expired!',
+          'Token is invalid or expired1!',
           HttpStatus.BAD_REQUEST,
         );
       }
@@ -32,7 +32,7 @@ export class JwtAuthGuard implements CanActivate {
       return true;
     } catch (error) {
       throw new HttpException(
-        'Token is invalid or expired!',
+        'Token is invalid or expired2!',
         HttpStatus.BAD_REQUEST,
       );
     }

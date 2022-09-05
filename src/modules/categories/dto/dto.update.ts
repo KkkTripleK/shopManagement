@@ -4,23 +4,23 @@ import { Entity } from 'typeorm';
 
 @Entity()
 export class UpdateCategoryDto {
-  @ApiProperty()
+  @ApiProperty({ required: false })
   @IsString()
   @Length(0, 12)
   @IsOptional()
   name?: string;
 
-  @ApiProperty()
+  @ApiProperty({ required: false })
   @IsString()
   @IsOptional()
   banner?: string;
 
-  @ApiProperty()
+  @ApiProperty({ required: false })
   @IsString()
   @IsOptional()
   status?: string;
 
-  @ApiProperty()
+  @ApiProperty({ required: false })
   @IsString()
   @IsOptional()
   position?: string;

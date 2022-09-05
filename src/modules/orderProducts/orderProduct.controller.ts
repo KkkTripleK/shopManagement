@@ -10,7 +10,13 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBadRequestResponse,
+  ApiBearerAuth,
+  ApiConsumes,
+  ApiOkResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { userRole } from 'src/commons/common.enum';
 import { Roles } from 'src/decorators/decorator.roles';
 import { JwtAuthGuard } from 'src/guards/guard.jwt';
@@ -29,6 +35,9 @@ export class OrderProductController {
   // Show list products by OrderID
   @Get('user/order-product/:orderId')
   @UseGuards(JwtAuthGuard)
+  @ApiConsumes('multipart/form-data')
+  @ApiOkResponse()
+  @ApiBadRequestResponse()
   async getListProductByOrderId(
     @Param('orderId', new ParseUUIDPipe()) orderId: string,
     @Req() req: any,
@@ -43,6 +52,9 @@ export class OrderProductController {
   @Get('admin/order-product/:orderId')
   @UseGuards(JWTandRolesGuard)
   @Roles(userRole.ADMIN)
+  @ApiConsumes('multipart/form-data')
+  @ApiOkResponse()
+  @ApiBadRequestResponse()
   async adminGetListProductByOrderId(
     @Param('orderId', new ParseUUIDPipe()) orderId: string,
   ) {
@@ -52,6 +64,9 @@ export class OrderProductController {
   //Create new Order-products
   @Post('user/order-product')
   @UseGuards(JwtAuthGuard)
+  @ApiConsumes('multipart/form-data')
+  @ApiOkResponse()
+  @ApiBadRequestResponse()
   async addProductToOrder(
     @Body() requestBody: createOrderProductDto,
     @Req() req: any,
@@ -64,6 +79,9 @@ export class OrderProductController {
 
   @Patch('user/order-product/:orderProductId')
   @UseGuards(JwtAuthGuard)
+  @ApiConsumes('multipart/form-data')
+  @ApiOkResponse()
+  @ApiBadRequestResponse()
   async updateProductInOrder(
     @Body() requestBody: updateOrderProductDto,
     @Param('orderProductId') orderProductId: string,

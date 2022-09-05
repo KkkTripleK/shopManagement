@@ -200,7 +200,6 @@ export class OrderProductService {
       username,
     );
     orderInfo.totalProductPrice -= orderProductInfo.totalPrice;
-    console.log(orderInfo.fk_OrderProduct);
     if (orderInfo.fk_OrderProduct === undefined) {
       throw new HttpException('List order-product is empty!', HttpStatus.OK);
     }

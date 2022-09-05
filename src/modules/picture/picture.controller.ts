@@ -21,6 +21,7 @@ import { PictureService } from './picture.service';
 
 @ApiBearerAuth()
 @ApiTags('Picture')
+@ApiConsumes('multipart/form-data')
 @Controller()
 export class PictureController {
   constructor(private pictureService: PictureService) {}
@@ -44,7 +45,6 @@ export class PictureController {
   @UseGuards(JWTandRolesGuard)
   @Roles('admin')
   @UseInterceptors(FileInterceptor('file', multerOptions))
-  @ApiConsumes('multipart/form-data')
   @ApiBody({
     description: 'Banner',
     type: uploadFileDto,

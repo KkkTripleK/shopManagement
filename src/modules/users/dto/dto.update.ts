@@ -5,34 +5,34 @@ import { Entity } from 'typeorm';
 
 @Entity()
 export class UpdateDto {
-  @ApiProperty()
+  @ApiProperty({ required: false })
   @IsString()
   @IsOptional()
   password?: string;
 
-  @ApiProperty()
+  @ApiProperty({ required: false })
   @IsAlpha()
   @IsString()
   @Length(3, 20)
   @IsOptional()
   fullName?: string;
 
-  @ApiProperty()
+  @ApiProperty({ required: false })
   @IsOptional()
   @IsEnum(userGender)
   gender?: userGender;
 
-  @ApiProperty()
+  @ApiProperty({ required: false })
   @IsString()
   @IsOptional()
   age?: string;
 
-  @ApiProperty()
+  @ApiProperty({ required: false })
   @IsEnum(userStatus)
   @IsOptional()
   accountStatus?: userStatus;
 
-  @ApiProperty()
+  @ApiProperty({ required: false })
   @IsString()
   @IsOptional()
   address?: string;

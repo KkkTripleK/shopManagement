@@ -14,7 +14,7 @@ export class CreateCategoryDto {
   @Length(0, 12)
   name: string;
 
-  @ApiProperty()
+  @ApiProperty({ required: false })
   @IsEnum(categoryStatus)
   @IsOptional()
   status?: categoryStatus;

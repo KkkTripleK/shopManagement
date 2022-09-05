@@ -12,7 +12,13 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBadRequestResponse,
+  ApiBearerAuth,
+  ApiConsumes,
+  ApiOkResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { Pagination } from 'nestjs-typeorm-paginate';
 import { userRole } from 'src/commons/common.enum';
 import { VerifyToken } from 'src/utils/util.verifyToken';
@@ -48,11 +54,17 @@ export class UserController {
 
   @Patch('user/update')
   @UseGuards(JwtAuthGuard)
+  @ApiConsumes('multipart/form-data')
+  @ApiOkResponse()
+  @ApiBadRequestResponse()
   async updateAccount(@Body() param: UpdateDto, @Req() req: any): Promise<any> {
     return this.userService.updateAccount(req.userInfo, param);
   }
 
   @Post('user/forgot-password')
+  @ApiConsumes('multipart/form-data')
+  @ApiOkResponse()
+  @ApiBadRequestResponse()
   async forgotPassword(@Body() requestBody: ForgotPasswordDto): Promise<any> {
     await this.userService.forgotPassword(requestBody.username);
     return 'New password is sent to your email!';
@@ -60,6 +72,9 @@ export class UserController {
 
   @Post('user/change-password')
   @UseGuards(JwtAuthGuard)
+  @ApiConsumes('multipart/form-data')
+  @ApiOkResponse()
+  @ApiBadRequestResponse()
   async changePassword(
     @Body() requestBody: ChangePasswordDto,
     @Req() req: any,
@@ -70,6 +85,9 @@ export class UserController {
   @Delete('user')
   @UseGuards(JWTandRolesGuard)
   @Roles(userRole.ADMIN, userRole.MEMBER)
+  @ApiConsumes('multipart/form-data')
+  @ApiOkResponse()
+  @ApiBadRequestResponse()
   async deleteAccount(@Body() requestBody: DeleteAccountDto, @Req() req: any) {
     await this.authService.validateUser(req.userInfo, requestBody.password);
     await this.userService.deleteAccount(req.userInfo);
@@ -100,6 +118,9 @@ export class UserController {
   @Delete('/admin/account/:userID')
   @UseGuards(JWTandRolesGuard)
   @Roles(userRole.ADMIN)
+  @ApiConsumes('multipart/form-data')
+  @ApiOkResponse()
+  @ApiBadRequestResponse()
   async deleteUserByID(@Param('userID') userID: string) {
     await this.userService.deleteAccount({ id: userID });
     return 'The account have been change to Inactive status!';

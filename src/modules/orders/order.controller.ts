@@ -10,7 +10,13 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBadRequestResponse,
+  ApiBearerAuth,
+  ApiConsumes,
+  ApiOkResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { userRole } from 'src/commons/common.enum';
 import { Roles } from '../../decorators/decorator.roles';
 import { JwtAuthGuard } from '../../guards/guard.jwt';
@@ -45,6 +51,9 @@ export class OrderController {
 
   @Post('user/order/create')
   @UseGuards(JwtAuthGuard)
+  @ApiConsumes('multipart/form-data')
+  @ApiOkResponse()
+  @ApiBadRequestResponse()
   async createOrder(@Body() orderInfo: createOrderDto, @Req() req: any) {
     orderInfo.fk_User = req.userInfo.username;
     return this.orderService.createOrder(orderInfo);
@@ -52,6 +61,9 @@ export class OrderController {
 
   @Patch('user/order/:orderId')
   @UseGuards(JwtAuthGuard)
+  @ApiConsumes('multipart/form-data')
+  @ApiOkResponse()
+  @ApiBadRequestResponse()
   async updateOrder(
     @Param('orderId') orderId: string,
     @Body() updateOrder: updateOrderDto,
@@ -91,6 +103,9 @@ export class OrderController {
 
   @Post('user/order/confirm')
   @UseGuards(JwtAuthGuard)
+  @ApiConsumes('multipart/form-data')
+  @ApiOkResponse()
+  @ApiBadRequestResponse()
   async orderConfirm(@Body() requestBody: orderConfirmDto, @Req() req: any) {
     const fk_User = req.userInfo.username;
     return this.orderService.orderConfirm(requestBody.id, fk_User);

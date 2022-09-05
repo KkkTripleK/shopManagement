@@ -10,11 +10,11 @@ export class updateOrderDto {
   address?: string;
 
   //su dung Regex
-  @ApiProperty()
+  @ApiProperty({ required: false })
   @IsOptional()
   phone?: string;
 
-  @ApiProperty()
+  @ApiProperty({ required: false })
   @IsOptional()
   @IsEnum(orderPayment)
   payment?: orderPayment;

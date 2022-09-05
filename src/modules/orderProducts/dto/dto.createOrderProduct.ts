@@ -18,12 +18,12 @@ export class createOrderProductDto {
   @IsString()
   qty: string;
 
-  @ApiProperty()
+  @ApiProperty({ required: false })
   @IsNumber()
   @IsOptional()
   price?: number;
 
-  @ApiProperty()
+  @ApiProperty({ required: false })
   @IsNumber()
   @IsOptional()
   totalPrice?: number;

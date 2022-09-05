@@ -39,12 +39,12 @@ export class CreateUserDto {
   @Length(3, 20)
   fullName: string;
 
-  @ApiProperty()
+  @ApiProperty({ required: false })
   @IsOptional()
   @IsEnum(userGender)
   gender: userGender;
 
-  @ApiProperty()
+  @ApiProperty({ required: false })
   @IsString()
   @IsOptional()
   age: string;
