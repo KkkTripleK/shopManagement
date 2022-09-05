@@ -26,5 +26,6 @@ import { ProductService } from './product.service';
     UserRepository,
     CategoryRepository,
   ],
+  exports: [ProductService],
 })
 export class ProductModule {}

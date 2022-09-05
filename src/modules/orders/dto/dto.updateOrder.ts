@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEnum, IsOptional } from 'class-validator';
+import { IsEnum, IsOptional, Matches } from 'class-validator';
 import { orderPayment } from 'src/commons/common.enum';
+import { PHONE_REGEX } from 'src/utils/util.regex';
 import { Entity } from 'typeorm';
 
 @Entity()
@@ -11,7 +12,7 @@ export class updateOrderDto {
 
   //su dung Regex
   @ApiProperty({ required: false })
-  @IsOptional()
+  @Matches(PHONE_REGEX)
   phone?: string;
 
   @ApiProperty({ required: false })

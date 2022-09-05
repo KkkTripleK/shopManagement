@@ -11,13 +11,7 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import {
-  ApiBadRequestResponse,
-  ApiBearerAuth,
-  ApiConsumes,
-  ApiOkResponse,
-  ApiTags,
-} from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { Pagination } from 'nestjs-typeorm-paginate';
 import { userRole } from 'src/commons/common.enum';
 import { Roles } from '../../decorators/decorator.roles';
@@ -79,9 +73,6 @@ export class ProductController {
   @Post('admin/product/create')
   @UseGuards(JWTandRolesGuard)
   @Roles(userRole.ADMIN)
-  @ApiConsumes('multipart/form-data')
-  @ApiOkResponse()
-  @ApiBadRequestResponse()
   async createNewProduct(
     @Body() requestBody: CreateProductDto,
   ): Promise<ProductEntity> {
@@ -91,9 +82,6 @@ export class ProductController {
   @Patch('admin/product/:productID')
   @UseGuards(JWTandRolesGuard)
   @Roles(userRole.ADMIN)
-  @ApiConsumes('multipart/form-data')
-  @ApiOkResponse()
-  @ApiBadRequestResponse()
   async updateProductByID(
     @Param('productID') productID: string,
     @Body() requestBody: UpdateProductDto,
@@ -104,9 +92,6 @@ export class ProductController {
   @Post('admin/product/addToCate')
   @UseGuards(JWTandRolesGuard)
   @Roles(userRole.ADMIN)
-  @ApiConsumes('multipart/form-data')
-  @ApiOkResponse()
-  @ApiBadRequestResponse()
   async addProductToCategory(@Body() requestBody: AddProductToCategoryDto) {
     return this.productService.addProductToCategory(requestBody);
   }

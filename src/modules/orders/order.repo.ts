@@ -45,7 +45,8 @@ export class OrderRepository {
         ],
       })
       .leftJoinAndSelect('order.fk_User', 'fk_User')
-      .select(['order'])
+      .leftJoinAndSelect('order.fk_OrderProduct', 'fk_OrderProduct')
+      .select(['order', 'fk_OrderProduct'])
       .getOne();
     return result;
   }

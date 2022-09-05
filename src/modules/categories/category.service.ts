@@ -55,7 +55,7 @@ export class CategoryService {
     fs.unlinkSync(path);
   }
 
-  async uploadBanner(file, requestBody) {
+  async uploadBanner(file: any, requestBody: any) {
     const productInfo = await this.cateRepo.findCategoryByID(
       requestBody.productId,
     );

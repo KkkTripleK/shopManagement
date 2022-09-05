@@ -1,4 +1,10 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+  forwardRef,
+  HttpException,
+  HttpStatus,
+  Inject,
+  Injectable,
+} from '@nestjs/common';
 import { orderShipment, orderStatus } from 'src/commons/common.enum';
 import { OrderService } from '../orders/order.service';
 import { ProductEntity } from '../products/product.entity';
@@ -12,6 +18,7 @@ export class OrderProductService {
   constructor(
     private orderProductRepo: OrderProductRepository,
     private productRepo: ProductRepository,
+    @Inject(forwardRef(() => OrderService))
     private orderService: OrderService,
   ) {}
 

@@ -33,12 +33,7 @@ export class OrderProductRepository {
       .leftJoinAndSelect('orderProduct.fk_Product', 'fk_Product')
       .leftJoinAndSelect('orderProduct.fk_Order', 'fk_Order')
       .where('fk_Order.id = :orderId', { orderId })
-      .select([
-        'orderProduct',
-        'fk_Product.id',
-        'fk_Product.name',
-        'fk_Order.id',
-      ])
+      .select(['orderProduct', 'fk_Product'])
       .getMany();
     return result;
   }

@@ -1,12 +1,19 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { orderStatus } from 'src/commons/common.enum';
+import { OrderProductService } from '../orderProducts/orderProduct.service';
+import { ProductService } from '../products/product.service';
 import { createOrderDto } from './dto/dto.createOrder';
 import { OrderEntity } from './order.entity';
 import { OrderRepository } from './order.repo';
 
 @Injectable()
 export class OrderService {
-  constructor(private orderRepo: OrderRepository) {}
+  constructor(
+    private orderRepo: OrderRepository,
+    private productService: ProductService,
+    //@Inject(forwardRef(() => OrderProductService))
+    private orderProductService: OrderProductService,
+  ) {}
 
   async getListOrder(fk_Username: string) {
     const listOrder = await this.orderRepo.getListOrder(fk_Username);
@@ -86,17 +93,38 @@ export class OrderService {
 
   async orderConfirm(orderId: string, fk_Username: string) {
     const orderInfo = await this.getOrderByIdAndUsername(orderId, fk_Username);
-    console.log(orderInfo);
     if (orderInfo.totalProductPrice === 0) {
       throw new HttpException(
         "Order doesn't have any product!",
         HttpStatus.BAD_REQUEST,
       );
-    } else if (orderInfo.status === orderStatus.SHOPPING) {
+    } else if (orderInfo.status !== orderStatus.SHOPPING) {
       throw new HttpException(
-        "Order doesn't have any product!",
+        'Can not change the status of this order!',
         HttpStatus.BAD_REQUEST,
       );
+    }
+    // show list product by orderId
+    const listOrderProductInfo =
+      await this.orderProductService.getListProductByOrderId(
+        orderId,
+        fk_Username,
+      );
+    for (const orderProductInfo of listOrderProductInfo) {
+      console.log(orderProductInfo.qty);
+      const productInfo = await this.productService.showProductByID(
+        orderProductInfo.fk_Product.id,
+      );
+      if (productInfo.qtyRemaining < orderProductInfo.qty) {
+        throw new HttpException(
+          'The qty instock is not enouch!',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+      productInfo.qtyRemaining = String(
+        Number(productInfo.qtyRemaining) - Number(orderProductInfo.qty),
+      );
+      await this.productService.createNewProduct(productInfo);
     }
     return this.orderRepo.updateOrder(orderInfo, {
       status: orderStatus.ORDERED,
