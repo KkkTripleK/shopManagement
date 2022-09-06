@@ -211,6 +211,7 @@ export class OrderProductService {
     orderInfo.totalOrderPrice -= orderProductInfo.totalPrice;
     if (orderInfo.totalProductPrice === 0) {
       orderInfo.shipmentPrice = 0;
+      orderInfo.totalOrderPrice = 0;
     }
     if (orderInfo.fk_OrderProduct === undefined) {
       throw new HttpException('List order-product is empty!', HttpStatus.OK);

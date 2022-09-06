@@ -46,5 +46,6 @@ import { UserService } from './user.service';
     ConfigService,
     VerificationRepository,
   ],
+  exports: [UserRepository],
 })
 export class UserModule {}

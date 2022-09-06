@@ -43,3 +43,8 @@ export enum orderShipment {
   GHN = 'Giao hang nhanh',
   VIETTELPOST = 'ViettelPost',
 }
+
+export enum couponStatus {
+  ACTIVE = 'Active',
+  INACTIVE = 'Inactive',
+}
