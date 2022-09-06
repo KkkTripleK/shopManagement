@@ -7,49 +7,49 @@ import { PictureEntity } from './picture.entity';
 
 @Injectable()
 export class PictureRepository {
-  constructor(
-    @InjectRepository(PictureEntity)
-    private pictureRepo: Repository<PictureEntity>,
-  ) {}
+    constructor(
+        @InjectRepository(PictureEntity)
+        private pictureRepo: Repository<PictureEntity>,
+    ) {}
 
-  async uploadPicture(pictureInfo: UploadPictureDto) {
-    return this.pictureRepo.save(pictureInfo);
-  }
-
-  async updatePicture(pictureId, pictureInfo: UpdatePictureDto) {
-    const info = await this.showPictureByID(pictureId);
-    if (info === null) {
-      throw new HttpException('PictureID is invalid!', HttpStatus.BAD_REQUEST);
+    async uploadPicture(pictureInfo: UploadPictureDto) {
+        return this.pictureRepo.save(pictureInfo);
     }
-    for (const key in pictureInfo) {
-      info[key] = pictureInfo[key];
+
+    async updatePicture(pictureId, pictureInfo: UpdatePictureDto) {
+        const info = await this.showPictureByID(pictureId);
+        if (info === null) {
+            throw new HttpException('PictureID is invalid!', HttpStatus.BAD_REQUEST);
+        }
+        for (const key in pictureInfo) {
+            info[key] = pictureInfo[key];
+        }
+        return this.pictureRepo.save(info);
     }
-    return this.pictureRepo.save(info);
-  }
 
-  async showListPicture() {
-    return this.pictureRepo.find();
-  }
+    async showListPicture() {
+        return this.pictureRepo.find();
+    }
 
-  async showListPictureByCondition(condition: any) {
-    return this.pictureRepo.find(condition);
-  }
+    async showListPictureByCondition(condition: any) {
+        return this.pictureRepo.find(condition);
+    }
 
-  async showPictureByID(id: string) {
-    return this.pictureRepo.findOne({ where: [{ id }] });
-  }
+    async showPictureByID(id: string) {
+        return this.pictureRepo.findOne({ where: [{ id }] });
+    }
 
-  async showPictureByProductID(productId: string) {
-    return this.pictureRepo.find({
-      where: {
-        product: {
-          id: productId,
-        },
-      },
-    });
-  }
+    async showPictureByProductID(productId: string) {
+        return this.pictureRepo.find({
+            where: {
+                product: {
+                    id: productId,
+                },
+            },
+        });
+    }
 
-  async deletePicture(id: string) {
-    return this.pictureRepo.delete({ id });
-  }
+    async deletePicture(id: string) {
+        return this.pictureRepo.delete({ id });
+    }
 }

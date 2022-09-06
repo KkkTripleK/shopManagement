@@ -1,7 +1,7 @@
-import { Controller } from '@nestjs/common';
-import { CouponUserService } from './couponUser.service';
+// import { Controller } from '@nestjs/common';
+// import { CouponUserService } from './couponUser.service';
 
-@Controller()
-export class CouponUserController {
-  constructor(private couponUserService: CouponUserService) {}
-}
+// @Controller()
+// export class CouponUserController {
+//   constructor(private couponUserService: CouponUserService) {}
+// }

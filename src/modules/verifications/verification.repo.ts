@@ -6,19 +6,16 @@ import { VerificationEntity } from './verification.entity';
 
 @Injectable()
 export class VerificationRepository {
-  constructor(
-    @InjectRepository(VerificationEntity)
-    private verificationEntity: Repository<VerificationEntity>,
-  ) {}
+    constructor(
+        @InjectRepository(VerificationEntity)
+        private verificationEntity: Repository<VerificationEntity>,
+    ) {}
 
-  saveActiveCode(
-    username: string,
-    activeCode: string,
-  ): Promise<VerificationEntity> {
-    return this.verificationEntity.save({ username, activeCode });
-  }
+    saveActiveCode(username: string, activeCode: string): Promise<VerificationEntity> {
+        return this.verificationEntity.save({ username, activeCode });
+    }
 
-  verifyUser(verifyDTO: VerifyDTO): Promise<number> {
-    return this.verificationEntity.count({ where: [verifyDTO] });
-  }
+    verifyUser(verifyDTO: VerifyDTO): Promise<number> {
+        return this.verificationEntity.count({ where: [verifyDTO] });
+    }
 }

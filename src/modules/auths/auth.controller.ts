@@ -15,7 +15,6 @@ import {
 import { HeadersObject } from '@nestjs/swagger/dist/interfaces/open-api-spec.interface';
 import { VerifyToken } from 'src/utils/util.verifyToken';
 import { ValidateAuthGuard } from '../../guards/guard.validate';
-import { MailService } from '../email/email.service';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from './dto/dto.create';
 import { GenerateTokenDto } from './dto/dto.generateToken';
@@ -27,7 +26,6 @@ import { VerifyDTO } from './dto/dto.verify';
 export class AuthController {
   constructor(
     private authService: AuthService,
-    private mailService: MailService,
     private verifyToken: VerifyToken,
   ) {}
 

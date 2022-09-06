@@ -9,14 +9,14 @@ import { CategoryRepository } from './category.repo';
 import { CategoryService } from './category.service';
 
 @Module({
-  imports: [
-    TypeOrmModule.forRoot(typeOrmConfig),
-    TypeOrmModule.forFeature([CategoryEntity]),
-    MulterModule,
-    UserModule,
-  ],
-  controllers: [CategoryController],
-  providers: [CategoryService, CategoryRepository],
-  exports: [CategoryRepository],
+    imports: [
+        TypeOrmModule.forRoot(typeOrmConfig),
+        TypeOrmModule.forFeature([CategoryEntity]),
+        MulterModule,
+        UserModule,
+    ],
+    controllers: [CategoryController],
+    providers: [CategoryService, CategoryRepository],
+    exports: [CategoryRepository],
 })
 export class CategoryModule {}

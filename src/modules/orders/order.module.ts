@@ -13,16 +13,16 @@ import { OrderRepository } from './order.repo';
 import { OrderService } from './order.service';
 
 @Module({
-  imports: [
-    TypeOrmModule.forRoot(typeOrmConfig),
-    TypeOrmModule.forFeature([OrderEntity, ProductEntity]),
-    CategoryModule,
-    UserModule,
-    CouponModule,
-    forwardRef(() => OrderProductModule),
-  ],
-  controllers: [OrderController],
-  providers: [OrderService, OrderRepository, ProductRepository],
-  exports: [OrderService, OrderRepository],
+    imports: [
+        TypeOrmModule.forRoot(typeOrmConfig),
+        TypeOrmModule.forFeature([OrderEntity, ProductEntity]),
+        CategoryModule,
+        UserModule,
+        CouponModule,
+        forwardRef(() => OrderProductModule),
+    ],
+    controllers: [OrderController],
+    providers: [OrderService, OrderRepository, ProductRepository],
+    exports: [OrderService, OrderRepository],
 })
 export class OrderModule {}

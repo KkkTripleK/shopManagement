@@ -6,58 +6,53 @@ import { OrderProductEntity } from './orderProduct.entity';
 
 @Injectable()
 export class OrderProductRepository {
-  constructor(
-    @InjectRepository(OrderProductEntity)
-    private orderProductRepo: Repository<OrderProductEntity>,
-  ) {}
+    constructor(
+        @InjectRepository(OrderProductEntity)
+        private orderProductRepo: Repository<OrderProductEntity>,
+    ) {}
 
-  async showOrderProduct(orderProductId: string) {
-    return this.orderProductRepo.findOne({
-      where: [{ id: orderProductId }],
-      relations: {
-        fk_Order: true,
-        fk_Product: true,
-      },
-    });
-  }
+    async updateProductInOrderProduct(orderProductId: string) {
+        return this.orderProductRepo.findOne({
+            where: [{ id: orderProductId }],
+            relations: {
+                fk_Order: true,
+                fk_Product: true,
+            },
+        });
+    }
 
-  async createOrderProduct(
-    requestBody: createOrderProductDto,
-  ): Promise<OrderProductEntity> {
-    return this.orderProductRepo.save(requestBody);
-  }
+    async createOrderProduct(requestBody: createOrderProductDto): Promise<OrderProductEntity> {
+        return this.orderProductRepo.save(requestBody);
+    }
 
-  async getListProductByOrderId(orderId: string) {
-    const result = this.orderProductRepo
-      .createQueryBuilder('orderProduct')
-      .leftJoinAndSelect('orderProduct.fk_Product', 'fk_Product')
-      .leftJoinAndSelect('orderProduct.fk_Order', 'fk_Order')
-      .where('fk_Order.id = :orderId', { orderId })
-      .select(['orderProduct', 'fk_Product'])
-      .getMany();
-    return result;
-  }
+    async getListProductByOrderId(orderId: string) {
+        const result = this.orderProductRepo
+            .createQueryBuilder('orderProduct')
+            .leftJoinAndSelect('orderProduct.fk_Product', 'fk_Product')
+            .leftJoinAndSelect('orderProduct.fk_Order', 'fk_Order')
+            .where('fk_Order.id = :orderId', { orderId })
+            .select(['orderProduct', 'fk_Product'])
+            .getMany();
+        return result;
+    }
 
-  async updateProductInOrder(
-    orderProductInfo: OrderProductEntity,
-    newQty: string,
-  ) {
-    orderProductInfo.qty = newQty;
-    return orderProductInfo;
-  }
+    async updateProductInOrder(orderProductInfo: OrderProductEntity, newQty: string) {
+        orderProductInfo.qty = newQty;
+        return orderProductInfo;
+    }
 
-  async deleteProductInOrder(orderProductId: string) {
-    return this.orderProductRepo.delete({ id: orderProductId });
-  }
+    async deleteProductInOrder(orderProductId: string) {
+        return this.orderProductRepo.delete({ id: orderProductId });
+    }
 
-  async getListOrderProductByProductId(productId: string) {
-    const result = this.orderProductRepo
-      .createQueryBuilder('orderProduct')
-      .leftJoinAndSelect('orderProduct.fk_Product', 'fk_Product')
-      .leftJoinAndSelect('orderProduct.fk_Order', 'fk_Order')
-      .where('fk_Product.id = :productId', { productId })
-      .select(['orderProduct', 'fk_Product', 'fk_Order'])
-      .getMany();
-    return result;
-  }
+    async getListOrderProductByProductId(productId: string) {
+        const result = this.orderProductRepo
+            .createQueryBuilder('orderProduct')
+            .leftJoinAndSelect('orderProduct.fk_Product', 'fk_Product')
+            .leftJoinAndSelect('orderProduct.fk_Order', 'fk_Order')
+            .where('fk_Product.id = :productId', { productId })
+            .select(['orderProduct', 'fk_Product', 'fk_Order'])
+            .getMany();
+        return result;
+    }
 }

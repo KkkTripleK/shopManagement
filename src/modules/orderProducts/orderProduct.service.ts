@@ -1,11 +1,5 @@
-import {
-  forwardRef,
-  HttpException,
-  HttpStatus,
-  Inject,
-  Injectable,
-} from '@nestjs/common';
-import { orderShipment, orderStatus } from 'src/commons/common.enum';
+import { BadRequestException, forwardRef, HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
+import { orderShipment, orderStatus, productStatus } from 'src/commons/common.enum';
 import { OrderService } from '../orders/order.service';
 import { ProductEntity } from '../products/product.entity';
 import { ProductRepository } from '../products/product.repo';
@@ -15,217 +9,202 @@ import { OrderProductRepository } from './orderProduct.repo';
 
 @Injectable()
 export class OrderProductService {
-  constructor(
-    private orderProductRepo: OrderProductRepository,
-    private productRepo: ProductRepository,
-    @Inject(forwardRef(() => OrderService))
-    private orderService: OrderService,
-  ) {}
+    constructor(
+        private orderProductRepo: OrderProductRepository,
+        private productRepo: ProductRepository,
+        @Inject(forwardRef(() => OrderService))
+        private orderService: OrderService,
+    ) {}
 
-  async createOrderProduct(
-    orderProductInfo: createOrderProductDto,
-    username: string,
-  ): Promise<OrderProductEntity> {
-    /*
-    Check valid fk_Order
-    */
-    const orderInfo = await this.orderService.getOrderByIdAndUsername(
-      orderProductInfo.fk_Order.toString(),
-      username,
-    );
-    if (orderInfo.status !== orderStatus.SHOPPING) {
-      throw new HttpException(
-        'Can not change the order!',
-        HttpStatus.BAD_REQUEST,
-      );
-    }
-    /*
-    Check valid fk_Product
-    */
-    const productInfo = await this.checkProductExist(
-      orderProductInfo.fk_Product,
-    );
-    /*
-    Check orderProduct exist
-    */
-    const listOrderProduct = await this.getListProductByOrderId(
-      orderProductInfo.fk_Order.toString(),
-      username,
-    );
-    for (const oldOrderProductInfo of listOrderProduct) {
-      if (
-        Number(oldOrderProductInfo.fk_Product.id) ===
-        Number(orderProductInfo.fk_Product)
-      ) {
+    async createOrderProduct(orderProductInfo: createOrderProductDto, username: string): Promise<OrderProductEntity> {
         /*
-        Check qty after change
+        Check valid fk_Order
         */
-        const productQty = await this.checkQtyRemain(
-          productInfo,
-          Number(orderProductInfo.qty) + Number(oldOrderProductInfo.qty),
+        const orderInfo = await this.orderService.getOrderByOrderIdAndUsername(
+            orderProductInfo.fk_Order.toString(),
+            username,
         );
-        if (productQty > Number(productInfo.qtyRemaining)) {
-          throw new HttpException(
-            'Your order quantities is higher than quantity in stock!',
-            HttpStatus.BAD_REQUEST,
-          );
+        if (orderInfo.status !== orderStatus.SHOPPING) {
+            throw new HttpException('Can not change the order!', HttpStatus.BAD_REQUEST);
         }
-        oldOrderProductInfo.qty = productQty.toString();
-        oldOrderProductInfo.totalPrice = oldOrderProductInfo.price * productQty;
-        orderInfo.totalProductPrice +=
-          oldOrderProductInfo.price * Number(orderProductInfo.qty);
-        orderInfo.totalOrderPrice +=
-          oldOrderProductInfo.price * Number(orderProductInfo.qty);
+        /*
+        Check valid fk_Product
+        */
+        const productInfo = await this.checkProductExist(orderProductInfo.fk_Product);
+        if (productInfo.status === productStatus.INACTIVE || productInfo.status === productStatus.OUTSTOCK) {
+            throw new BadRequestException(`${productInfo.name} is Inactive or Out-stock!`);
+        }
+        /*
+        Check coupon exist
+        */
+        let couponDiscount = 0;
+        if (orderInfo.fk_Coupon === null) {
+            couponDiscount = 0;
+        } else {
+            couponDiscount = orderInfo.fk_Coupon.discount;
+        }
+        /*
+        Check orderProduct exist
+        */
+        const listOrderProduct = await this.getListProductByOrderId(orderProductInfo.fk_Order.toString(), username);
+        for (const oldOrderProductInfo of listOrderProduct) {
+            if (Number(oldOrderProductInfo.fk_Product.id) === Number(orderProductInfo.fk_Product)) {
+                /*
+                Check qty after change
+                */
+                const productQty = await this.checkQtyRemain(
+                    productInfo,
+                    Number(orderProductInfo.qty) + Number(oldOrderProductInfo.qty),
+                );
+                if (productQty > Number(productInfo.qtyRemaining)) {
+                    throw new HttpException(
+                        'Your order quantities is higher than quantity in stock!',
+                        HttpStatus.BAD_REQUEST,
+                    );
+                }
+
+                // Caculate price of orderInfo, save to DB
+                const newOrderProductPrice = oldOrderProductInfo.price * Number(orderProductInfo.qty);
+                const newOrderProductPrice_discounted = (newOrderProductPrice * (100 - couponDiscount)) / 100;
+                oldOrderProductInfo.qty = productQty.toString();
+                oldOrderProductInfo.totalPrice += newOrderProductPrice;
+                orderInfo.totalProductPrice += newOrderProductPrice;
+                orderInfo.totalOrderPrice += newOrderProductPrice_discounted;
+                await this.orderService.createOrder(orderInfo);
+                return this.orderProductRepo.createOrderProduct(oldOrderProductInfo);
+            }
+        }
+        /*
+        Check qty input
+        */
+        const orderQty = await this.checkQtyRemain(productInfo, Number(orderProductInfo.qty));
+        /*
+        OrderProduct not exist
+        */
+        orderProductInfo.qty = orderQty.toString();
+        orderProductInfo.price = Number(productInfo.netPrice);
+        if (orderInfo.shipment === orderShipment.GHN && orderInfo.shipmentPrice === 0) {
+            orderInfo.shipmentPrice = 30000;
+            orderInfo.totalOrderPrice = orderInfo.shipmentPrice;
+        } else if (orderInfo.shipment === orderShipment.VIETTELPOST && orderInfo.shipmentPrice === 0) {
+            orderInfo.shipmentPrice = 35000;
+            orderInfo.totalOrderPrice = orderInfo.shipmentPrice;
+        }
+        const newOrderProductPrice = orderProductInfo.price * orderQty;
+        const newOrderProductPrice_discounted = (orderProductInfo.price * orderQty * (100 - couponDiscount)) / 100;
+        orderProductInfo.totalPrice = newOrderProductPrice;
+        orderInfo.totalProductPrice += newOrderProductPrice;
+        orderInfo.totalOrderPrice += newOrderProductPrice_discounted;
         await this.orderService.createOrder(orderInfo);
-        console.log(orderInfo.totalProductPrice);
-        return this.orderProductRepo.createOrderProduct(oldOrderProductInfo);
-      }
+        return this.orderProductRepo.createOrderProduct(orderProductInfo);
     }
-    /*
-    Check qty input
-    */
-    const orderQty = await this.checkQtyRemain(
-      productInfo,
-      Number(orderProductInfo.qty),
-    );
-    /*
-    OrderProduct not exist
-    */
-    orderProductInfo.qty = orderQty.toString();
-    orderProductInfo.price = Number(productInfo.netPrice);
-    if (orderInfo.shipment === orderShipment.GHN) {
-      orderInfo.shipmentPrice = 30000;
-    } else {
-      orderInfo.shipmentPrice = 35000;
-    }
-    orderProductInfo.totalPrice = orderProductInfo.price * orderQty;
-    orderInfo.totalProductPrice += orderProductInfo.totalPrice;
-    orderInfo.totalOrderPrice =
-      orderInfo.totalProductPrice + orderInfo.shipmentPrice;
-    await this.orderService.createOrder(orderInfo);
-    return this.orderProductRepo.createOrderProduct(orderProductInfo);
-  }
 
-  async getListProductByOrderId(
-    orderId: string,
-    username: string,
-  ): Promise<OrderProductEntity[]> {
-    await this.orderService.getOrderByIdAndUsername(orderId, username);
-    return this.orderProductRepo.getListProductByOrderId(orderId);
-  }
-
-  async adminGetListProductByOrderId(
-    orderId: string,
-  ): Promise<OrderProductEntity[]> {
-    const listProduct = await this.orderProductRepo.getListProductByOrderId(
-      orderId,
-    );
-    if (listProduct.length === 0) {
-      throw new HttpException('The order is empty!', HttpStatus.BAD_REQUEST);
+    async getListProductByOrderId(orderId: string, username: string): Promise<OrderProductEntity[]> {
+        await this.orderService.getOrderByOrderIdAndUsername(orderId, username);
+        return this.orderProductRepo.getListProductByOrderId(orderId);
     }
-    return listProduct;
-  }
 
-  async updateProductInOrder(
-    orderProductId: string,
-    newQty: string,
-    username: string,
-  ) {
-    const orderProductInfo = await this.orderProductRepo.showOrderProduct(
-      orderProductId,
-    );
-    if (orderProductInfo === null) {
-      throw new HttpException(
-        'OrderProductID is invalid!',
-        HttpStatus.BAD_REQUEST,
-      );
+    async adminGetListProductByOrderId(orderId: string): Promise<OrderProductEntity[]> {
+        const listProduct = await this.orderProductRepo.getListProductByOrderId(orderId);
+        if (listProduct.length === 0) {
+            throw new HttpException('The order is empty!', HttpStatus.BAD_REQUEST);
+        }
+        return listProduct;
     }
-    const productInfo = await this.checkProductExist(
-      orderProductInfo.fk_Product.id,
-    );
-    await this.checkQtyRemain(productInfo, Number(newQty));
-    const orderInfo = await this.orderService.getOrderByIdAndUsername(
-      orderProductInfo.fk_Order.id,
-      username,
-    );
-    const oldTotalPrice = orderProductInfo.totalPrice;
-    /*
-      Save new Data to OrderProductTable
-    */
-    orderProductInfo.qty = newQty;
-    orderProductInfo.totalPrice = Number(newQty) * orderProductInfo.price;
-    await this.orderProductRepo.createOrderProduct(orderProductInfo);
-    /*
-      Save new Data to OrderTable
-    */
-    orderInfo.totalProductPrice =
-      orderInfo.totalProductPrice - oldTotalPrice + orderProductInfo.totalPrice;
-    return this.orderService.createOrder(orderInfo);
-  }
 
-  async checkProductExist(productId): Promise<ProductEntity> {
-    const productInfo = await this.productRepo.showProductByProductId({
-      id: productId,
-    });
-    if (productInfo === null) {
-      throw new HttpException('ProductID is invalid!', HttpStatus.BAD_REQUEST);
+    async updateProductInOrderProduct(orderProductId: string, newQty: string, username: string) {
+        const orderProductInfo = await this.orderProductRepo.updateProductInOrderProduct(orderProductId);
+        if (orderProductInfo === null) {
+            throw new HttpException('OrderProductID is invalid!', HttpStatus.BAD_REQUEST);
+        }
+        const productInfo = await this.checkProductExist(orderProductInfo.fk_Product.id);
+        await this.checkQtyRemain(productInfo, Number(newQty));
+        const orderInfo = await this.orderService.getOrderByOrderIdAndUsername(orderProductInfo.fk_Order.id, username);
+        const oldTotalPrice = orderProductInfo.totalPrice;
+        /*
+        Save new Data to OrderProductTable
+        */
+        orderProductInfo.qty = newQty;
+        orderProductInfo.totalPrice = Number(newQty) * orderProductInfo.price;
+        await this.orderProductRepo.createOrderProduct(orderProductInfo);
+        /*
+        Save new Data to OrderTable
+        */
+        orderInfo.totalProductPrice = orderInfo.totalProductPrice - oldTotalPrice + orderProductInfo.totalPrice;
+        orderInfo.totalOrderPrice = orderInfo.totalOrderPrice - oldTotalPrice + orderProductInfo.totalPrice;
+        await this.orderService.createOrder(orderInfo);
+        return `Update orderProduct ${orderProductId} successful!`;
     }
-    return productInfo;
-  }
 
-  async checkQtyRemain(productInfo: ProductEntity, orderQty: number) {
-    if (orderQty > Number(productInfo.qtyRemaining)) {
-      throw new HttpException(
-        'Your order quantities is higher than quantity in stock!',
-        HttpStatus.BAD_REQUEST,
-      );
-    } else if (orderQty === 0) {
-      throw new HttpException(
-        'The minimum of order quantity is 1!',
-        HttpStatus.BAD_REQUEST,
-      );
-    } else if (orderQty < 0) {
-      throw new HttpException(
-        'Product qty can not smaller than 0!',
-        HttpStatus.BAD_REQUEST,
-      );
+    async checkProductExist(productId): Promise<ProductEntity> {
+        const productInfo = await this.productRepo.showProductByProductId({
+            id: productId,
+        });
+        if (productInfo === null) {
+            throw new HttpException('ProductID is invalid!', HttpStatus.BAD_REQUEST);
+        }
+        return productInfo;
     }
-    return orderQty;
-  }
 
-  async deleteOrderProductInOrder(orderProductId: string, username: string) {
-    const orderProductInfo = await this.orderProductRepo.showOrderProduct(
-      orderProductId,
-    );
-    if (orderProductInfo === null) {
-      throw new HttpException(
-        'OrderProductID is invalid!',
-        HttpStatus.BAD_REQUEST,
-      );
+    async checkQtyRemain(productInfo: ProductEntity, orderQty: number) {
+        if (orderQty > Number(productInfo.qtyRemaining)) {
+            throw new HttpException('Your order quantities is higher than quantity in stock!', HttpStatus.BAD_REQUEST);
+        } else if (orderQty === 0) {
+            throw new HttpException('The minimum of order quantity is 1!', HttpStatus.BAD_REQUEST);
+        } else if (orderQty < 0) {
+            throw new HttpException('Product qty can not smaller than 0!', HttpStatus.BAD_REQUEST);
+        }
+        return orderQty;
     }
-    const orderInfo = await this.orderService.getOrderByIdAndUsername(
-      orderProductInfo.fk_Order.id,
-      username,
-    );
-    orderInfo.totalProductPrice -= orderProductInfo.totalPrice;
-    orderInfo.totalOrderPrice -= orderProductInfo.totalPrice;
-    if (orderInfo.totalProductPrice === 0) {
-      orderInfo.shipmentPrice = 0;
-      orderInfo.totalOrderPrice = 0;
-    }
-    if (orderInfo.fk_OrderProduct === undefined) {
-      throw new HttpException('List order-product is empty!', HttpStatus.OK);
-    }
-    await this.orderService.createOrder(orderInfo);
-    this.orderProductRepo.deleteProductInOrder(orderProductId);
-    return 'Delete successful!';
-  }
 
-  async getListOrderProductByProductId(productId: string) {
-    return this.orderProductRepo.getListOrderProductByProductId(productId);
-  }
+    async deleteOrderProductInOrder(orderProductId: string, username: string) {
+        const orderProductInfo = await this.orderProductRepo.updateProductInOrderProduct(orderProductId);
+        // check status of Orders, status === shopping --> Update Orders
 
-  async updateOrderProduct(orderProductInfo: createOrderProductDto) {
-    return this.orderProductRepo.createOrderProduct(orderProductInfo);
-  }
+        const orderInfo = await this.orderService.getOrderByOrderIdAndUsername(orderProductInfo.fk_Order.id, username);
+
+        if (orderInfo.status !== orderStatus.SHOPPING) {
+            throw new BadRequestException('Can not delete orderProduct!');
+        }
+        orderInfo.totalProductPrice -= orderProductInfo.totalPrice;
+        orderInfo.totalOrderPrice -= orderProductInfo.totalPrice;
+        // when order is empty
+        if (orderInfo.totalProductPrice === 0) {
+            orderInfo.shipmentPrice = 0;
+            orderInfo.totalOrderPrice = 0;
+        }
+        if (orderInfo.fk_OrderProduct === undefined) {
+            throw new HttpException('List order-product is empty!', HttpStatus.OK);
+        }
+        await this.orderService.createOrder(orderInfo);
+        this.orderProductRepo.deleteProductInOrder(orderProductId);
+    }
+
+    async adminDeleteOrderProductInOrder(orderProductId: string) {
+        const orderProductInfo = await this.orderProductRepo.updateProductInOrderProduct(orderProductId);
+        // check status of Orders, status === shopping --> Update Orders
+
+        const orderInfo = await this.orderService.adminGetOrderByOrderID(orderProductInfo.fk_Order.id);
+
+        if (orderInfo.status === orderStatus.SHOPPING) {
+            orderInfo.totalProductPrice -= orderProductInfo.totalPrice;
+            orderInfo.totalOrderPrice -=
+                orderProductInfo.totalPrice * ((100 - Number(orderInfo.fk_Coupon.discount)) / 100);
+            // when order is empty
+            if (orderInfo.totalProductPrice === 0) {
+                orderInfo.shipmentPrice = 0;
+                orderInfo.totalOrderPrice = 0;
+            }
+            await this.orderService.createOrder(orderInfo);
+            this.orderProductRepo.deleteProductInOrder(orderProductId);
+        }
+    }
+
+    async getListOrderProductByProductId(productId: string) {
+        return this.orderProductRepo.getListOrderProductByProductId(productId);
+    }
+
+    async updateOrderProduct(orderProductInfo: createOrderProductDto) {
+        return this.orderProductRepo.createOrderProduct(orderProductInfo);
+    }
 }

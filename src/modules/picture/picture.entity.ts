@@ -1,23 +1,17 @@
-import {
-  BaseEntity,
-  Column,
-  Entity,
-  ManyToOne,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
+import { BaseEntity, Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { ProductEntity } from '../products/product.entity';
 
 @Entity('Picture')
 export class PictureEntity extends BaseEntity {
-  @PrimaryGeneratedColumn()
-  id: string;
+    @PrimaryGeneratedColumn()
+    id: string;
 
-  @Column()
-  filename: string;
+    @Column()
+    filename: string;
 
-  @Column()
-  path: string;
+    @Column()
+    path: string;
 
-  @ManyToOne(() => ProductEntity, (product) => product.pictures)
-  product: ProductEntity;
+    @ManyToOne(() => ProductEntity, (product) => product.pictures)
+    product: ProductEntity;
 }

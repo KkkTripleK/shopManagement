@@ -16,25 +16,20 @@ import { PictureRepository } from './picture.repository';
 import { PictureService } from './picture.service';
 
 @Module({
-  imports: [
-    TypeOrmModule.forRoot(typeOrmConfig),
-    TypeOrmModule.forFeature([
-      UserEntity,
-      PictureEntity,
-      ProductEntity,
-      CategoryEntity,
-    ]),
-    MulterModule,
-  ],
-  controllers: [PictureController],
-  providers: [
-    PictureService,
-    VerifyToken,
-    JwtService,
-    UserRepository,
-    PictureRepository,
-    ProductRepository,
-    CategoryRepository,
-  ],
+    imports: [
+        TypeOrmModule.forRoot(typeOrmConfig),
+        TypeOrmModule.forFeature([UserEntity, PictureEntity, ProductEntity, CategoryEntity]),
+        MulterModule,
+    ],
+    controllers: [PictureController],
+    providers: [
+        PictureService,
+        VerifyToken,
+        JwtService,
+        UserRepository,
+        PictureRepository,
+        ProductRepository,
+        CategoryRepository,
+    ],
 })
 export class PictureModule {}

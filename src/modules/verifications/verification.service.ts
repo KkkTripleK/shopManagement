@@ -5,16 +5,13 @@ import { VerificationRepository } from './verification.repo';
 
 @Injectable()
 export class VerificationService {
-  constructor(private verificationRepository: VerificationRepository) {}
+    constructor(private verificationRepository: VerificationRepository) {}
 
-  saveActiveCode(
-    username: string,
-    activeCode: string,
-  ): Promise<VerificationDTO> {
-    return this.verificationRepository.saveActiveCode(username, activeCode);
-  }
+    saveActiveCode(username: string, activeCode: string): Promise<VerificationDTO> {
+        return this.verificationRepository.saveActiveCode(username, activeCode);
+    }
 
-  verifyUser(verifyDTO: VerifyDTO): Promise<number> {
-    return this.verificationRepository.verifyUser(verifyDTO);
-  }
+    verifyUser(verifyDTO: VerifyDTO): Promise<number> {
+        return this.verificationRepository.verifyUser(verifyDTO);
+    }
 }

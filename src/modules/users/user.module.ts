@@ -17,25 +17,25 @@ import { UserRepository } from './user.repo';
 import { UserService } from './user.service';
 
 @Module({
-  imports: [
-    TypeOrmModule.forRoot(typeOrmConfig),
-    TypeOrmModule.forFeature([UserEntity]),
-    VerificationModule,
-    PassportModule,
-    cacheModule,
-  ],
-  controllers: [UserController],
-  providers: [
-    UserService,
-    UserRepository,
-    VerifyToken,
-    JwtService,
-    RandomOTP,
-    MailService,
-    JwtStrategy,
-    AuthService,
-    ConfigService,
-  ],
-  exports: [UserRepository, VerifyToken, JwtService, MailService, RandomOTP],
+    imports: [
+        TypeOrmModule.forRoot(typeOrmConfig),
+        TypeOrmModule.forFeature([UserEntity]),
+        VerificationModule,
+        PassportModule,
+        cacheModule,
+    ],
+    controllers: [UserController],
+    providers: [
+        UserService,
+        UserRepository,
+        VerifyToken,
+        JwtService,
+        RandomOTP,
+        MailService,
+        JwtStrategy,
+        AuthService,
+        ConfigService,
+    ],
+    exports: [UserRepository, VerifyToken, JwtService, MailService, RandomOTP],
 })
 export class UserModule {}

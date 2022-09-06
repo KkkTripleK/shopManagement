@@ -4,18 +4,18 @@ import { Payload } from './dto/dto.verifyToken';
 
 @Injectable()
 export class VerifyToken {
-  constructor(private jwtService: JwtService) {}
+    constructor(private jwtService: JwtService) {}
 
-  async verifyJWT(header: any): Promise<Payload> {
-    const token = header.split(' ');
-    return this.jwtService.verifyAsync(token[1], {
-      secret: process.env.SECRET,
-    });
-  }
+    async verifyJWT(header: any): Promise<Payload> {
+        const token = header.split(' ');
+        return this.jwtService.verifyAsync(token[1], {
+            secret: process.env.SECRET,
+        });
+    }
 
-  async verifyTokenWithoutBearer(token: string): Promise<Payload> {
-    return this.jwtService.verifyAsync(token, {
-      secret: process.env.SECRET,
-    });
-  }
+    async verifyTokenWithoutBearer(token: string): Promise<Payload> {
+        return this.jwtService.verifyAsync(token, {
+            secret: process.env.SECRET,
+        });
+    }
 }

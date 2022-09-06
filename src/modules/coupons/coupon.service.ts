@@ -7,29 +7,29 @@ import { updateCouponDto } from './dto/dto.updateCoupon';
 
 @Injectable()
 export class CouponService {
-  constructor(private couponRepo: CouponRepository) {}
-  async createNewCoupon(couponInfo: createCouponDto) {
-    couponInfo.qtyRemain = couponInfo.totalQty;
-    return this.couponRepo.createNewCoupon(couponInfo);
-  }
-
-  async updateCouponInfo(couponId: string, param: updateCouponDto) {
-    const couponInfo = await this.getCoupon(couponId);
-    for (const key in param) {
-      couponInfo[key] = param[key];
+    constructor(private couponRepo: CouponRepository) {}
+    async createNewCoupon(couponInfo: createCouponDto) {
+        couponInfo.qtyRemain = couponInfo.totalQty;
+        return this.couponRepo.createNewCoupon(couponInfo);
     }
-    return this.couponRepo.updateCouponInfo(couponInfo);
-  }
 
-  async getCoupon(couponId: string): Promise<CouponEntity> {
-    return this.couponRepo.getCoupon(couponId);
-  }
+    async updateCouponInfo(couponId: string, param: updateCouponDto) {
+        const couponInfo = await this.getCouponById(couponId);
+        for (const key in param) {
+            couponInfo[key] = param[key];
+        }
+        return this.couponRepo.updateCouponInfo(couponInfo);
+    }
 
-  async getListCoupon(): Promise<CouponEntity[]> {
-    return this.couponRepo.getListCoupon();
-  }
+    async getCouponById(couponId: string): Promise<CouponEntity> {
+        return this.couponRepo.getCouponById(couponId);
+    }
 
-  async inactiveCoupon(couponId: string) {
-    return this.updateCouponInfo(couponId, { status: couponStatus.INACTIVE });
-  }
+    async getListCoupon(): Promise<CouponEntity[]> {
+        return this.couponRepo.getListCoupon();
+    }
+
+    async inactiveCoupon(couponId: string) {
+        return this.updateCouponInfo(couponId, { status: couponStatus.INACTIVE });
+    }
 }

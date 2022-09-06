@@ -1,7 +1,7 @@
-import { Injectable } from '@nestjs/common';
-import { CouponUserRepository } from './couponUser.repo';
+// import { Injectable } from '@nestjs/common';
+// import { CouponUserRepository } from './couponUser.repo';
 
-@Injectable()
-export class CouponUserService {
-  constructor(private couponUserRepo: CouponUserRepository) {}
-}
+// @Injectable()
+// export class CouponUserService {
+//   constructor(private couponUserRepo: CouponUserRepository) {}
+// }

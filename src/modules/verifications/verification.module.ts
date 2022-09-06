@@ -7,12 +7,9 @@ import { VerificationRepository } from './verification.repo';
 import { VerificationService } from './verification.service';
 
 @Module({
-  imports: [
-    TypeOrmModule.forRoot(typeOrmConfig),
-    TypeOrmModule.forFeature([VerificationEntity]),
-  ],
-  controllers: [VerificationController],
-  providers: [VerificationRepository, VerificationService],
-  exports: [VerificationRepository, VerificationService],
+    imports: [TypeOrmModule.forRoot(typeOrmConfig), TypeOrmModule.forFeature([VerificationEntity])],
+    controllers: [VerificationController],
+    providers: [VerificationRepository, VerificationService],
+    exports: [VerificationRepository, VerificationService],
 })
 export class VerificationModule {}

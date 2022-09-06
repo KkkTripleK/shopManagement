@@ -17,7 +17,13 @@ export class OrderRepository {
       .createQueryBuilder('order')
       .leftJoinAndSelect('order.fk_User', 'fk_User')
       .leftJoinAndSelect('order.fk_OrderProduct', 'fk_OrderProduct')
-      .select(['order', 'fk_OrderProduct.id', 'fk_OrderProduct.totalPrice'])
+      .leftJoinAndSelect('order.fk_Coupon', 'fk_Coupon')
+      .select([
+        'order',
+        'fk_OrderProduct.id',
+        'fk_OrderProduct.totalPrice',
+        'fk_Coupon',
+      ])
       .where('fk_User.username LIKE :fk_Username', { fk_Username })
       .andWhere('order.status IN (:...status)', {
         status: [
@@ -46,7 +52,8 @@ export class OrderRepository {
       })
       .leftJoinAndSelect('order.fk_User', 'fk_User')
       .leftJoinAndSelect('order.fk_OrderProduct', 'fk_OrderProduct')
-      .select(['order', 'fk_OrderProduct'])
+      .leftJoinAndSelect('order.fk_Coupon', 'fk_Coupon')
+      .select(['order', 'fk_OrderProduct', 'fk_Coupon'])
       .getOne();
     return result;
   }
@@ -55,7 +62,8 @@ export class OrderRepository {
     const listOrder = this.orderRepo
       .createQueryBuilder('order')
       .leftJoinAndSelect('order.fk_User', 'fk_User')
-      .select(['order', 'fk_User.username'])
+      .leftJoinAndSelect('order.fk_Coupon', 'fk_Coupon')
+      .select(['order', 'fk_User.username', 'fk_Coupon'])
       .where('order.status IN (:...status)', {
         status: [
           orderStatus.SHOPPING,
@@ -68,11 +76,12 @@ export class OrderRepository {
     return listOrder;
   }
 
-  async adminGetOrderByID(orderId: string) {
-    const listOrder = this.orderRepo
+  async adminGetOrderByOrderID(orderId: string) {
+    const orderInfo = this.orderRepo
       .createQueryBuilder('order')
       .leftJoinAndSelect('order.fk_User', 'fk_User')
-      .select(['order', 'fk_User.username'])
+      .leftJoinAndSelect('order.fk_Coupon', 'fk_Coupon')
+      .select(['order', 'fk_User.username', 'fk_Coupon'])
       .where('order.id = :id', { id: orderId })
       .andWhere('order.status IN (:...status)', {
         status: [
@@ -82,8 +91,8 @@ export class OrderRepository {
           orderStatus.COMPLETED,
         ],
       })
-      .getMany();
-    return listOrder;
+      .getOne();
+    return orderInfo;
   }
 
   async adminGetOrderByUsername(fk_Username: string) {

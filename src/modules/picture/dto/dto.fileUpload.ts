@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 export class uploadFileDto {
-  @ApiProperty({ type: 'string', format: 'binary' })
-  file: 'jpeg';
+    @ApiProperty({ type: 'string', format: 'binary' })
+    file: 'jpeg';
 }

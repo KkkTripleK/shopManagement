@@ -4,21 +4,21 @@ import { categoryStatus } from 'src/commons/common.enum';
 import { PrimaryGeneratedColumn } from 'typeorm';
 
 export class CreateCategoryDto {
-  @ApiProperty()
-  @PrimaryGeneratedColumn()
-  categoryID: string;
+    @ApiProperty()
+    @PrimaryGeneratedColumn()
+    categoryID: string;
 
-  @ApiProperty()
-  @IsString()
-  @Length(0, 12)
-  name: string;
+    @ApiProperty()
+    @IsString()
+    @Length(0, 12)
+    name: string;
 
-  @ApiProperty({ required: false })
-  @IsEnum(categoryStatus)
-  @IsOptional()
-  status?: categoryStatus;
+    @ApiProperty({ required: false })
+    @IsEnum(categoryStatus)
+    @IsOptional()
+    status?: categoryStatus;
 
-  @ApiProperty()
-  @IsString()
-  position: string;
+    @ApiProperty()
+    @IsString()
+    position: string;
 }

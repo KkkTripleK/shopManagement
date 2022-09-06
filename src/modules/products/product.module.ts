@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { typeOrmConfig } from '../../configs/config.typeorm';
 import { CategoryModule } from '../categories/category.module';
+import { OrderProductModule } from '../orderProducts/orderProduct.module';
 import { OrderModule } from '../orders/order.module';
 import { UserModule } from '../users/user.module';
 import { ProductController } from './product.controller';
@@ -14,6 +15,7 @@ import { ProductService } from './product.service';
     OrderModule,
     UserModule,
     CategoryModule,
+    OrderProductModule,
     TypeOrmModule.forRoot(typeOrmConfig),
     TypeOrmModule.forFeature([ProductEntity]),
   ],

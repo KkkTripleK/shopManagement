@@ -1,12 +1,13 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString } from 'class-validator';
+import { Matches } from 'class-validator';
+import { UUID_REGEX } from 'src/utils/util.regex';
 
 export class addCouponDto {
   @ApiProperty()
-  @IsString()
+  @Matches(UUID_REGEX)
   couponId: string;
 
   @ApiProperty()
-  @IsString()
+  @Matches(UUID_REGEX)
   orderId: string;
 }

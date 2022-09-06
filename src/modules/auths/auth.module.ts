@@ -14,15 +14,15 @@ import { AuthService } from './auth.service';
 
 @Module({
   imports: [
-    PassportModule,
-    cacheModule,
-    UserModule,
-    VerificationModule,
     TypeOrmModule.forRoot(typeOrmConfig),
     TypeOrmModule.forFeature([VerificationEntity]),
     JwtModule.register({
       secret: process.env.SECRET,
     }),
+    PassportModule,
+    cacheModule,
+    UserModule,
+    VerificationModule,
   ],
   controllers: [AuthController],
   providers: [AuthService, LocalStrategy, ConfigService],

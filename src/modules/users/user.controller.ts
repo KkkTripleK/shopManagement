@@ -1,16 +1,16 @@
 import {
-  Body,
-  Controller,
-  DefaultValuePipe,
-  Delete,
-  Get,
-  Param,
-  ParseIntPipe,
-  Patch,
-  Post,
-  Query,
-  Req,
-  UseGuards,
+    Body,
+    Controller,
+    DefaultValuePipe,
+    Delete,
+    Get,
+    Param,
+    ParseIntPipe,
+    Patch,
+    Post,
+    Query,
+    Req,
+    UseGuards,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { Pagination } from 'nestjs-typeorm-paginate';
@@ -32,76 +32,73 @@ import { UserService } from './user.service';
 @ApiTags('User')
 @Controller('')
 export class UserController {
-  constructor(
-    private userService: UserService,
-    private verifyToken: VerifyToken,
-    private authService: AuthService,
-    private userRepo: UserRepository,
-  ) {}
+    constructor(
+        private userService: UserService,
+        private verifyToken: VerifyToken,
+        private authService: AuthService,
+        private userRepo: UserRepository,
+    ) {}
 
-  @Get('user/info')
-  @UseGuards(JWTandRolesGuard)
-  @Roles(userRole.ADMIN, userRole.MEMBER)
-  async findInfo(@Req() req: any): Promise<UserEntity> {
-    return this.userService.findAccount(req.userInfo);
-  }
+    @Get('user/info')
+    @UseGuards(JWTandRolesGuard)
+    @Roles(userRole.ADMIN, userRole.MEMBER)
+    async findInfo(@Req() req: any): Promise<UserEntity> {
+        return this.userService.findAccount(req.userInfo);
+    }
 
-  @Patch('user/update')
-  @UseGuards(JwtAuthGuard)
-  async updateAccount(@Body() param: UpdateDto, @Req() req: any): Promise<any> {
-    return this.userService.updateAccount(req.userInfo, param);
-  }
+    @Patch('user/update')
+    @UseGuards(JwtAuthGuard)
+    async updateAccount(@Body() param: UpdateDto, @Req() req: any): Promise<any> {
+        return this.userService.updateAccount(req.userInfo, param);
+    }
 
-  @Post('user/forgot-password')
-  async forgotPassword(@Body() requestBody: ForgotPasswordDto): Promise<any> {
-    await this.userService.forgotPassword(requestBody.username);
-    return 'New password is sent to your email!';
-  }
+    @Post('user/forgot-password')
+    async forgotPassword(@Body() requestBody: ForgotPasswordDto): Promise<any> {
+        await this.userService.forgotPassword(requestBody.username);
+        return 'New password is sent to your email!';
+    }
 
-  @Post('user/change-password')
-  @UseGuards(JwtAuthGuard)
-  async changePassword(
-    @Body() requestBody: ChangePasswordDto,
-    @Req() req: any,
-  ) {
-    return this.userService.changePassword(requestBody, req.userInfo);
-  }
+    @Post('user/change-password')
+    @UseGuards(JwtAuthGuard)
+    async changePassword(@Body() requestBody: ChangePasswordDto, @Req() req: any) {
+        return this.userService.changePassword(requestBody, req.userInfo);
+    }
 
-  @Delete('user')
-  @UseGuards(JWTandRolesGuard)
-  @Roles(userRole.ADMIN, userRole.MEMBER)
-  async deleteAccount(@Body() requestBody: DeleteAccountDto, @Req() req: any) {
-    await this.authService.validateUser(req.userInfo, requestBody.password);
-    await this.userService.deleteAccount(req.userInfo);
-    return 'The account have been change to Inactive status!';
-  }
+    @Delete('user')
+    @UseGuards(JWTandRolesGuard)
+    @Roles(userRole.ADMIN, userRole.MEMBER)
+    async deleteAccount(@Body() requestBody: DeleteAccountDto, @Req() req: any) {
+        await this.authService.validateUser(req.userInfo, requestBody.password);
+        await this.userService.deleteAccount(req.userInfo);
+        return 'The account have been change to Inactive status!';
+    }
 
-  @Get('/admin/list-account')
-  @UseGuards(JWTandRolesGuard)
-  @Roles(userRole.ADMIN)
-  async showList(
-    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page = 1,
-    @Query('limit', new DefaultValuePipe(3), ParseIntPipe) limit = 3,
-  ): Promise<Pagination<UserEntity>> {
-    return this.userService.getListAccount({
-      page,
-      limit,
-      route: `localhost:${process.env.PORT}/admin/list-account`,
-    });
-  }
+    @Get('/admin/list-account')
+    @UseGuards(JWTandRolesGuard)
+    @Roles(userRole.ADMIN)
+    async showList(
+        @Query('page', new DefaultValuePipe(1), ParseIntPipe) page = 1,
+        @Query('limit', new DefaultValuePipe(3), ParseIntPipe) limit = 3,
+    ): Promise<Pagination<UserEntity>> {
+        return this.userService.getListAccount({
+            page,
+            limit,
+            route: `localhost:${process.env.PORT}/admin/list-account`,
+        });
+    }
 
-  @Get('/admin/account/:id')
-  @UseGuards(JWTandRolesGuard)
-  @Roles(userRole.ADMIN)
-  async showUserByID(@Param('id') id: string) {
-    return await this.userService.findAccount({ id });
-  }
+    @Get('/admin/account/:id')
+    @UseGuards(JWTandRolesGuard)
+    @Roles(userRole.ADMIN)
+    async showUserByID(@Param('id') id: string) {
+        return await this.userService.findAccount({ id });
+    }
 
-  @Delete('/admin/account/:userID')
-  @UseGuards(JWTandRolesGuard)
-  @Roles(userRole.ADMIN)
-  async deleteUserByID(@Param('userID') userID: string) {
-    await this.userService.deleteAccount({ id: userID });
-    return 'The account have been change to Inactive status!';
-  }
+    @Delete('/admin/account/:userID')
+    @UseGuards(JWTandRolesGuard)
+    @Roles(userRole.ADMIN)
+    async deleteUserByID(@Param('userID') userID: string) {
+        await this.userService.deleteAccount({ id: userID });
+        return 'The account have been change to Inactive status!';
+    }
 }

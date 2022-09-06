@@ -1,69 +1,62 @@
 import { userGender, userRole, userStatus } from 'src/commons/common.enum';
-import {
-  BaseEntity,
-  Column,
-  CreateDateColumn,
-  Entity,
-  PrimaryGeneratedColumn,
-  UpdateDateColumn,
-} from 'typeorm';
+import { BaseEntity, Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 
 @Entity('Users')
 export class UserEntity extends BaseEntity {
-  @PrimaryGeneratedColumn()
-  id: string;
+    @PrimaryGeneratedColumn()
+    id: string;
 
-  @Column({ unique: true })
-  username: string;
+    @Column({ unique: true })
+    username: string;
 
-  @Column()
-  password: string;
+    @Column()
+    password: string;
 
-  @Column()
-  email: string;
+    @Column()
+    email: string;
 
-  @Column()
-  fullName: string;
+    @Column()
+    fullName: string;
 
-  @Column({
-    type: 'enum',
-    enum: userGender,
-    default: userGender.MALE,
-  })
-  gender: userGender;
+    @Column({
+        type: 'enum',
+        enum: userGender,
+        default: userGender.MALE,
+    })
+    gender: userGender;
 
-  @Column({ nullable: true })
-  age: string;
+    @Column({ nullable: true })
+    age: string;
 
-  @Column({
-    type: 'enum',
-    enum: userRole,
-    default: userRole.MEMBER,
-  })
-  role: userRole;
+    @Column({
+        type: 'enum',
+        enum: userRole,
+        default: userRole.MEMBER,
+    })
+    role: userRole;
 
-  @Column()
-  address: string;
+    @Column()
+    address: string;
 
-  @Column({
-    type: 'enum',
-    enum: userStatus,
-    default: userStatus.NOTACTIVE,
-  })
-  accountStatus: userStatus;
+    @Column({
+        type: 'enum',
+        enum: userStatus,
+        default: userStatus.NOTACTIVE,
+    })
+    accountStatus: userStatus;
 
-  // @OneToMany(() => OrderEntity, (order) => order.user)
-  // orders: OrderEntity[];
+    // @OneToMany(() => OrderEntity, (order) => order.user)
+    // orders: OrderEntity[];
 
-  @CreateDateColumn({
-    default: `now()`,
-    nullable: false,
-  })
-  createAt: string;
+    @CreateDateColumn({
+        default: `now()`,
+        nullable: false,
+    })
+    createAt: string;
 
-  @UpdateDateColumn({
-    default: `now()`,
-    nullable: true,
-  })
-  updateAt: string;
+    @UpdateDateColumn({
+        default: `now()`,
+        nullable: true,
+    })
+    updateAt: string;
 }

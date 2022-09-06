@@ -1,5 +1,4 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config/dist/config.service';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { userStatus } from 'src/commons/common.enum';
@@ -23,7 +22,6 @@ export class AuthService {
     private jwtService: JwtService,
     private verifyToken: VerifyToken,
     private cacheService: CacheService,
-    private configService: ConfigService,
   ) {}
 
   async checkExistUsername(createUserDto: CreateUserDto): Promise<number> {
@@ -82,6 +80,7 @@ export class AuthService {
       accessToken,
       Number(process.env.CACHE_ACCESS_TOKEN_TTL),
     );
+    console.log(2);
     await this.cacheService.set(
       `users:${username}:refreshToken`,
       refreshToken,

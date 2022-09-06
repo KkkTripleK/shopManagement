@@ -40,7 +40,7 @@ export class OrderController {
     @Req() req: any,
   ) {
     const fk_User = req.userInfo.username;
-    return this.orderService.getOrderByIdAndUsername(orderId, fk_User);
+    return this.orderService.getOrderByOrderIdAndUsername(orderId, fk_User);
   }
 
   @Post('user/order/create')
@@ -79,7 +79,7 @@ export class OrderController {
   @UseGuards(JWTandRolesGuard)
   @Roles(userRole.ADMIN)
   async adminGetOrderByID(@Param('orderId') orderId: string) {
-    return this.orderService.adminGetOrderByID(orderId);
+    return this.orderService.adminGetOrderByOrderID(orderId);
   }
 
   @Get('admin/order/username/:username')

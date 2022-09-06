@@ -2,7 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsString } from 'class-validator';
 
 export class updateOrderProductDto {
-  @ApiProperty()
-  @IsString()
-  qty: string;
+    @ApiProperty()
+    @IsString()
+    qty: string;
 }

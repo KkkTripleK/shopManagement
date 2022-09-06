@@ -1,15 +1,4 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  ParseUUIDPipe,
-  Patch,
-  Post,
-  Req,
-  UseGuards,
-} from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseUUIDPipe, Patch, Post, Req, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { userRole } from 'src/commons/common.enum';
 import { Roles } from 'src/decorators/decorator.roles';
@@ -24,67 +13,48 @@ import { OrderProductService } from './orderProduct.service';
 @ApiTags('OrderProduct')
 @Controller()
 export class OrderProductController {
-  constructor(private orderProductService: OrderProductService) {}
+    constructor(private orderProductService: OrderProductService) {}
 
-  // Show list products by OrderID
-  @Get('user/order-product/:orderId')
-  @UseGuards(JwtAuthGuard)
-  async getListProductByOrderId(
-    @Param('orderId', new ParseUUIDPipe()) orderId: string,
-    @Req() req: any,
-  ) {
-    return this.orderProductService.getListProductByOrderId(
-      orderId,
-      req.userInfo.username,
-    );
-  }
+    // Show list products by OrderID
+    @Get('user/order-product/:orderId')
+    @UseGuards(JwtAuthGuard)
+    async getListProductByOrderId(@Param('orderId', new ParseUUIDPipe()) orderId: string, @Req() req: any) {
+        return this.orderProductService.getListProductByOrderId(orderId, req.userInfo.username);
+    }
 
-  //Admin show list products by OrderId
-  @Get('admin/order-product/:orderId')
-  @UseGuards(JWTandRolesGuard)
-  @Roles(userRole.ADMIN)
-  async adminGetListProductByOrderId(
-    @Param('orderId', new ParseUUIDPipe()) orderId: string,
-  ) {
-    return this.orderProductService.adminGetListProductByOrderId(orderId);
-  }
+    //Admin show list products by OrderId
+    @Get('admin/order-product/:orderId')
+    @UseGuards(JWTandRolesGuard)
+    @Roles(userRole.ADMIN)
+    async adminGetListProductByOrderId(@Param('orderId', new ParseUUIDPipe()) orderId: string) {
+        return this.orderProductService.adminGetListProductByOrderId(orderId);
+    }
 
-  //Create new Order-products
-  @Post('user/order-product')
-  @UseGuards(JwtAuthGuard)
-  async addProductToOrder(
-    @Body() requestBody: createOrderProductDto,
-    @Req() req: any,
-  ): Promise<OrderProductEntity> {
-    return this.orderProductService.createOrderProduct(
-      requestBody,
-      req.userInfo.username,
-    );
-  }
+    //Create new Order-products
+    @Post('user/order-product')
+    @UseGuards(JwtAuthGuard)
+    async addProductToOrder(@Body() requestBody: createOrderProductDto, @Req() req: any): Promise<OrderProductEntity> {
+        return this.orderProductService.createOrderProduct(requestBody, req.userInfo.username);
+    }
 
-  @Patch('user/order-product/:orderProductId')
-  @UseGuards(JwtAuthGuard)
-  async updateProductInOrder(
-    @Body() requestBody: updateOrderProductDto,
-    @Param('orderProductId') orderProductId: string,
-    @Req() req: any,
-  ) {
-    return this.orderProductService.updateProductInOrder(
-      orderProductId,
-      requestBody.qty,
-      req.userInfo.username,
-    );
-  }
+    @Patch('user/order-product/:orderProductId')
+    @UseGuards(JwtAuthGuard)
+    async updateProductInOrderProduct(
+        @Body() requestBody: updateOrderProductDto,
+        @Param('orderProductId') orderProductId: string,
+        @Req() req: any,
+    ) {
+        return this.orderProductService.updateProductInOrderProduct(
+            orderProductId,
+            requestBody.qty,
+            req.userInfo.username,
+        );
+    }
 
-  @Delete('user/order-product/:orderProductId')
-  @UseGuards(JwtAuthGuard)
-  async deleteOrderProductInOrder(
-    @Param('orderProductId') orderProductId: string,
-    @Req() req: any,
-  ) {
-    return this.orderProductService.deleteOrderProductInOrder(
-      orderProductId,
-      req.userInfo.username,
-    );
-  }
+    @Delete('user/order-product/:orderProductId')
+    @UseGuards(JwtAuthGuard)
+    async deleteOrderProductInOrder(@Param('orderProductId') orderProductId: string, @Req() req: any) {
+        await this.orderProductService.deleteOrderProductInOrder(orderProductId, req.userInfo.username);
+        return 'Delete successful!';
+    }
 }

@@ -1,27 +1,20 @@
 import {
-  Body,
-  Controller,
-  DefaultValuePipe,
-  Delete,
-  Get,
-  Param,
-  ParseIntPipe,
-  Patch,
-  Post,
-  Query,
-  UploadedFile,
-  UseGuards,
-  UseInterceptors,
+    Body,
+    Controller,
+    DefaultValuePipe,
+    Delete,
+    Get,
+    Param,
+    ParseIntPipe,
+    Patch,
+    Post,
+    Query,
+    UploadedFile,
+    UseGuards,
+    UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import {
-  ApiBadRequestResponse,
-  ApiBearerAuth,
-  ApiBody,
-  ApiConsumes,
-  ApiOkResponse,
-  ApiTags,
-} from '@nestjs/swagger';
+import { ApiBadRequestResponse, ApiBearerAuth, ApiBody, ApiConsumes, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { Pagination } from 'nestjs-typeorm-paginate';
 import { userRole } from 'src/commons/common.enum';
 import { Roles } from '../../decorators/decorator.roles';
@@ -37,73 +30,68 @@ import { UpdateCategoryDto } from './dto/dto.update';
 @ApiTags('Category')
 @Controller()
 export class CategoryController {
-  constructor(private cateService: CategoryService) {}
+    constructor(private cateService: CategoryService) {}
 
-  @Get('category/all')
-  async showList(
-    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page = 1,
-    @Query('limit', new DefaultValuePipe(3), ParseIntPipe) limit = 3,
-  ): Promise<Pagination<CategoryEntity>> {
-    return this.cateService.showList({
-      page,
-      limit,
-      route: `localhost:${process.env.PORT}/category/all`,
-    });
-  }
+    @Get('category/all')
+    async showList(
+        @Query('page', new DefaultValuePipe(1), ParseIntPipe) page = 1,
+        @Query('limit', new DefaultValuePipe(3), ParseIntPipe) limit = 3,
+    ): Promise<Pagination<CategoryEntity>> {
+        return this.cateService.showList({
+            page,
+            limit,
+            route: `localhost:${process.env.PORT}/category/all`,
+        });
+    }
 
-  @Get('category/:categoryID')
-  @ApiOkResponse()
-  @ApiBadRequestResponse()
-  async findCategoryByID(@Param('categoryID') categoryID: string) {
-    return this.cateService.findCategoryByID(categoryID);
-  }
+    @Get('category/:categoryID')
+    @ApiOkResponse()
+    @ApiBadRequestResponse()
+    async findCategoryByID(@Param('categoryID') categoryID: string) {
+        return this.cateService.findCategoryByID(categoryID);
+    }
 
-  @Post('admin/category/create')
-  @UseGuards(JWTandRolesGuard)
-  @Roles(userRole.ADMIN)
-  @ApiConsumes('multipart/form-data')
-  @ApiOkResponse()
-  @ApiBadRequestResponse()
-  async createNewCategory(
-    @Body() createCategoryDto: CreateCategoryDto,
-  ): Promise<CategoryEntity> {
-    return this.cateService.createNewCategory(createCategoryDto);
-  }
+    @Post('admin/category/create')
+    @UseGuards(JWTandRolesGuard)
+    @Roles(userRole.ADMIN)
+    @ApiConsumes('multipart/form-data')
+    @ApiOkResponse()
+    @ApiBadRequestResponse()
+    async createNewCategory(@Body() createCategoryDto: CreateCategoryDto): Promise<CategoryEntity> {
+        return this.cateService.createNewCategory(createCategoryDto);
+    }
 
-  @Post('admin/category/upload-banner')
-  @UseGuards(JWTandRolesGuard)
-  @Roles(userRole.ADMIN)
-  @UseInterceptors(FileInterceptor('file', multerOptions))
-  @ApiConsumes('multipart/form-data')
-  @ApiBody({
-    description: 'Banner',
-    type: uploadFileDto,
-  })
-  async upload(@UploadedFile() file, @Body() requestBody: any) {
-    return this.cateService.uploadBanner(file, requestBody);
-  }
+    @Post('admin/category/upload-banner')
+    @UseGuards(JWTandRolesGuard)
+    @Roles(userRole.ADMIN)
+    @UseInterceptors(FileInterceptor('file', multerOptions))
+    @ApiConsumes('multipart/form-data')
+    @ApiBody({
+        description: 'Banner',
+        type: uploadFileDto,
+    })
+    async upload(@UploadedFile() file, @Body() requestBody: any) {
+        return this.cateService.uploadBanner(file, requestBody);
+    }
 
-  @Patch('admin/category/:categoryID')
-  @UseGuards(JWTandRolesGuard)
-  @Roles(userRole.ADMIN)
-  @ApiConsumes('multipart/form-data')
-  @ApiOkResponse()
-  @ApiBadRequestResponse()
-  async updateCategoryInfo(
-    @Param('categoryID') categoryID: string,
-    @Body() requestBody: UpdateCategoryDto,
-  ) {
-    return this.cateService.updateCategoryInfo(categoryID, requestBody);
-  }
+    @Patch('admin/category/:categoryID')
+    @UseGuards(JWTandRolesGuard)
+    @Roles(userRole.ADMIN)
+    @ApiConsumes('multipart/form-data')
+    @ApiOkResponse()
+    @ApiBadRequestResponse()
+    async updateCategoryInfo(@Param('categoryID') categoryID: string, @Body() requestBody: UpdateCategoryDto) {
+        return this.cateService.updateCategoryInfo(categoryID, requestBody);
+    }
 
-  @Delete('admin/category/:categoryID')
-  @UseGuards(JWTandRolesGuard)
-  @Roles(userRole.ADMIN)
-  @ApiConsumes('multipart/form-data')
-  @ApiOkResponse()
-  @ApiBadRequestResponse()
-  async inactiveCategoryByID(@Param('categoryID') categoryID: string) {
-    await this.cateService.inactiveCategoryByID(categoryID);
-    return `Status of categoryID ${categoryID} is Inactive!`;
-  }
+    @Delete('admin/category/:categoryID')
+    @UseGuards(JWTandRolesGuard)
+    @Roles(userRole.ADMIN)
+    @ApiConsumes('multipart/form-data')
+    @ApiOkResponse()
+    @ApiBadRequestResponse()
+    async inactiveCategoryByID(@Param('categoryID') categoryID: string) {
+        await this.cateService.inactiveCategoryByID(categoryID);
+        return `Status of categoryID ${categoryID} is Inactive!`;
+    }
 }
