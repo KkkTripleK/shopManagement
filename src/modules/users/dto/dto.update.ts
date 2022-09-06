@@ -1,9 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsAlpha, IsEnum, IsOptional, IsString, Length } from 'class-validator';
 import { userGender, userStatus } from 'src/commons/common.enum';
-import { Entity } from 'typeorm';
 
-@Entity()
 export class UpdateDto {
   @ApiProperty({ required: false })
   @IsString()

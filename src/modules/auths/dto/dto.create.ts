@@ -5,18 +5,11 @@ import {
   IsEnum,
   IsOptional,
   IsString,
-  // eslint-disable-next-line prettier/prettier
   Length,
 } from 'class-validator';
 import { userGender, userRole, userStatus } from 'src/commons/common.enum';
-import { Entity } from 'typeorm';
 
-@Entity()
 export class CreateUserDto {
-  // @ApiProperty()
-  // @PrimaryGeneratedColumn()
-  // id: string;
-
   @ApiProperty()
   @IsAlphanumeric()
   @IsString()

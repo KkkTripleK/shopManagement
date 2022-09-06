@@ -16,7 +16,7 @@ export class UserService {
     private userRepository: UserRepository,
     private randomOTP: RandomOTP,
     private cacheService: CacheService,
-    private mailService: MailService, // private changePasswordDto: ChangePasswordDto, // private updateDto: UpdateDto, // private createUserDto: CreateUserDto,
+    private mailService: MailService,
   ) {}
 
   async getListAccount(

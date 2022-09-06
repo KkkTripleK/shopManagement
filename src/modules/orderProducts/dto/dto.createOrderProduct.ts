@@ -2,9 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsNumber, IsOptional, IsString } from 'class-validator';
 import { OrderEntity } from 'src/modules/orders/order.entity';
 import { ProductEntity } from 'src/modules/products/product.entity';
-import { Entity } from 'typeorm';
 
-@Entity()
 export class createOrderProductDto {
   @ApiProperty()
   @IsOptional()

@@ -15,6 +15,7 @@ import { userRole } from 'src/commons/common.enum';
 import { Roles } from '../../decorators/decorator.roles';
 import { JwtAuthGuard } from '../../guards/guard.jwt';
 import { JWTandRolesGuard } from '../../guards/guard.roles';
+import { addCouponDto } from './dto/dto.addCoupon';
 import { createOrderDto } from './dto/dto.createOrder';
 import { updateOrderDto } from './dto/dto.updateOrder';
 import { OrderService } from './order.service';
@@ -27,9 +28,9 @@ export class OrderController {
 
   @Get('user/order/all')
   @UseGuards(JwtAuthGuard)
-  async getListOrder(@Req() req: any) {
+  async getListOrderByUsername(@Req() req: any) {
     const fk_User = req.userInfo.username;
-    return this.orderService.getListOrder(fk_User);
+    return this.orderService.getListOrderByUsername(fk_User);
   }
 
   @Get('user/order/:orderId')
@@ -96,5 +97,14 @@ export class OrderController {
   ) {
     const fk_User = req.userInfo.username;
     return this.orderService.orderConfirm(id, fk_User);
+  }
+
+  @Post('user/order/add-coupon')
+  @UseGuards(JwtAuthGuard)
+  async addCouponToOrder(@Body() requestBody: addCouponDto, @Req() req: any) {
+    return this.orderService.addCouponToOrder(
+      requestBody,
+      req.userInfo.username,
+    );
   }
 }

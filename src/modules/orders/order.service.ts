@@ -3,6 +3,7 @@ import { orderStatus } from 'src/commons/common.enum';
 import { OrderProductService } from '../orderProducts/orderProduct.service';
 import { ProductEntity } from '../products/product.entity';
 import { ProductRepository } from '../products/product.repo';
+import { addCouponDto } from './dto/dto.addCoupon';
 import { createOrderDto } from './dto/dto.createOrder';
 import { OrderEntity } from './order.entity';
 import { OrderRepository } from './order.repo';
@@ -12,11 +13,11 @@ export class OrderService {
   constructor(
     private orderRepo: OrderRepository,
     private productRepo: ProductRepository,
-    private orderProductService: OrderProductService,
+    private orderProductService: OrderProductService, //private couponService: CouponService,
   ) {}
 
-  async getListOrder(fk_Username: string) {
-    const listOrder = await this.orderRepo.getListOrder(fk_Username);
+  async getListOrderByUsername(fk_Username: string) {
+    const listOrder = await this.orderRepo.getListOrderByUsername(fk_Username);
     if (listOrder.length === 0) {
       throw new HttpException('The order list is empty!', HttpStatus.OK);
     }
@@ -194,5 +195,32 @@ export class OrderService {
       await this.orderRepo.createOrder(orderProductInfo.fk_Order);
     }
     return { listOrderProductInfo };
+  }
+
+  async addCouponToOrder(requestBody: addCouponDto, username: string) {
+    // 1. check valid orderId: exist, orderStatus
+    // 2. check valid couponId: exist, orderStatus, qty
+    // Step 1:
+    const orderInfo = await this.getOrderByIdAndUsername(
+      requestBody.orderId,
+      username,
+    );
+    if (orderInfo.status !== orderStatus.SHOPPING) {
+      throw new HttpException(
+        `Can not add coupon to Order ${requestBody.orderId}`,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    // Step 2:
+    const listOrderInfo = await this.getListOrderByUsername(username);
+    for (const orderInfo of listOrderInfo) {
+      if (orderInfo.fk_Coupon.id === requestBody.couponId) {
+        throw new HttpException(
+          `Coupon ${requestBody.couponId} was used already`,
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+    }
+    // const couponInfo = await this.
   }
 }

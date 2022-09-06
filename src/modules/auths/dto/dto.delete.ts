@@ -1,7 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { PrimaryGeneratedColumn } from 'typeorm';
 
-@Entity()
 export class DeleteUser {
   @ApiProperty()
   @PrimaryGeneratedColumn()

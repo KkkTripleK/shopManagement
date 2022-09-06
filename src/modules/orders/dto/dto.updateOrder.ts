@@ -2,9 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsEnum, IsOptional, Matches } from 'class-validator';
 import { orderPayment } from 'src/commons/common.enum';
 import { PHONE_REGEX } from 'src/utils/util.regex';
-import { Entity } from 'typeorm';
 
-@Entity()
 export class updateOrderDto {
   @ApiProperty()
   @IsOptional()

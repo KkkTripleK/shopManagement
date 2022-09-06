@@ -12,7 +12,7 @@ export class OrderRepository {
     private orderRepo: Repository<OrderEntity>,
   ) {}
 
-  async getListOrder(fk_Username: string): Promise<OrderEntity[]> {
+  async getListOrderByUsername(fk_Username: string): Promise<OrderEntity[]> {
     const listOrder = this.orderRepo
       .createQueryBuilder('order')
       .leftJoinAndSelect('order.fk_User', 'fk_User')

@@ -1,8 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsOptional, IsString, Length } from 'class-validator';
-import { Entity } from 'typeorm';
 
-@Entity()
 export class UpdateCategoryDto {
   @ApiProperty({ required: false })
   @IsString()

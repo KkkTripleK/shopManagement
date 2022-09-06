@@ -11,9 +11,11 @@ import {
   JoinColumn,
   ManyToOne,
   OneToMany,
+  OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { CouponEntity } from '../coupons/coupon.entity';
 import { OrderProductEntity } from '../orderProducts/orderProduct.entity';
 import { UserEntity } from '../users/user.entity';
 
@@ -28,6 +30,13 @@ export class OrderEntity extends BaseEntity {
     referencedColumnName: 'username',
   })
   fk_User: UserEntity;
+
+  @OneToOne(() => CouponEntity)
+  @JoinColumn({
+    name: 'fk_Coupon',
+    referencedColumnName: 'id',
+  })
+  fk_Coupon: CouponEntity;
 
   @Column()
   address: string;

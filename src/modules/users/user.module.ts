@@ -7,15 +7,10 @@ import { RandomOTP } from 'src/utils/util.random';
 import { VerifyToken } from 'src/utils/util.verifyToken';
 import { typeOrmConfig } from '../../configs/config.typeorm';
 import { AuthService } from '../auths/auth.service';
-import { CreateUserDto } from '../auths/dto/dto.create';
 import { cacheModule } from '../cache/cache.module';
 import { MailService } from '../email/email.service';
 import { JwtStrategy } from '../strategies/strategy.guard.jwt';
-import { VerificationEntity } from '../verifications/verification.entity';
-import { VerificationRepository } from '../verifications/verification.repo';
-import { VerificationService } from '../verifications/verification.service';
-import { ChangePasswordDto } from './dto/dto.changePassword';
-import { UpdateDto } from './dto/dto.update';
+import { VerificationModule } from '../verifications/verification.module';
 import { UserController } from './user.controller';
 import { UserEntity } from './user.entity';
 import { UserRepository } from './user.repo';
@@ -25,7 +20,7 @@ import { UserService } from './user.service';
   imports: [
     TypeOrmModule.forRoot(typeOrmConfig),
     TypeOrmModule.forFeature([UserEntity]),
-    TypeOrmModule.forFeature([VerificationEntity]),
+    VerificationModule,
     PassportModule,
     cacheModule,
   ],
@@ -37,15 +32,10 @@ import { UserService } from './user.service';
     JwtService,
     RandomOTP,
     MailService,
-    CreateUserDto,
-    ChangePasswordDto,
-    UpdateDto,
     JwtStrategy,
     AuthService,
-    VerificationService,
     ConfigService,
-    VerificationRepository,
   ],
-  exports: [UserRepository],
+  exports: [UserRepository, VerifyToken, JwtService, MailService, RandomOTP],
 })
 export class UserModule {}

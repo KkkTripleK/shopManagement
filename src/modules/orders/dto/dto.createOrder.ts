@@ -3,9 +3,7 @@ import { IsEnum, IsString, Matches } from 'class-validator';
 import { orderPayment, orderShipment } from 'src/commons/common.enum';
 import { UserEntity } from 'src/modules/users/user.entity';
 import { PHONE_REGEX } from 'src/utils/util.regex';
-import { Entity } from 'typeorm';
 
-@Entity()
 export class createOrderDto {
   @ApiProperty()
   id: string;
