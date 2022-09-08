@@ -12,7 +12,7 @@ export class UserEntity extends BaseEntity {
     @Column()
     password: string;
 
-    @Column()
+    @Column({ unique: true })
     email: string;
 
     @Column()
@@ -44,9 +44,6 @@ export class UserEntity extends BaseEntity {
         default: userStatus.NOTACTIVE,
     })
     accountStatus: userStatus;
-
-    // @OneToMany(() => OrderEntity, (order) => order.user)
-    // orders: OrderEntity[];
 
     @CreateDateColumn({
         default: `now()`,

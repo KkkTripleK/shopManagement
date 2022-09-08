@@ -1,5 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { IPaginationOptions, paginate, Pagination } from 'nestjs-typeorm-paginate';
 import { Repository } from 'typeorm';
 import { UpdatePictureDto } from './dto/dto.updatePicture.dto';
 import { UploadPictureDto } from './dto/dto.uploadPicture.dto';
@@ -27,12 +28,12 @@ export class PictureRepository {
         return this.pictureRepo.save(info);
     }
 
-    async showListPicture() {
-        return this.pictureRepo.find();
-    }
-
-    async showListPictureByCondition(condition: any) {
-        return this.pictureRepo.find(condition);
+    async showListPicture(options: IPaginationOptions): Promise<Pagination<PictureEntity>> {
+        const listPicture = await this.pictureRepo.manager
+            .createQueryBuilder(PictureEntity, 'picture')
+            .leftJoinAndSelect('picture.product', 'product')
+            .orderBy('product.id');
+        return paginate<PictureEntity>(listPicture, options);
     }
 
     async showPictureByID(id: string) {

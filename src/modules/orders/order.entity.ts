@@ -1,4 +1,6 @@
+import { Matches } from 'class-validator';
 import { orderPayment, orderShipment, orderStatus } from 'src/commons/common.enum';
+import { PHONE_REGEX } from 'src/utils/util.regex';
 import {
     BaseEntity,
     Column,
@@ -36,8 +38,8 @@ export class OrderEntity extends BaseEntity {
     @Column()
     address: string;
 
-    //Regex
     @Column()
+    @Matches(PHONE_REGEX)
     phone: string;
 
     @Column({

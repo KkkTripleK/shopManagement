@@ -1,7 +1,9 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import * as fs from 'fs';
+import { IPaginationOptions, Pagination } from 'nestjs-typeorm-paginate';
 import { ProductRepository } from '../products/product.repo';
 import { UpdatePictureDto } from './dto/dto.updatePicture.dto';
+import { PictureEntity } from './picture.entity';
 import { PictureRepository } from './picture.repository';
 
 @Injectable()
@@ -39,10 +41,8 @@ export class PictureService {
         return pictureInfo;
     }
 
-    async showListPicture() {
-        return this.pictureRepo.showListPictureByCondition({
-            relations: { product: true },
-        });
+    async showListPicture(options: IPaginationOptions): Promise<Pagination<PictureEntity>> {
+        return this.pictureRepo.showListPicture(options);
     }
 
     async showPictureByID(pictureId: string) {

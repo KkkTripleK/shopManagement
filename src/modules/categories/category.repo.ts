@@ -31,7 +31,6 @@ export class CategoryRepository {
         const listCategory = await this.cateRepo.find({
             where: [{ status: categoryStatus.ACTIVE }],
         });
-        console.log(listCategory);
         return listCategory;
     }
 

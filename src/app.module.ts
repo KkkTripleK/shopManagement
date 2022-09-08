@@ -3,6 +3,8 @@ import { Module } from '@nestjs/common';
 import { AuthModule } from './modules/auths/auth.module';
 import { CategoryModule } from './modules/categories/category.module';
 import { CouponModule } from './modules/coupons/coupon.module';
+import { FlashSaleProductModule } from './modules/flashSaleProducts/flashSaleProduct.module';
+import { CouponUserModule } from './modules/flashSales/flashSale.module';
 import { OrderProductModule } from './modules/orderProducts/orderProduct.module';
 import { OrderModule } from './modules/orders/order.module';
 import { PictureModule } from './modules/picture/picture.module';
@@ -18,6 +20,8 @@ import { UserModule } from './modules/users/user.module';
         PictureModule,
         OrderModule,
         OrderProductModule,
+        FlashSaleProductModule,
+        CouponUserModule,
         CouponModule,
         MailerModule,
         MailerModule.forRoot({

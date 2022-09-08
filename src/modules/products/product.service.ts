@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { IPaginationOptions, Pagination } from 'nestjs-typeorm-paginate';
 import { orderStatus, productStatus } from 'src/commons/common.enum';
 import { OrderProductRepository } from '../orderProducts/orderProduct.repo';
@@ -21,10 +21,7 @@ export class ProductService {
 
     async createNewProduct(requestBody: CreateProductDto): Promise<ProductEntity> {
         if (Number(requestBody.qtyRemaining) >= Number(requestBody.qtyInstock)) {
-            throw new HttpException(
-                'Quantity remaining can not be more then quantity instock!',
-                HttpStatus.BAD_REQUEST,
-            );
+            throw new BadRequestException('Quantity remaining can not be more then quantity instock!');
         } else if (Number(requestBody.qtyRemaining) === 0) {
             requestBody.status = productStatus.OUTSTOCK;
         }
@@ -33,6 +30,10 @@ export class ProductService {
 
     async showListProduct(options: IPaginationOptions): Promise<Pagination<ProductEntity>> {
         return this.productRepository.showListProduct(options);
+    }
+
+    async findProductByName(options: IPaginationOptions, nameProduct: string): Promise<Pagination<ProductEntity>> {
+        return this.productRepository.findProductByName(options, nameProduct);
     }
 
     async adminShowListProduct(options: IPaginationOptions): Promise<Pagination<ProductEntity>> {
@@ -44,7 +45,7 @@ export class ProductService {
             id: productID,
         });
         if (result === null) {
-            throw new HttpException('ProductID is invalid!', HttpStatus.BAD_REQUEST);
+            throw new BadRequestException('ProductID is invalid!');
         }
         return result;
     }
@@ -69,22 +70,19 @@ export class ProductService {
 
     async inactiveProductByID(productID: string) {
         /* 
-    1. Change status of product
-    2. Find orderProducts and Orders are containing a deleted product
-    3. Check status of Orders, status === Shopping --> Update
-    4. Delete orderProduct
-    5. Update price of Order
-    */
+        1. Change status of product
+        2. Find orderProducts and Orders are containing a deleted product
+        3. Check status of Orders, status === Shopping --> Update
+        4. Update price of Order
+        5. Delete orderProduct
+        */
 
         // Step 1. Change status of product
         await this.productRepository.updateProductByID(productID, {
             status: productStatus.INACTIVE,
         });
         // Step 2. Find orderProducts and Orders are containing a deleted product
-        // Step 2. Delete orderProducts containing a deleted product
-        const listOrderProductInfo = await this.orderProductRepo.getListOrderProductByProductId(
-            productID,
-        );
+        const listOrderProductInfo = await this.orderProductRepo.getListOrderProductByProductId(productID);
         for (const orderProductInfo of listOrderProductInfo) {
             if (orderProductInfo.fk_Order.status === orderStatus.SHOPPING) {
                 await this.orderProductService.adminDeleteOrderProductInOrder(orderProductInfo.id);
@@ -93,9 +91,6 @@ export class ProductService {
     }
 
     async addProductToCategory(requestBody: AddProductToCategoryDto) {
-        return this.productRepository.addProductToCategory(
-            requestBody.categoryId,
-            requestBody.productId,
-        );
+        return this.productRepository.addProductToCategory(requestBody.categoryId, requestBody.productId);
     }
 }

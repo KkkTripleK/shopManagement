@@ -20,19 +20,36 @@ export class ProductRepository {
     }
 
     async showListProduct(options: IPaginationOptions): Promise<Pagination<ProductEntity>> {
-        return paginate<ProductEntity>(this.productRepo, options, {
-            where: [{ status: productStatus.STOCK }, { status: productStatus.OUTSTOCK }],
-            relations: ['category', 'pictures'],
-        });
-    }
-
-    async adminShowListProduct(options: IPaginationOptions): Promise<Pagination<ProductEntity>> {
-        const queryBuilder = this.productRepo
+        const listProduct = this.productRepo
             .createQueryBuilder('product')
             .leftJoinAndSelect('product.category', 'category')
             .leftJoinAndSelect('product.pictures', 'pictures')
-            .select(['product', 'product.cost', 'pictures', 'category']);
-        return paginate<ProductEntity>(queryBuilder, options);
+            .select(['product', 'pictures', 'category'])
+            .where('product.status != :status', { status: productStatus.INACTIVE })
+            .orderBy('product.id');
+        return paginate<ProductEntity>(listProduct, options);
+    }
+
+    async findProductByName(options: IPaginationOptions, nameProduct: string): Promise<Pagination<ProductEntity>> {
+        console.log(nameProduct);
+        const listProduct = this.productRepo
+            .createQueryBuilder('product')
+            .leftJoinAndSelect('product.category', 'category')
+            .leftJoinAndSelect('product.pictures', 'pictures')
+            .select(['product', 'pictures', 'category'])
+            .where('product.name like :name', { name: `%${nameProduct}%` })
+            .orderBy('product.id');
+        return paginate<ProductEntity>(listProduct, options);
+    }
+
+    async adminShowListProduct(options: IPaginationOptions): Promise<Pagination<ProductEntity>> {
+        const listProduct = this.productRepo
+            .createQueryBuilder('product')
+            .leftJoinAndSelect('product.category', 'category')
+            .leftJoinAndSelect('product.pictures', 'pictures')
+            .select(['product', 'product.cost', 'pictures', 'category'])
+            .orderBy('product.id');
+        return paginate<ProductEntity>(listProduct, options);
     }
 
     async showProductByProductId(id: object): Promise<ProductEntity> {

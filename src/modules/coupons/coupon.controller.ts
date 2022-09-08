@@ -17,11 +17,12 @@ export class CouponController {
     @UseGuards(JWTandRolesGuard)
     @Roles(userRole.ADMIN)
     async createNewCoupon(@Body() couponInfo: createCouponDto) {
-        console.log(couponInfo);
         return this.couponService.createNewCoupon(couponInfo);
     }
 
     @Patch('admin/coupon/:couponId')
+    @UseGuards(JWTandRolesGuard)
+    @Roles(userRole.ADMIN)
     async updateCouponInfo(@Param('couponId') couponId: string, @Body() param: updateCouponDto) {
         return this.couponService.updateCouponInfo(couponId, param);
     }

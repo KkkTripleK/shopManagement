@@ -1,4 +1,5 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
+import { IPaginationOptions, Pagination } from 'nestjs-typeorm-paginate';
 import { couponStatus, orderStatus } from 'src/commons/common.enum';
 import { CouponService } from '../coupons/coupon.service';
 import { OrderProductService } from '../orderProducts/orderProduct.service';
@@ -26,6 +27,10 @@ export class OrderService {
         return listOrder;
     }
 
+    async showListOrderByUsername(options: IPaginationOptions, fk_Username: string): Promise<Pagination<OrderEntity>> {
+        return this.orderRepo.showListOrderByUsername(options, fk_Username);
+    }
+
     async getOrderByOrderIdAndUsername(orderId: string, fk_Username: string): Promise<OrderEntity> {
         try {
             const orderInfo = await this.orderRepo.checkOrderUserExist(fk_Username, orderId);
@@ -38,12 +43,8 @@ export class OrderService {
         }
     }
 
-    async adminGetListOrder() {
-        const listOrder = await this.orderRepo.adminGetListOrder();
-        if (listOrder.length === 0) {
-            throw new BadRequestException('The order list is empty!');
-        }
-        return listOrder;
+    async adminGetListOrder(options: IPaginationOptions): Promise<Pagination<OrderEntity>> {
+        return this.orderRepo.adminGetListOrder(options);
     }
 
     async adminGetOrderByOrderID(orderId: string) {
@@ -58,12 +59,8 @@ export class OrderService {
         }
     }
 
-    async adminGetOrderByUsername(username: string) {
-        const orderInfo = await this.orderRepo.adminGetOrderByUsername(username);
-        if (orderInfo.length === 0) {
-            throw new BadRequestException(`Orders of User: ${username} has been removed or invalid!`);
-        }
-        return orderInfo;
+    async adminGetOrderByUsername(options: IPaginationOptions, username: string) {
+        return this.orderRepo.adminGetOrderByUsername(options, username);
     }
 
     async createOrder(orderInfo: createOrderDto) {
@@ -71,27 +68,43 @@ export class OrderService {
     }
 
     async orderConfirm(orderId: string, fk_Username: string) {
-        const orderInfo = await this.getOrderByOrderIdAndUsername(orderId, fk_Username);
         /*
-         ** Check total value of order
-         */
+        1. Check exist Order
+        2. Check valid Coupon
+        3. Check qty remain of each Product
+        4. Confirm and update qtyRemain of Product and Coupon: if qtyRemain === 0 --> change status: OutStock
+        */
+
+        // Step 1. Check exist Order
+        const orderInfo = await this.getOrderByOrderIdAndUsername(orderId, fk_Username);
         if (orderInfo.totalProductPrice === 0) {
             throw new BadRequestException("Order doesn't have any product!");
         } else if (orderInfo.status !== orderStatus.SHOPPING) {
             throw new BadRequestException('Can not change the status of this order!');
         }
-        /*
-         ** show list product by orderId
-         */
+
+        // Step 2. Check valid Coupon
+        if (orderInfo.fk_Coupon.begin.getTime() >= Date.now() || orderInfo.fk_Coupon.end.getTime() <= Date.now()) {
+            throw new BadRequestException('Coupon is not available!');
+        } else if (orderInfo.fk_Coupon.qtyRemain === 0) {
+            throw new BadRequestException('Coupon is not available!');
+        }
+
+        // Step 3. Check qty remain of each Product
         const listOrderProductInfo = await this.orderProductService.getListProductByOrderId(orderId, fk_Username);
         for (const orderProductInfo of listOrderProductInfo) {
             const productInfo = orderProductInfo.fk_Product;
             if (productInfo.qtyRemaining < orderProductInfo.qty) {
-                throw new BadRequestException('The qty instock is not enouch!');
+                throw new BadRequestException(
+                    `Order confirm failed! The qty remaining is ${productInfo.qtyRemaining}!`,
+                );
             }
             productInfo.qtyRemaining = String(Number(productInfo.qtyRemaining) - Number(orderProductInfo.qty));
             await this.productRepo.createNewProduct(productInfo);
         }
+
+        //Step 4. Confirm and update qtyRemain of Product and Coupon: if qtyRemain === 0 --> change status: OutStock
+        await this.couponService.updateCouponInfo(orderInfo.fk_Coupon.id, { qtyRemain: orderInfo.fk_Coupon.qtyRemain });
         return this.orderRepo.updateOrder(orderInfo, {
             status: orderStatus.ORDERED,
         });
@@ -127,7 +140,7 @@ export class OrderService {
         for (const orderProductInfo of listOrderProductInfo) {
             if (orderProductInfo.fk_Order.status === orderStatus.SHOPPING) {
                 // New price
-                orderProductInfo.price = Number(productInfo.netPrice);
+                orderProductInfo.price = Number(productInfo.price);
 
                 const differencePrice =
                     orderProductInfo.price * Number(orderProductInfo.qty) - Number(orderProductInfo.totalPrice);
@@ -152,19 +165,21 @@ export class OrderService {
 
     async addCouponToOrder(requestBody: addCouponDto, username: string) {
         /*
-    1. Check valid orderId: exist, orderStatus, orderTotalPrice
-    2. Check valid couponId: exist, orderStatus, qty
-    3. Update OrderInfo: totalOrderPrice
-    */
+        1. Check valid orderId: exist, orderStatus, orderTotalPrice
+        2. Check valid couponId: exist, orderStatus, qty
+        3. Update OrderInfo: totalOrderPrice
+        */
+
         // Step 1. Check valid orderId: exist, orderStatus, orderTotalPrice
-        const couponId = requestBody.couponId;
         const orderInfo = await this.getOrderByOrderIdAndUsername(requestBody.orderId, username);
         if (orderInfo.status !== orderStatus.SHOPPING) {
             throw new BadRequestException(`Can not add coupon to Order ${requestBody.orderId}`);
         } else if (orderInfo.totalOrderPrice === 0) {
             throw new BadRequestException(`Order  <${requestBody.orderId}> doesn't have any product!`);
         }
-        // Step 2. Check valid couponId: exist, orderStatus, qty
+
+        // Step 2. Check valid couponId: exist, couponStatus, orderStatus, qty
+        const couponId = requestBody.couponId;
         const couponInfo = await this.couponService.getCouponById(couponId);
         if (couponInfo === null) {
             throw new BadRequestException(`Coupon ${couponId} is invalid`);
@@ -173,17 +188,47 @@ export class OrderService {
         } else if (couponInfo.qtyRemain === 0) {
             throw new BadRequestException(`Coupon ${couponId} is not available`);
         }
+        if (couponInfo.begin.getTime() >= Date.now() || couponInfo.end.getTime() <= Date.now()) {
+            throw new BadRequestException('Coupon is not available!');
+        } else if (couponInfo.qtyRemain === 0) {
+            throw new BadRequestException('Coupon is not available!');
+        }
         const listOrderInfo = await this.getListOrderByUsername(username);
         for (const orderInfo of listOrderInfo) {
             if (orderInfo.fk_Coupon !== null) {
-                if (orderInfo.fk_Coupon.id === couponId) {
+                if (couponInfo.id !== couponId) {
                     throw new BadRequestException(`Coupon ${couponId} was used already`);
                 }
             }
         }
+
         // Step 3. Update OrderInfo: totalOrderPrice
         orderInfo.fk_Coupon = couponInfo;
-        orderInfo.totalOrderPrice = (orderInfo.totalOrderPrice * (100 - Number(couponInfo.discount))) / 100;
+        orderInfo.totalOrderPrice =
+            orderInfo.shipmentPrice + (orderInfo.totalProductPrice * (100 - Number(couponInfo.discount))) / 100;
+        console.log((orderInfo.totalProductPrice * (100 - Number(couponInfo.discount))) / 100);
+
         return this.createOrder(orderInfo);
+    }
+
+    async removeCouponFromOrder(requestBody: addCouponDto, username: string) {
+        /*
+        1. Check coupon exist in orderId
+        2. Check valid new couponId: Date, Qty, Status
+        3. Save new OrderInfo: CouponId, totalOrderPrice
+        */
+        console.log({ requestBody });
+        // Step 1. Check coupon exist in orderId
+        const orderInfo = await this.getOrderByOrderIdAndUsername(requestBody.orderId, username);
+        if (orderInfo.status !== orderStatus.SHOPPING) {
+            throw new BadRequestException(`Can not add coupon to Order ${requestBody.orderId}`);
+        } else if (orderInfo.fk_Coupon === null) {
+            throw new BadRequestException(`Order  <${requestBody.orderId}> doesn't have any coupon!`);
+        } else if (orderInfo.fk_Coupon.id !== requestBody.couponId) {
+            throw new BadRequestException(`CouponId  <${orderInfo.fk_Coupon.id}> is not exist in Order!`);
+        }
+        orderInfo.totalOrderPrice = orderInfo.totalProductPrice + orderInfo.shipmentPrice;
+        orderInfo.fk_Coupon = null;
+        return orderInfo;
     }
 }

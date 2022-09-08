@@ -1,30 +1,34 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsDateString, IsEnum, IsOptional, IsString } from 'class-validator';
+import { Type } from 'class-transformer';
+import { IsDateString, IsEnum, IsNumber, IsOptional } from 'class-validator';
 import { couponStatus } from 'src/commons/common.enum';
 
 export class updateCouponDto {
     @ApiProperty()
+    @Type(() => Number)
+    @IsNumber()
     @IsOptional()
-    @IsString()
-    totalQty?: string;
+    totalQty?: number;
 
     @ApiProperty()
-    @IsString()
+    @Type(() => Number)
+    @IsNumber()
     @IsOptional()
-    qtyRemain?: string;
+    qtyRemain?: number;
 
     @ApiProperty()
+    @Type(() => Number)
+    @IsNumber()
     @IsOptional()
-    @IsString()
-    discount?: string;
+    discount?: number;
 
     @ApiProperty()
     @IsOptional()
     @IsEnum(couponStatus)
     status?: string;
 
-    @IsOptional()
     @ApiProperty()
+    @IsOptional()
     @IsDateString({}, { each: true })
     begin?: Date[];
 

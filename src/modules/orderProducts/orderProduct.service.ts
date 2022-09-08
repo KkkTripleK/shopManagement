@@ -25,7 +25,7 @@ export class OrderProductService {
             username,
         );
         if (orderInfo.status !== orderStatus.SHOPPING) {
-            throw new HttpException('Can not change the order!', HttpStatus.BAD_REQUEST);
+            throw new BadRequestException('Can not change the order!');
         }
         /*
         Check valid fk_Product
@@ -57,10 +57,7 @@ export class OrderProductService {
                     Number(orderProductInfo.qty) + Number(oldOrderProductInfo.qty),
                 );
                 if (productQty > Number(productInfo.qtyRemaining)) {
-                    throw new HttpException(
-                        'Your order quantities is higher than quantity in stock!',
-                        HttpStatus.BAD_REQUEST,
-                    );
+                    throw new BadRequestException('Your order quantities is higher than quantity in stock!');
                 }
 
                 // Caculate price of orderInfo, save to DB
@@ -82,7 +79,7 @@ export class OrderProductService {
         OrderProduct not exist
         */
         orderProductInfo.qty = orderQty.toString();
-        orderProductInfo.price = Number(productInfo.netPrice);
+        orderProductInfo.price = Number(productInfo.price);
         if (orderInfo.shipment === orderShipment.GHN && orderInfo.shipmentPrice === 0) {
             orderInfo.shipmentPrice = 30000;
             orderInfo.totalOrderPrice = orderInfo.shipmentPrice;
@@ -91,7 +88,7 @@ export class OrderProductService {
             orderInfo.totalOrderPrice = orderInfo.shipmentPrice;
         }
         const newOrderProductPrice = orderProductInfo.price * orderQty;
-        const newOrderProductPrice_discounted = (orderProductInfo.price * orderQty * (100 - couponDiscount)) / 100;
+        const newOrderProductPrice_discounted = (newOrderProductPrice * (100 - couponDiscount)) / 100;
         orderProductInfo.totalPrice = newOrderProductPrice;
         orderInfo.totalProductPrice += newOrderProductPrice;
         orderInfo.totalOrderPrice += newOrderProductPrice_discounted;
@@ -107,7 +104,7 @@ export class OrderProductService {
     async adminGetListProductByOrderId(orderId: string): Promise<OrderProductEntity[]> {
         const listProduct = await this.orderProductRepo.getListProductByOrderId(orderId);
         if (listProduct.length === 0) {
-            throw new HttpException('The order is empty!', HttpStatus.BAD_REQUEST);
+            throw new BadRequestException('The order is empty!');
         }
         return listProduct;
     }
@@ -115,7 +112,7 @@ export class OrderProductService {
     async updateProductInOrderProduct(orderProductId: string, newQty: string, username: string) {
         const orderProductInfo = await this.orderProductRepo.updateProductInOrderProduct(orderProductId);
         if (orderProductInfo === null) {
-            throw new HttpException('OrderProductID is invalid!', HttpStatus.BAD_REQUEST);
+            throw new BadRequestException('OrderProductID is invalid!');
         }
         const productInfo = await this.checkProductExist(orderProductInfo.fk_Product.id);
         await this.checkQtyRemain(productInfo, Number(newQty));
@@ -141,18 +138,18 @@ export class OrderProductService {
             id: productId,
         });
         if (productInfo === null) {
-            throw new HttpException('ProductID is invalid!', HttpStatus.BAD_REQUEST);
+            throw new BadRequestException('ProductID is invalid!');
         }
         return productInfo;
     }
 
     async checkQtyRemain(productInfo: ProductEntity, orderQty: number) {
         if (orderQty > Number(productInfo.qtyRemaining)) {
-            throw new HttpException('Your order quantities is higher than quantity in stock!', HttpStatus.BAD_REQUEST);
+            throw new BadRequestException('Your order quantities is higher than quantity in stock!');
         } else if (orderQty === 0) {
-            throw new HttpException('The minimum of order quantity is 1!', HttpStatus.BAD_REQUEST);
+            throw new BadRequestException('The minimum of order quantity is 1!');
         } else if (orderQty < 0) {
-            throw new HttpException('Product qty can not smaller than 0!', HttpStatus.BAD_REQUEST);
+            throw new BadRequestException('Product qty can not smaller than 0!');
         }
         return orderQty;
     }
@@ -181,21 +178,26 @@ export class OrderProductService {
     }
 
     async adminDeleteOrderProductInOrder(orderProductId: string) {
+        // Step 3. Check status of Orders, status === Shopping --> Update
         const orderProductInfo = await this.orderProductRepo.updateProductInOrderProduct(orderProductId);
-        // check status of Orders, status === shopping --> Update Orders
-
         const orderInfo = await this.orderService.adminGetOrderByOrderID(orderProductInfo.fk_Order.id);
-
         if (orderInfo.status === orderStatus.SHOPPING) {
             orderInfo.totalProductPrice -= orderProductInfo.totalPrice;
-            orderInfo.totalOrderPrice -=
-                orderProductInfo.totalPrice * ((100 - Number(orderInfo.fk_Coupon.discount)) / 100);
+            if (orderInfo.fk_Coupon !== null) {
+                orderInfo.totalOrderPrice =
+                    orderInfo.totalOrderPrice -
+                    orderProductInfo.totalPrice * ((100 - Number(orderInfo.fk_Coupon.discount)) / 100);
+            } else {
+                orderInfo.totalOrderPrice -= orderProductInfo.totalPrice;
+            }
             // when order is empty
             if (orderInfo.totalProductPrice === 0) {
                 orderInfo.shipmentPrice = 0;
                 orderInfo.totalOrderPrice = 0;
             }
+            // Step 4. Update price of Order
             await this.orderService.createOrder(orderInfo);
+            // Step 5. Delete orderProduct
             this.orderProductRepo.deleteProductInOrder(orderProductId);
         }
     }

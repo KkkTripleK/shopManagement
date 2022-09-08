@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { IPaginationOptions, Pagination } from 'nestjs-typeorm-paginate';
 import { userStatus } from 'src/commons/common.enum';
@@ -27,11 +27,11 @@ export class UserService {
         try {
             const result = await this.userRepository.findAccount(param);
             if (result === null) {
-                throw new HttpException('Can not find your account!', HttpStatus.BAD_REQUEST);
+                throw new BadRequestException('Can not find your account!');
             }
             return result;
         } catch (error) {
-            throw new HttpException('Can not find your account!', HttpStatus.BAD_REQUEST);
+            throw new BadRequestException('Can not find your account!');
         }
     }
 
@@ -60,10 +60,10 @@ export class UserService {
         const userInfo = await this.findAccount(username);
         const isMatch = await bcrypt.compare(oldPassword, userInfo.password);
         if (!isMatch) {
-            throw new HttpException('Old password is not correct!', HttpStatus.BAD_REQUEST);
+            throw new BadRequestException('Old password is not correct!');
         }
         if (newPassword === oldPassword) {
-            throw new HttpException('Old password and new password can not be the same!', HttpStatus.BAD_REQUEST);
+            throw new BadRequestException('Old password and new password can not be the same!');
         }
         const newPasswordBcrypt = await bcrypt.hash(requestBody.newPassword, Number(process.env.PRIVATE_KEY));
         return this.userRepository.updateAccount({ username: userInfo.username }, { password: newPasswordBcrypt });

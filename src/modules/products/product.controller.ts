@@ -36,13 +36,29 @@ export class ProductController {
         return this.productService.showListProduct({
             page,
             limit,
-            route: `localhost:${process.env.PORT}/admin/list-account`,
+            route: `localhost:${process.env.PORT}/product/all`,
         });
     }
 
     @Get('product/:productID')
     async showProductByID(@Param('productID') productID: string): Promise<ProductEntity> {
         return this.productService.showProductByID(productID);
+    }
+
+    @Get('product/find/:nameProduct')
+    async findProductByName(
+        @Param('nameProduct') nameProduct: string,
+        @Query('page', new DefaultValuePipe(1), ParseIntPipe) page = 1,
+        @Query('limit', new DefaultValuePipe(3), ParseIntPipe) limit = 3,
+    ): Promise<Pagination<ProductEntity>> {
+        return this.productService.findProductByName(
+            {
+                page,
+                limit,
+                route: `localhost:${process.env.PORT}/product/all`,
+            },
+            nameProduct,
+        );
     }
 
     @Get('admin/product/all')
@@ -55,7 +71,7 @@ export class ProductController {
         return this.productService.adminShowListProduct({
             page,
             limit,
-            route: `localhost:${process.env.PORT}/admin/list-account`,
+            route: `localhost:${process.env.PORT}/admin/product/all`,
         });
     }
 

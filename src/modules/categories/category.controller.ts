@@ -70,6 +70,8 @@ export class CategoryController {
         description: 'Banner',
         type: uploadFileDto,
     })
+    @ApiOkResponse()
+    @ApiBadRequestResponse()
     async upload(@UploadedFile() file, @Body() requestBody: any) {
         return this.cateService.uploadBanner(file, requestBody);
     }

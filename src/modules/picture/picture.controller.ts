@@ -1,22 +1,27 @@
 import {
     Body,
     Controller,
+    DefaultValuePipe,
     Delete,
     Get,
     Param,
+    ParseIntPipe,
     Patch,
     Post,
+    Query,
     UploadedFile,
     UseGuards,
     UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
+import { Pagination } from 'nestjs-typeorm-paginate';
 import { Roles } from '../../decorators/decorator.roles';
 import { JWTandRolesGuard } from '../../guards/guard.roles';
 import { multerOptions } from '../../utils/util.multer';
 import { uploadFileDto } from './dto/dto.fileUpload';
 import { UpdatePictureDto } from './dto/dto.updatePicture.dto';
+import { PictureEntity } from './picture.entity';
 import { PictureService } from './picture.service';
 
 @ApiBearerAuth()
@@ -27,8 +32,15 @@ export class PictureController {
     constructor(private pictureService: PictureService) {}
 
     @Get('picture')
-    async showListPicture() {
-        return this.pictureService.showListPicture();
+    async showListPicture(
+        @Query('page', new DefaultValuePipe(1), ParseIntPipe) page = 1,
+        @Query('limit', new DefaultValuePipe(3), ParseIntPipe) limit = 3,
+    ): Promise<Pagination<PictureEntity>> {
+        return this.pictureService.showListPicture({
+            page,
+            limit,
+            route: `localhost:${process.env.PORT}/admin/list-account`,
+        });
     }
 
     @Get('picture/:pictureId')

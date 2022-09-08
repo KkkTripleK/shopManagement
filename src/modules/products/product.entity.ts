@@ -24,13 +24,10 @@ export class ProductEntity extends BaseEntity {
     barcode: string;
 
     @Column({ select: false })
-    cost: string;
+    importPrice: string;
 
     @Column()
-    netPrice: string;
-
-    @Column({ nullable: true })
-    salePrice: string;
+    price: string;
 
     @Column()
     weight: string;

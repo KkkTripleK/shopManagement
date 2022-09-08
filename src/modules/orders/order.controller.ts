@@ -1,16 +1,20 @@
 import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  ParseUUIDPipe,
-  Patch,
-  Post,
-  Req,
-  UseGuards,
+    Body,
+    Controller,
+    DefaultValuePipe,
+    Delete,
+    Get,
+    Param,
+    ParseIntPipe,
+    ParseUUIDPipe,
+    Patch,
+    Post,
+    Query,
+    Req,
+    UseGuards,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiBadRequestResponse, ApiBearerAuth, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { Pagination } from 'nestjs-typeorm-paginate';
 import { userRole } from 'src/commons/common.enum';
 import { Roles } from '../../decorators/decorator.roles';
 import { JwtAuthGuard } from '../../guards/guard.jwt';
@@ -18,93 +22,138 @@ import { JWTandRolesGuard } from '../../guards/guard.roles';
 import { addCouponDto } from './dto/dto.addCoupon';
 import { createOrderDto } from './dto/dto.createOrder';
 import { updateOrderDto } from './dto/dto.updateOrder';
+import { OrderEntity } from './order.entity';
 import { OrderService } from './order.service';
 
 @ApiBearerAuth()
 @ApiTags('Order')
 @Controller()
 export class OrderController {
-  constructor(private orderService: OrderService) {}
+    constructor(private orderService: OrderService) {}
 
-  @Get('user/order/all')
-  @UseGuards(JwtAuthGuard)
-  async getListOrderByUsername(@Req() req: any) {
-    const fk_User = req.userInfo.username;
-    return this.orderService.getListOrderByUsername(fk_User);
-  }
+    @Get('user/order/all')
+    @UseGuards(JwtAuthGuard)
+    @ApiOkResponse()
+    @ApiBadRequestResponse()
+    async getListOrderByUsername(
+        @Req() req: any,
+        @Query('page', new DefaultValuePipe(1), ParseIntPipe) page = 1,
+        @Query('limit', new DefaultValuePipe(3), ParseIntPipe) limit = 3,
+    ): Promise<Pagination<OrderEntity>> {
+        const fk_User = req.userInfo.username;
+        return this.orderService.showListOrderByUsername(
+            {
+                page,
+                limit,
+                route: `localhost:${process.env.PORT}/user/order/all`,
+            },
+            fk_User,
+        );
+    }
 
-  @Get('user/order/:orderId')
-  @UseGuards(JwtAuthGuard)
-  async getOrderByIdAndUsername(
-    @Param('orderId', new ParseUUIDPipe()) orderId: string,
-    @Req() req: any,
-  ) {
-    const fk_User = req.userInfo.username;
-    return this.orderService.getOrderByOrderIdAndUsername(orderId, fk_User);
-  }
+    @Get('user/order/:orderId')
+    @UseGuards(JwtAuthGuard)
+    @ApiOkResponse()
+    @ApiBadRequestResponse()
+    async getOrderByIdAndUsername(@Param('orderId', new ParseUUIDPipe()) orderId: string, @Req() req: any) {
+        const fk_User = req.userInfo.username;
+        return this.orderService.getOrderByOrderIdAndUsername(orderId, fk_User);
+    }
 
-  @Post('user/order/create')
-  @UseGuards(JwtAuthGuard)
-  async createOrder(@Body() orderInfo: createOrderDto, @Req() req: any) {
-    orderInfo.fk_User = req.userInfo.username;
-    return this.orderService.createOrder(orderInfo);
-  }
+    @Post('user/order/create')
+    @UseGuards(JwtAuthGuard)
+    @ApiOkResponse()
+    @ApiBadRequestResponse()
+    async createOrder(@Body() orderInfo: createOrderDto, @Req() req: any) {
+        orderInfo.fk_User = req.userInfo.username;
+        return this.orderService.createOrder(orderInfo);
+    }
 
-  @Patch('user/order/:orderId')
-  @UseGuards(JwtAuthGuard)
-  async updateOrder(
-    @Param('orderId') orderId: string,
-    @Body() updateOrder: updateOrderDto,
-    @Req() req: any,
-  ) {
-    const fk_User = req.userInfo.username;
-    return this.orderService.updateOrder(orderId, updateOrder, fk_User);
-  }
+    @Patch('user/order/:orderId')
+    @UseGuards(JwtAuthGuard)
+    @ApiOkResponse()
+    @ApiBadRequestResponse()
+    async updateOrder(@Param('orderId') orderId: string, @Body() updateOrder: updateOrderDto, @Req() req: any) {
+        const fk_User = req.userInfo.username;
+        return this.orderService.updateOrder(orderId, updateOrder, fk_User);
+    }
 
-  @Delete('user/order/:orderId')
-  @UseGuards(JwtAuthGuard)
-  async deleteOrder(@Param('orderId') orderId: string, @Req() req: any) {
-    const fk_User = req.userInfo.username;
-    return this.orderService.deleteOrder(orderId, fk_User);
-  }
+    @Delete('user/order/:orderId')
+    @UseGuards(JwtAuthGuard)
+    @ApiOkResponse()
+    @ApiBadRequestResponse()
+    async deleteOrder(@Param('orderId') orderId: string, @Req() req: any) {
+        const fk_User = req.userInfo.username;
+        return this.orderService.deleteOrder(orderId, fk_User);
+    }
 
-  @Get('admin/order/all')
-  @UseGuards(JWTandRolesGuard)
-  @Roles(userRole.ADMIN)
-  async adminGetListOrder() {
-    return this.orderService.adminGetListOrder();
-  }
+    @Get('admin/order/all')
+    @UseGuards(JWTandRolesGuard)
+    @Roles(userRole.ADMIN)
+    @ApiOkResponse()
+    @ApiBadRequestResponse()
+    async adminGetListOrder(
+        @Query('page', new DefaultValuePipe(1), ParseIntPipe) page = 1,
+        @Query('limit', new DefaultValuePipe(3), ParseIntPipe) limit = 3,
+    ): Promise<Pagination<OrderEntity>> {
+        return this.orderService.adminGetListOrder({
+            page,
+            limit,
+            route: `localhost:${process.env.PORT}/admin/order/all`,
+        });
+    }
 
-  @Get('admin/order/id/:orderId')
-  @UseGuards(JWTandRolesGuard)
-  @Roles(userRole.ADMIN)
-  async adminGetOrderByID(@Param('orderId') orderId: string) {
-    return this.orderService.adminGetOrderByOrderID(orderId);
-  }
+    @Get('admin/order/id/:orderId')
+    @UseGuards(JWTandRolesGuard)
+    @Roles(userRole.ADMIN)
+    @ApiOkResponse()
+    @ApiBadRequestResponse()
+    async adminGetOrderByID(@Param('orderId') orderId: string) {
+        return this.orderService.adminGetOrderByOrderID(orderId);
+    }
 
-  @Get('admin/order/username/:username')
-  @UseGuards(JWTandRolesGuard)
-  @Roles(userRole.ADMIN)
-  async adminGetOrderByUsername(@Param('username') username: string) {
-    return this.orderService.adminGetOrderByUsername(username);
-  }
+    @Get('admin/order/username/:username')
+    @UseGuards(JWTandRolesGuard)
+    @Roles(userRole.ADMIN)
+    @ApiOkResponse()
+    @ApiBadRequestResponse()
+    async adminGetOrderByUsername(
+        @Param('username') username: string,
+        @Query('page', new DefaultValuePipe(1), ParseIntPipe) page = 1,
+        @Query('limit', new DefaultValuePipe(3), ParseIntPipe) limit = 3,
+    ): Promise<Pagination<OrderEntity>> {
+        return this.orderService.adminGetOrderByUsername(
+            {
+                page,
+                limit,
+                route: `localhost:${process.env.PORT}/admin/order/username/${username}`,
+            },
+            username,
+        );
+    }
 
-  @Post('user/order/confirm')
-  @UseGuards(JwtAuthGuard)
-  async orderConfirm(
-    @Body('id', new ParseUUIDPipe()) id: string,
-    @Req() req: any,
-  ) {
-    const fk_User = req.userInfo.username;
-    return this.orderService.orderConfirm(id, fk_User);
-  }
+    @Post('user/order/confirm')
+    @UseGuards(JwtAuthGuard)
+    @ApiOkResponse()
+    @ApiBadRequestResponse()
+    async orderConfirm(@Body('id', new ParseUUIDPipe()) id: string, @Req() req: any) {
+        const fk_User = req.userInfo.username;
+        return this.orderService.orderConfirm(id, fk_User);
+    }
 
-  @Post('user/order/add-coupon')
-  @UseGuards(JwtAuthGuard)
-  async addCouponToOrder(@Body() requestBody: addCouponDto, @Req() req: any) {
-    return this.orderService.addCouponToOrder(
-      requestBody,
-      req.userInfo.username,
-    );
-  }
+    @Post('user/order-coupon/add-coupon')
+    @UseGuards(JwtAuthGuard)
+    @ApiOkResponse()
+    @ApiBadRequestResponse()
+    async addCouponToOrder(@Body() requestBody: addCouponDto, @Req() req: any) {
+        return this.orderService.addCouponToOrder(requestBody, req.userInfo.username);
+    }
+
+    @Delete('user/order-coupon/remove-coupon')
+    @UseGuards(JwtAuthGuard)
+    @ApiOkResponse()
+    @ApiBadRequestResponse()
+    async removeCouponFromOrder(@Body() requestBody: addCouponDto, @Req() req: any) {
+        return this.orderService.removeCouponFromOrder(requestBody, req.userInfo.username);
+    }
 }

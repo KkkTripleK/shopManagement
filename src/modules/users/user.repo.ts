@@ -15,7 +15,8 @@ export class UserRepository {
     ) {}
 
     async getListAccount(options: IPaginationOptions): Promise<Pagination<UserEntity>> {
-        return paginate<UserEntity>(this.userRepo, options);
+        const listAccount = await this.userRepo.manager.createQueryBuilder(UserEntity, 'User').orderBy('id');
+        return paginate<UserEntity>(listAccount, options);
     }
 
     async createUser(createUserDto: CreateUserDto): Promise<any> {
@@ -44,5 +45,10 @@ export class UserRepository {
     async checkExistUsername(createUserDto: CreateUserDto): Promise<number> {
         const username = createUserDto.username;
         return this.userRepo.count({ where: [{ username }] });
+    }
+
+    async checkExistEmail(createUserDto: CreateUserDto): Promise<number> {
+        const email = createUserDto.email;
+        return this.userRepo.count({ where: [{ email }] });
     }
 }

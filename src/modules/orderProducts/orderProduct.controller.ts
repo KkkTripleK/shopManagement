@@ -15,14 +15,12 @@ import { OrderProductService } from './orderProduct.service';
 export class OrderProductController {
     constructor(private orderProductService: OrderProductService) {}
 
-    // Show list products by OrderID
     @Get('user/order-product/:orderId')
     @UseGuards(JwtAuthGuard)
     async getListProductByOrderId(@Param('orderId', new ParseUUIDPipe()) orderId: string, @Req() req: any) {
         return this.orderProductService.getListProductByOrderId(orderId, req.userInfo.username);
     }
 
-    //Admin show list products by OrderId
     @Get('admin/order-product/:orderId')
     @UseGuards(JWTandRolesGuard)
     @Roles(userRole.ADMIN)
@@ -30,7 +28,6 @@ export class OrderProductController {
         return this.orderProductService.adminGetListProductByOrderId(orderId);
     }
 
-    //Create new Order-products
     @Post('user/order-product')
     @UseGuards(JwtAuthGuard)
     async addProductToOrder(@Body() requestBody: createOrderProductDto, @Req() req: any): Promise<OrderProductEntity> {

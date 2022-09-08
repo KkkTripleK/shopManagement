@@ -24,16 +24,11 @@ export class CreateProductDto {
 
     @ApiProperty()
     @IsString()
-    cost: string;
+    importPrice: string;
 
     @ApiProperty()
     @IsString()
-    netPrice: string;
-
-    @ApiProperty()
-    @IsString()
-    @IsOptional()
-    salePrice?: string;
+    price: string;
 
     @ApiProperty()
     @IsString()
