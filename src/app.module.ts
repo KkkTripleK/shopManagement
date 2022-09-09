@@ -1,15 +1,17 @@
 import { MailerModule } from '@nestjs-modules/mailer';
 import { Module } from '@nestjs/common';
+import { ScheduleModule } from '@nestjs/schedule';
 import { AuthModule } from './modules/auths/auth.module';
 import { CategoryModule } from './modules/categories/category.module';
 import { CouponModule } from './modules/coupons/coupon.module';
 import { FlashSaleProductModule } from './modules/flashSaleProducts/flashSaleProduct.module';
-import { CouponUserModule } from './modules/flashSales/flashSale.module';
+import { FlashSaleModule } from './modules/flashSales/flashSale.module';
 import { OrderProductModule } from './modules/orderProducts/orderProduct.module';
 import { OrderModule } from './modules/orders/order.module';
 import { PictureModule } from './modules/picture/picture.module';
 import { ProductModule } from './modules/products/product.module';
 import { UserModule } from './modules/users/user.module';
+import { TasksService } from './utils/util.cronJobs';
 
 @Module({
     imports: [
@@ -20,8 +22,9 @@ import { UserModule } from './modules/users/user.module';
         PictureModule,
         OrderModule,
         OrderProductModule,
+        CouponModule,
         FlashSaleProductModule,
-        CouponUserModule,
+        FlashSaleModule,
         CouponModule,
         MailerModule,
         MailerModule.forRoot({
@@ -39,8 +42,9 @@ import { UserModule } from './modules/users/user.module';
                 from: '"No Reply" <no-reply@localhost>',
             },
         }),
+        ScheduleModule.forRoot(),
     ],
     controllers: [],
-    providers: [],
+    providers: [TasksService],
 })
 export class AppModule {}

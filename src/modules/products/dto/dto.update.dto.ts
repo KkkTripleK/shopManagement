@@ -20,12 +20,12 @@ export class UpdateProductDto {
     @ApiProperty({ required: false })
     @IsString()
     @IsOptional()
-    cost?: string;
+    importPrice?: number;
 
     @ApiProperty({ required: false })
     @IsString()
     @IsOptional()
-    netPrice?: string;
+    price?: number;
 
     @ApiProperty({ required: false })
     @IsString()

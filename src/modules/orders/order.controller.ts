@@ -13,11 +13,10 @@ import {
     Req,
     UseGuards,
 } from '@nestjs/common';
-import { ApiBadRequestResponse, ApiBearerAuth, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBadRequestResponse, ApiBearerAuth, ApiForbiddenResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { Pagination } from 'nestjs-typeorm-paginate';
 import { userRole } from 'src/commons/common.enum';
 import { Roles } from '../../decorators/decorator.roles';
-import { JwtAuthGuard } from '../../guards/guard.jwt';
 import { JWTandRolesGuard } from '../../guards/guard.roles';
 import { addCouponDto } from './dto/dto.addCoupon';
 import { createOrderDto } from './dto/dto.createOrder';
@@ -32,8 +31,10 @@ export class OrderController {
     constructor(private orderService: OrderService) {}
 
     @Get('user/order/all')
-    @UseGuards(JwtAuthGuard)
+    @UseGuards(JWTandRolesGuard)
+    @Roles(userRole.MEMBER, userRole.ADMIN)
     @ApiOkResponse()
+    @ApiForbiddenResponse()
     @ApiBadRequestResponse()
     async getListOrderByUsername(
         @Req() req: any,
@@ -52,8 +53,10 @@ export class OrderController {
     }
 
     @Get('user/order/:orderId')
-    @UseGuards(JwtAuthGuard)
+    @UseGuards(JWTandRolesGuard)
+    @Roles(userRole.MEMBER, userRole.ADMIN)
     @ApiOkResponse()
+    @ApiForbiddenResponse()
     @ApiBadRequestResponse()
     async getOrderByIdAndUsername(@Param('orderId', new ParseUUIDPipe()) orderId: string, @Req() req: any) {
         const fk_User = req.userInfo.username;
@@ -61,17 +64,21 @@ export class OrderController {
     }
 
     @Post('user/order/create')
-    @UseGuards(JwtAuthGuard)
+    @UseGuards(JWTandRolesGuard)
+    @Roles(userRole.MEMBER, userRole.ADMIN)
     @ApiOkResponse()
     @ApiBadRequestResponse()
+    @ApiForbiddenResponse()
     async createOrder(@Body() orderInfo: createOrderDto, @Req() req: any) {
         orderInfo.fk_User = req.userInfo.username;
         return this.orderService.createOrder(orderInfo);
     }
 
     @Patch('user/order/:orderId')
-    @UseGuards(JwtAuthGuard)
+    @UseGuards(JWTandRolesGuard)
+    @Roles(userRole.MEMBER, userRole.ADMIN)
     @ApiOkResponse()
+    @ApiForbiddenResponse()
     @ApiBadRequestResponse()
     async updateOrder(@Param('orderId') orderId: string, @Body() updateOrder: updateOrderDto, @Req() req: any) {
         const fk_User = req.userInfo.username;
@@ -79,7 +86,8 @@ export class OrderController {
     }
 
     @Delete('user/order/:orderId')
-    @UseGuards(JwtAuthGuard)
+    @UseGuards(JWTandRolesGuard)
+    @Roles(userRole.MEMBER, userRole.ADMIN)
     @ApiOkResponse()
     @ApiBadRequestResponse()
     async deleteOrder(@Param('orderId') orderId: string, @Req() req: any) {
@@ -92,6 +100,7 @@ export class OrderController {
     @Roles(userRole.ADMIN)
     @ApiOkResponse()
     @ApiBadRequestResponse()
+    @ApiForbiddenResponse()
     async adminGetListOrder(
         @Query('page', new DefaultValuePipe(1), ParseIntPipe) page = 1,
         @Query('limit', new DefaultValuePipe(3), ParseIntPipe) limit = 3,
@@ -108,6 +117,7 @@ export class OrderController {
     @Roles(userRole.ADMIN)
     @ApiOkResponse()
     @ApiBadRequestResponse()
+    @ApiForbiddenResponse()
     async adminGetOrderByID(@Param('orderId') orderId: string) {
         return this.orderService.adminGetOrderByOrderID(orderId);
     }
@@ -117,6 +127,7 @@ export class OrderController {
     @Roles(userRole.ADMIN)
     @ApiOkResponse()
     @ApiBadRequestResponse()
+    @ApiForbiddenResponse()
     async adminGetOrderByUsername(
         @Param('username') username: string,
         @Query('page', new DefaultValuePipe(1), ParseIntPipe) page = 1,
@@ -133,8 +144,10 @@ export class OrderController {
     }
 
     @Post('user/order/confirm')
-    @UseGuards(JwtAuthGuard)
+    @UseGuards(JWTandRolesGuard)
+    @Roles(userRole.MEMBER, userRole.ADMIN)
     @ApiOkResponse()
+    @ApiForbiddenResponse()
     @ApiBadRequestResponse()
     async orderConfirm(@Body('id', new ParseUUIDPipe()) id: string, @Req() req: any) {
         const fk_User = req.userInfo.username;
@@ -142,16 +155,20 @@ export class OrderController {
     }
 
     @Post('user/order-coupon/add-coupon')
-    @UseGuards(JwtAuthGuard)
+    @UseGuards(JWTandRolesGuard)
+    @Roles(userRole.MEMBER, userRole.ADMIN)
     @ApiOkResponse()
+    @ApiForbiddenResponse()
     @ApiBadRequestResponse()
     async addCouponToOrder(@Body() requestBody: addCouponDto, @Req() req: any) {
         return this.orderService.addCouponToOrder(requestBody, req.userInfo.username);
     }
 
     @Delete('user/order-coupon/remove-coupon')
-    @UseGuards(JwtAuthGuard)
+    @UseGuards(JWTandRolesGuard)
+    @Roles(userRole.MEMBER, userRole.ADMIN)
     @ApiOkResponse()
+    @ApiForbiddenResponse()
     @ApiBadRequestResponse()
     async removeCouponFromOrder(@Body() requestBody: addCouponDto, @Req() req: any) {
         return this.orderService.removeCouponFromOrder(requestBody, req.userInfo.username);

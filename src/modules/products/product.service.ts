@@ -1,6 +1,8 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { IPaginationOptions, Pagination } from 'nestjs-typeorm-paginate';
 import { orderStatus, productStatus } from 'src/commons/common.enum';
+import { FlashSaleProductService } from '../flashSaleProducts/flashSaleProduct.service';
+import { FlashSaleEntity } from '../flashSales/flashSale.entity';
 import { OrderProductRepository } from '../orderProducts/orderProduct.repo';
 import { OrderProductService } from '../orderProducts/orderProduct.service';
 import { OrderService } from '../orders/order.service';
@@ -17,6 +19,7 @@ export class ProductService {
         private orderService: OrderService,
         private orderProductRepo: OrderProductRepository,
         private orderProductService: OrderProductService,
+        private flashSaleProductService: FlashSaleProductService,
     ) {}
 
     async createNewProduct(requestBody: CreateProductDto): Promise<ProductEntity> {
@@ -66,6 +69,34 @@ export class ProductService {
         // Step 1. Check exist product & Step 2: Change info of product
         const productInfo = await this.productRepository.updateProductByID(productID, requestBody);
         await this.orderService.updateOrderInfoByProduct(productInfo);
+    }
+
+    async inFlashSale(flashSaleInfo: FlashSaleEntity) {
+        const listFlashSaleProductInfo = await this.flashSaleProductService.getFlashSaleProductByFlashSaleId(
+            flashSaleInfo.id,
+        );
+        for (const flashSaleProductInfo of listFlashSaleProductInfo) {
+            const productInfo = await this.showProductByID(flashSaleProductInfo.fk_Product.id);
+            const newPrice = (productInfo.price * (100 - flashSaleProductInfo.discount)) / 100;
+            try {
+                await this.updateProductByID(productInfo.id, { price: newPrice });
+            } catch (error) {
+                console.log(error);
+            }
+        }
+        console.log('FlashSale is comming!');
+    }
+
+    async flashSaleOver(flashSaleInfo: FlashSaleEntity) {
+        const listFlashSaleProductInfo = await this.flashSaleProductService.getFlashSaleProductByFlashSaleId(
+            flashSaleInfo.id,
+        );
+        for (const flashSaleProductInfo of listFlashSaleProductInfo) {
+            const productInfo = await this.showProductByID(flashSaleProductInfo.fk_Product.id);
+            const newPrice = (productInfo.price / (100 - flashSaleProductInfo.discount)) * 100;
+            await this.updateProductByID(productInfo.id, { price: newPrice });
+        }
+        console.log('FlashSale is end!');
     }
 
     async inactiveProductByID(productID: string) {

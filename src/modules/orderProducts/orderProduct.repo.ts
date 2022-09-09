@@ -35,7 +35,7 @@ export class OrderProductRepository {
                 'orderProduct',
                 'fk_Product.id',
                 'fk_Product.name',
-                'fk_Product.netPrice',
+                'fk_Product.price',
                 'fk_Product.qtyRemaining',
                 'fk_Product.qtyInstock',
                 'fk_Product.status',
@@ -59,7 +59,16 @@ export class OrderProductRepository {
             .leftJoinAndSelect('orderProduct.fk_Product', 'fk_Product')
             .leftJoinAndSelect('orderProduct.fk_Order', 'fk_Order')
             .where('fk_Product.id = :productId', { productId })
-            .select(['orderProduct', 'fk_Product', 'fk_Order'])
+            .select([
+                'orderProduct',
+                'fk_Product.id',
+                'fk_Product.name',
+                'fk_Product.price',
+                'fk_Product.qtyRemaining',
+                'fk_Product.qtyInstock',
+                'fk_Product.status',
+                'fk_Order',
+            ])
             .getMany();
         return result;
     }

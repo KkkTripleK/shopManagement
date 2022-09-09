@@ -13,6 +13,7 @@ import {
     UpdateDateColumn,
 } from 'typeorm';
 import { CouponEntity } from '../coupons/coupon.entity';
+import { FlashSaleProductEntity } from '../flashSaleProducts/flashSaleProduct.entity';
 import { OrderProductEntity } from '../orderProducts/orderProduct.entity';
 import { UserEntity } from '../users/user.entity';
 
@@ -20,20 +21,6 @@ import { UserEntity } from '../users/user.entity';
 export class OrderEntity extends BaseEntity {
     @PrimaryGeneratedColumn('uuid')
     id: string;
-
-    @ManyToOne(() => UserEntity)
-    @JoinColumn({
-        name: 'fk_User',
-        referencedColumnName: 'username',
-    })
-    fk_User: UserEntity;
-
-    @ManyToOne(() => CouponEntity)
-    @JoinColumn({
-        name: 'fk_Coupon',
-        referencedColumnName: 'id',
-    })
-    fk_Coupon: CouponEntity;
 
     @Column()
     address: string;
@@ -71,6 +58,27 @@ export class OrderEntity extends BaseEntity {
         default: orderStatus.SHOPPING,
     })
     status: orderStatus;
+
+    @ManyToOne(() => UserEntity)
+    @JoinColumn({
+        name: 'fk_User',
+        referencedColumnName: 'username',
+    })
+    fk_User: UserEntity;
+
+    @ManyToOne(() => CouponEntity)
+    @JoinColumn({
+        name: 'fk_Coupon',
+        referencedColumnName: 'id',
+    })
+    fk_Coupon: CouponEntity;
+
+    @OneToMany(() => FlashSaleProductEntity, (flashSaleProduct) => flashSaleProduct.fk_Order)
+    @JoinColumn({
+        name: 'fk_FlashSaleProduct',
+        referencedColumnName: 'id',
+    })
+    fk_FlashSaleProduct: FlashSaleProductEntity[];
 
     @OneToMany(() => OrderProductEntity, (orderProduct) => orderProduct.fk_Order)
     @JoinColumn({

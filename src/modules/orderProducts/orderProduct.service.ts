@@ -52,6 +52,7 @@ export class OrderProductService {
                 /*
                 Check qty after change
                 */
+
                 const productQty = await this.checkQtyRemain(
                     productInfo,
                     Number(orderProductInfo.qty) + Number(oldOrderProductInfo.qty),
@@ -145,11 +146,13 @@ export class OrderProductService {
 
     async checkQtyRemain(productInfo: ProductEntity, orderQty: number) {
         if (orderQty > Number(productInfo.qtyRemaining)) {
-            throw new BadRequestException('Your order quantities is higher than quantity in stock!');
+            throw new BadRequestException(
+                `Order product failed, the quantity remain is only ${productInfo.qtyRemaining}!`,
+            );
         } else if (orderQty === 0) {
-            throw new BadRequestException('The minimum of order quantity is 1!');
+            throw new BadRequestException('The minimum of order product quantity is 1!');
         } else if (orderQty < 0) {
-            throw new BadRequestException('Product qty can not smaller than 0!');
+            throw new BadRequestException('Order product quantity can not be smaller than 0!');
         }
         return orderQty;
     }

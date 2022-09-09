@@ -11,6 +11,9 @@ export class FlashSaleEntity extends BaseEntity {
     @Column()
     flashSaleEnd: Date;
 
+    @Column({ default: false })
+    onSale: boolean;
+
     @CreateDateColumn({
         default: `now()`,
         nullable: false,

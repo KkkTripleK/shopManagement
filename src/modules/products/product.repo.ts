@@ -24,7 +24,21 @@ export class ProductRepository {
             .createQueryBuilder('product')
             .leftJoinAndSelect('product.category', 'category')
             .leftJoinAndSelect('product.pictures', 'pictures')
-            .select(['product', 'pictures', 'category'])
+            .leftJoinAndSelect('product.fk_FlashSaleProduct', 'fk_FlashSaleProduct')
+            .select([
+                'product',
+                'pictures',
+                'category.id',
+                'category.name',
+                'category.banner',
+                'category.status',
+                'category.position',
+                'fk_FlashSaleProduct.id',
+                'fk_FlashSaleProduct.status',
+                'fk_FlashSaleProduct.discount',
+                'fk_FlashSaleProduct.totalQty',
+                'fk_FlashSaleProduct.qtyRemain',
+            ])
             .where('product.status != :status', { status: productStatus.INACTIVE })
             .orderBy('product.id');
         return paginate<ProductEntity>(listProduct, options);
@@ -36,7 +50,21 @@ export class ProductRepository {
             .createQueryBuilder('product')
             .leftJoinAndSelect('product.category', 'category')
             .leftJoinAndSelect('product.pictures', 'pictures')
-            .select(['product', 'pictures', 'category'])
+            .leftJoinAndSelect('product.fk_FlashSaleProduct', 'fk_FlashSaleProduct')
+            .select([
+                'product',
+                'pictures',
+                'category.id',
+                'category.name',
+                'category.banner',
+                'category.status',
+                'category.position',
+                'fk_FlashSaleProduct.id',
+                'fk_FlashSaleProduct.status',
+                'fk_FlashSaleProduct.discount',
+                'fk_FlashSaleProduct.totalQty',
+                'fk_FlashSaleProduct.qtyRemain',
+            ])
             .where('product.name like :name', { name: `%${nameProduct}%` })
             .orderBy('product.id');
         return paginate<ProductEntity>(listProduct, options);
@@ -47,7 +75,22 @@ export class ProductRepository {
             .createQueryBuilder('product')
             .leftJoinAndSelect('product.category', 'category')
             .leftJoinAndSelect('product.pictures', 'pictures')
-            .select(['product', 'product.cost', 'pictures', 'category'])
+            .leftJoinAndSelect('product.fk_FlashSaleProduct', 'fk_FlashSaleProduct')
+            .select([
+                'product',
+                'product.importPrice',
+                'pictures',
+                'category.id',
+                'category.name',
+                'category.banner',
+                'category.status',
+                'category.position',
+                'fk_FlashSaleProduct.id',
+                'fk_FlashSaleProduct.status',
+                'fk_FlashSaleProduct.discount',
+                'fk_FlashSaleProduct.totalQty',
+                'fk_FlashSaleProduct.qtyRemain',
+            ])
             .orderBy('product.id');
         return paginate<ProductEntity>(listProduct, options);
     }
@@ -65,9 +108,25 @@ export class ProductRepository {
     async adminShowProductByID(id: object): Promise<ProductEntity> {
         const product = await this.productRepo.manager
             .createQueryBuilder(ProductEntity, 'product')
-            .select(['product', 'product.cost'])
+            .select(['product', 'product.importPrice'])
             .leftJoinAndSelect('product.category', 'category')
             .leftJoinAndSelect('product.pictures', 'pictures')
+            .leftJoinAndSelect('product.fk_FlashSaleProduct', 'fk_FlashSaleProduct')
+            .select([
+                'product',
+                'product.importPrice',
+                'pictures',
+                'category.id',
+                'category.name',
+                'category.banner',
+                'category.status',
+                'category.position',
+                'fk_FlashSaleProduct.id',
+                'fk_FlashSaleProduct.status',
+                'fk_FlashSaleProduct.discount',
+                'fk_FlashSaleProduct.totalQty',
+                'fk_FlashSaleProduct.qtyRemain',
+            ])
             .where('product.id = :id', id)
             .getOne();
         if (product === null) {

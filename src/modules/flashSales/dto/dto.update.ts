@@ -1,17 +1,20 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsDateString } from 'class-validator';
+import { IsDateString, IsOptional } from 'class-validator';
 
-export class createFlashSaleDto {
+export class updateFlashSaleDto {
     @ApiProperty()
     @IsDateString({}, { each: true })
-    flashSaleBegin: Date[];
+    @IsOptional()
+    flashSaleBegin?: Date[];
 
     @ApiProperty()
     @IsDateString({}, { each: true })
-    flashSaleEnd: Date[];
+    @IsOptional()
+    flashSaleEnd?: Date[];
 
     @ApiProperty()
     @Type(() => Boolean)
-    onSale: boolean;
+    @IsOptional()
+    onSale?: boolean;
 }

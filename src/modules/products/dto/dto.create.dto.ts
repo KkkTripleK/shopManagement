@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEnum, IsOptional, IsString } from 'class-validator';
+import { Type } from 'class-transformer';
+import { IsEnum, IsNumber, IsOptional, IsString } from 'class-validator';
 import { productStatus } from 'src/commons/common.enum';
 import { PrimaryGeneratedColumn } from 'typeorm';
 
@@ -23,12 +24,14 @@ export class CreateProductDto {
     barcode?: string;
 
     @ApiProperty()
-    @IsString()
-    importPrice: string;
+    @Type(() => Number)
+    @IsNumber()
+    importPrice: number;
 
     @ApiProperty()
-    @IsString()
-    price: string;
+    @Type(() => Number)
+    @IsNumber()
+    price: number;
 
     @ApiProperty()
     @IsString()

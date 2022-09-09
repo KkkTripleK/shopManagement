@@ -12,4 +12,4 @@ import { FlashSaleService } from './flashSale.service';
     providers: [FlashSaleService, FlashSaleRepository],
     exports: [FlashSaleService],
 })
-export class CouponUserModule {}
+export class FlashSaleModule {}

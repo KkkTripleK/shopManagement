@@ -8,13 +8,20 @@ import {
     ParseIntPipe,
     Patch,
     Post,
-    Query,
     UploadedFile,
     UseGuards,
     UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiBadRequestResponse, ApiBearerAuth, ApiBody, ApiConsumes, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import {
+    ApiBadRequestResponse,
+    ApiBearerAuth,
+    ApiBody,
+    ApiConsumes,
+    ApiOkResponse,
+    ApiParam,
+    ApiTags,
+} from '@nestjs/swagger';
 import { Pagination } from 'nestjs-typeorm-paginate';
 import { userRole } from 'src/commons/common.enum';
 import { Roles } from '../../decorators/decorator.roles';
@@ -32,10 +39,16 @@ import { UpdateCategoryDto } from './dto/dto.update';
 export class CategoryController {
     constructor(private cateService: CategoryService) {}
 
-    @Get('category/all')
+    @ApiParam({
+        name: 'limit',
+    })
+    @ApiParam({
+        name: 'page',
+    })
+    @Get('category/all/:page/:limit')
     async showList(
-        @Query('page', new DefaultValuePipe(1), ParseIntPipe) page = 1,
-        @Query('limit', new DefaultValuePipe(3), ParseIntPipe) limit = 3,
+        @Param('page', new DefaultValuePipe(1), ParseIntPipe) page = 1,
+        @Param('limit', new DefaultValuePipe(3), ParseIntPipe) limit = 3,
     ): Promise<Pagination<CategoryEntity>> {
         return this.cateService.showList({
             page,

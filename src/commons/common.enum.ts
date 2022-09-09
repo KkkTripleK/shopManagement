@@ -49,7 +49,9 @@ export enum couponStatus {
     INACTIVE = 'Inactive',
 }
 
-export enum flashSaleStatus {
+export enum flashSaleProductStatus {
     ACTIVE = 'Active',
+    ONSALE = 'OnSale',
+    OUTSTOCK = 'OutStock',
     INACTIVE = 'Inactive',
 }

@@ -4,12 +4,14 @@ import {
     Column,
     CreateDateColumn,
     Entity,
+    JoinColumn,
     ManyToOne,
     OneToMany,
     PrimaryGeneratedColumn,
     UpdateDateColumn,
 } from 'typeorm';
 import { CategoryEntity } from '../categories/category.entity';
+import { FlashSaleProductEntity } from '../flashSaleProducts/flashSaleProduct.entity';
 import { PictureEntity } from '../picture/picture.entity';
 
 @Entity('Products')
@@ -23,11 +25,11 @@ export class ProductEntity extends BaseEntity {
     @Column({ nullable: true })
     barcode: string;
 
-    @Column({ select: false })
-    importPrice: string;
+    @Column({ nullable: true, select: false })
+    importPrice: number;
 
-    @Column()
-    price: string;
+    @Column({ nullable: true })
+    price: number;
 
     @Column()
     weight: string;
@@ -65,4 +67,11 @@ export class ProductEntity extends BaseEntity {
 
     @OneToMany(() => PictureEntity, (picture) => picture.product)
     pictures: PictureEntity[];
+
+    @OneToMany(() => FlashSaleProductEntity, (flashSaleProduct) => flashSaleProduct.fk_Product)
+    @JoinColumn({
+        name: 'fk_FlashSaleProduct',
+        referencedColumnName: 'id',
+    })
+    fk_FlashSaleProduct: FlashSaleProductEntity[];
 }

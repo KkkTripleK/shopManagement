@@ -17,9 +17,17 @@ export class OrderRepository {
         const listOrder = this.orderRepo
             .createQueryBuilder('order')
             .leftJoinAndSelect('order.fk_User', 'fk_User')
-            .leftJoinAndSelect('order.fk_OrderProduct', 'fk_OrderProduct')
             .leftJoinAndSelect('order.fk_Coupon', 'fk_Coupon')
-            .select(['order', 'fk_OrderProduct.id', 'fk_OrderProduct.totalPrice', 'fk_Coupon'])
+            .leftJoinAndSelect('order.fk_OrderProduct', 'fk_OrderProduct')
+            .leftJoinAndSelect('order.fk_FlashSaleProduct', 'fk_FlashSaleProduct')
+            .select([
+                'order',
+                'fk_OrderProduct.id',
+                'fk_OrderProduct.totalPrice',
+                'fk_Coupon',
+                'fk_FlashSaleProduct.id',
+                'fk_FlashSaleProduct.discount',
+            ])
             .where('fk_User.username LIKE :fk_Username', { fk_Username })
             .andWhere('order.status IN (:...status)', {
                 status: [orderStatus.SHOPPING, orderStatus.SHIPPING, orderStatus.ORDERED, orderStatus.COMPLETED],
@@ -32,9 +40,22 @@ export class OrderRepository {
         const listOrder = this.orderRepo
             .createQueryBuilder('order')
             .leftJoinAndSelect('order.fk_User', 'fk_User')
-            .leftJoinAndSelect('order.fk_OrderProduct', 'fk_OrderProduct')
             .leftJoinAndSelect('order.fk_Coupon', 'fk_Coupon')
-            .select(['order', 'fk_OrderProduct.id', 'fk_OrderProduct.totalPrice', 'fk_Coupon.id', 'fk_Coupon.discount'])
+            .leftJoinAndSelect('order.fk_OrderProduct', 'fk_OrderProduct')
+            .leftJoinAndSelect('order.fk_FlashSaleProduct', 'fk_FlashSaleProduct')
+            .select([
+                'order',
+                'fk_OrderProduct.id',
+                'fk_OrderProduct.totalPrice',
+                'fk_Coupon.id',
+                'fk_Coupon.discount',
+                'fk_OrderProduct.id',
+                'fk_OrderProduct.totalPrice',
+                'fk_FlashSaleProduct.id',
+                'fk_FlashSaleProduct.discount',
+                'fk_FlashSaleProduct.totalQty',
+                'fk_FlashSaleProduct.qtyRemain',
+            ])
             .where('fk_User.username LIKE :fk_Username', { fk_Username })
             .andWhere('order.status IN (:...status)', {
                 status: [orderStatus.SHOPPING, orderStatus.SHIPPING, orderStatus.ORDERED, orderStatus.COMPLETED],
@@ -54,9 +75,18 @@ export class OrderRepository {
                 status: [orderStatus.SHOPPING, orderStatus.SHIPPING, orderStatus.ORDERED, orderStatus.COMPLETED],
             })
             .leftJoinAndSelect('order.fk_User', 'fk_User')
-            .leftJoinAndSelect('order.fk_OrderProduct', 'fk_OrderProduct')
             .leftJoinAndSelect('order.fk_Coupon', 'fk_Coupon')
-            .select(['order', 'fk_OrderProduct', 'fk_Coupon'])
+            .leftJoinAndSelect('order.fk_OrderProduct', 'fk_OrderProduct')
+            .leftJoinAndSelect('order.fk_FlashSaleProduct', 'fk_FlashSaleProduct')
+            .select([
+                'order',
+                'fk_OrderProduct',
+                'fk_Coupon',
+                'fk_FlashSaleProduct.id',
+                'fk_FlashSaleProduct.discount',
+                'fk_FlashSaleProduct.totalQty',
+                'fk_FlashSaleProduct.qtyRemain',
+            ])
             .getOne();
         return result;
     }
@@ -67,13 +97,17 @@ export class OrderRepository {
             .leftJoinAndSelect('order.fk_User', 'fk_User')
             .leftJoinAndSelect('order.fk_Coupon', 'fk_Coupon')
             .leftJoinAndSelect('order.fk_OrderProduct', 'fk_OrderProduct')
+            .leftJoinAndSelect('order.fk_FlashSaleProduct', 'fk_FlashSaleProduct')
             .select([
                 'order',
                 'fk_User.username',
+                'fk_OrderProduct',
                 'fk_Coupon.id',
                 'fk_Coupon.discount',
-                'fk_OrderProduct.id',
-                'fk_OrderProduct.totalPrice',
+                'fk_FlashSaleProduct.id',
+                'fk_FlashSaleProduct.discount',
+                'fk_FlashSaleProduct.totalQty',
+                'fk_FlashSaleProduct.qtyRemain',
             ])
             .where('order.status IN (:...status)', {
                 status: [orderStatus.SHOPPING, orderStatus.SHIPPING, orderStatus.ORDERED, orderStatus.COMPLETED],
@@ -90,7 +124,19 @@ export class OrderRepository {
             .createQueryBuilder('order')
             .leftJoinAndSelect('order.fk_User', 'fk_User')
             .leftJoinAndSelect('order.fk_Coupon', 'fk_Coupon')
-            .select(['order', 'fk_User.username', 'fk_Coupon'])
+            .leftJoinAndSelect('order.fk_OrderProduct', 'fk_OrderProduct')
+            .leftJoinAndSelect('order.fk_FlashSaleProduct', 'fk_FlashSaleProduct')
+            .select([
+                'order',
+                'fk_User.username',
+                'fk_OrderProduct',
+                'fk_Coupon.id',
+                'fk_Coupon.discount',
+                'fk_FlashSaleProduct.id',
+                'fk_FlashSaleProduct.discount',
+                'fk_FlashSaleProduct.totalQty',
+                'fk_FlashSaleProduct.qtyRemain',
+            ])
             .where('order.id = :id', { id: orderId })
             .andWhere('order.status IN (:...status)', {
                 status: [orderStatus.SHOPPING, orderStatus.SHIPPING, orderStatus.ORDERED, orderStatus.COMPLETED],
@@ -105,13 +151,17 @@ export class OrderRepository {
             .leftJoinAndSelect('order.fk_User', 'fk_User')
             .leftJoinAndSelect('order.fk_Coupon', 'fk_Coupon')
             .leftJoinAndSelect('order.fk_OrderProduct', 'fk_OrderProduct')
+            .leftJoinAndSelect('order.fk_FlashSaleProduct', 'fk_FlashSaleProduct')
             .select([
                 'order',
                 'fk_User.username',
+                'fk_OrderProduct',
                 'fk_Coupon.id',
                 'fk_Coupon.discount',
-                'fk_OrderProduct.id',
-                'fk_OrderProduct.totalPrice',
+                'fk_FlashSaleProduct.id',
+                'fk_FlashSaleProduct.discount',
+                'fk_FlashSaleProduct.totalQty',
+                'fk_FlashSaleProduct.qtyRemain',
             ])
             .where('fk_User.username LIKE :username', {
                 username: `%${fk_Username}%`,
