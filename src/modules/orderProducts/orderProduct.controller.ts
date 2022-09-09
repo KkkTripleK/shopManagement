@@ -1,9 +1,9 @@
 import { Body, Controller, Delete, Get, Param, ParseUUIDPipe, Patch, Post, Req, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { userRole } from 'src/commons/common.enum';
-import { Roles } from 'src/decorators/decorator.roles';
-import { JwtAuthGuard } from 'src/guards/guard.jwt';
-import { JWTandRolesGuard } from 'src/guards/guard.roles';
+import { userRole } from '../../commons/common.enum';
+import { Roles } from '../../decorators/decorator.roles';
+import { JwtAuthGuard } from '../../guards/guard.jwt';
+import { JWTandRolesGuard } from '../../guards/guard.roles';
 import { createOrderProductDto } from './dto/dto.createOrderProduct';
 import { updateOrderProductDto } from './dto/dto.updateOrderProduct';
 import { OrderProductEntity } from './orderProduct.entity';

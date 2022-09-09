@@ -13,7 +13,7 @@ import {
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { Pagination } from 'nestjs-typeorm-paginate';
-import { userRole } from 'src/commons/common.enum';
+import { userRole } from '../../commons/common.enum';
 import { Roles } from '../../decorators/decorator.roles';
 import { JWTandRolesGuard } from '../../guards/guard.roles';
 import { AddProductToCategoryDto } from './dto/dto.addToCategory.dto';

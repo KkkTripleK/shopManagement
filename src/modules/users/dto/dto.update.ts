@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsAlpha, IsEnum, IsOptional, IsString, Length } from 'class-validator';
-import { userGender, userStatus } from 'src/commons/common.enum';
+import { userGender, userStatus } from '../../../commons/common.enum';
 
 export class UpdateDto {
     @ApiProperty({ required: false })

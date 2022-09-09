@@ -1,4 +1,3 @@
-import { productStatus } from 'src/commons/common.enum';
 import {
     BaseEntity,
     Column,
@@ -10,6 +9,7 @@ import {
     PrimaryGeneratedColumn,
     UpdateDateColumn,
 } from 'typeorm';
+import { productStatus } from '../../commons/common.enum';
 import { CategoryEntity } from '../categories/category.entity';
 import { FlashSaleProductEntity } from '../flashSaleProducts/flashSaleProduct.entity';
 import { PictureEntity } from '../picture/picture.entity';

@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { couponStatus } from 'src/commons/common.enum';
+import { couponStatus } from '../../commons/common.enum';
 import { CouponEntity } from './coupon.entity';
 import { CouponRepository } from './coupon.repo';
 import { createCouponDto } from './dto/dto.createCoupon';

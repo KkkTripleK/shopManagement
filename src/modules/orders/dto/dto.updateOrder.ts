@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsEnum, IsOptional, Matches } from 'class-validator';
-import { orderPayment } from 'src/commons/common.enum';
-import { PHONE_REGEX } from 'src/utils/util.regex';
+import { orderPayment } from '../../../commons/common.enum';
+import { PHONE_REGEX } from '../../../utils/util.regex';
 
 export class updateOrderDto {
     @ApiProperty()

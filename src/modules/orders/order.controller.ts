@@ -15,7 +15,7 @@ import {
 } from '@nestjs/common';
 import { ApiBadRequestResponse, ApiBearerAuth, ApiForbiddenResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { Pagination } from 'nestjs-typeorm-paginate';
-import { userRole } from 'src/commons/common.enum';
+import { userRole } from '../../commons/common.enum';
 import { Roles } from '../../decorators/decorator.roles';
 import { JWTandRolesGuard } from '../../guards/guard.roles';
 import { addCouponDto } from './dto/dto.addCoupon';

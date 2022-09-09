@@ -1,8 +1,8 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { IPaginationOptions, paginate, Pagination } from 'nestjs-typeorm-paginate';
-import { orderStatus } from 'src/commons/common.enum';
 import { Repository } from 'typeorm';
+import { orderStatus } from '../../commons/common.enum';
 import { createOrderDto } from './dto/dto.createOrder';
 import { OrderEntity } from './order.entity';
 

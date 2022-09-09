@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsEnum, IsOptional, IsString, Length } from 'class-validator';
-import { categoryStatus } from 'src/commons/common.enum';
 import { PrimaryGeneratedColumn } from 'typeorm';
+import { categoryStatus } from '../../../commons/common.enum';
 
 export class CreateCategoryDto {
     @ApiProperty()

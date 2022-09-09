@@ -1,5 +1,5 @@
 import { BadRequestException, forwardRef, HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
-import { orderShipment, orderStatus, productStatus } from 'src/commons/common.enum';
+import { orderShipment, orderStatus, productStatus } from '../../commons/common.enum';
 import { OrderService } from '../orders/order.service';
 import { ProductEntity } from '../products/product.entity';
 import { ProductRepository } from '../products/product.repo';

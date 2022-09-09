@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { IsDateString, IsEnum, IsNumber, IsOptional } from 'class-validator';
-import { couponStatus } from 'src/commons/common.enum';
+import { couponStatus } from '../../../commons/common.enum';
 
 export class updateCouponDto {
     @ApiProperty()

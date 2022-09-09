@@ -1,8 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { IsDateString, IsNumber, IsOptional } from 'class-validator';
-import { FlashSaleEntity } from 'src/modules/flashSales/flashSale.entity';
-import { ProductEntity } from 'src/modules/products/product.entity';
+import { FlashSaleEntity } from '../../../modules/flashSales/flashSale.entity';
+import { ProductEntity } from '../../../modules/products/product.entity';
 
 export class createFlashSaleProductDto {
     @ApiProperty()

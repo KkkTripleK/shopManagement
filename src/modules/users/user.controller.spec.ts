@@ -1,8 +1,9 @@
-import { INestApplication } from '@nestjs/common';
+import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
-import { AppModule } from 'src/app.module';
 import * as request from 'supertest';
+import { AppModule } from '../../app.module';
 import { UserRepository } from './user.repo';
+import { UserService } from './user.service';
 
 describe('User', () => {
     let app: INestApplication;
@@ -29,10 +30,14 @@ describe('User', () => {
     beforeAll(async () => {
         moduleRef = await Test.createTestingModule({
             imports: [AppModule],
-        }).compile();
+        })
+            .overrideProvider(UserService)
+            .useValue(userService)
+            .compile();
 
         userRepo = moduleRef.get<UserRepository>(UserRepository);
         app = moduleRef.createNestApplication();
+        app.useGlobalPipes(new ValidationPipe());
         await app.init();
     });
 

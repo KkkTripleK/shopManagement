@@ -1,8 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { IsEnum, IsNumber, IsOptional, IsString } from 'class-validator';
-import { productStatus } from 'src/commons/common.enum';
 import { PrimaryGeneratedColumn } from 'typeorm';
+import { productStatus } from '../../../commons/common.enum';
 
 export class CreateProductDto {
     @ApiProperty()

@@ -1,9 +1,9 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
-import { flashSaleProductStatus } from 'src/commons/common.enum';
-import { FlashSaleProductService } from 'src/modules/flashSaleProducts/flashSaleProduct.service';
-import { FlashSaleService } from 'src/modules/flashSales/flashSale.service';
-import { ProductService } from 'src/modules/products/product.service';
+import { flashSaleProductStatus } from '../commons/common.enum';
+import { FlashSaleProductService } from '../modules/flashSaleProducts/flashSaleProduct.service';
+import { FlashSaleService } from '../modules/flashSales/flashSale.service';
+import { ProductService } from '../modules/products/product.service';
 
 @Injectable()
 export class TasksService {

@@ -1,6 +1,4 @@
 import { Matches } from 'class-validator';
-import { orderPayment, orderShipment, orderStatus } from 'src/commons/common.enum';
-import { PHONE_REGEX } from 'src/utils/util.regex';
 import {
     BaseEntity,
     Column,
@@ -12,6 +10,8 @@ import {
     PrimaryGeneratedColumn,
     UpdateDateColumn,
 } from 'typeorm';
+import { orderPayment, orderShipment, orderStatus } from '../../commons/common.enum';
+import { PHONE_REGEX } from '../../utils/util.regex';
 import { CouponEntity } from '../coupons/coupon.entity';
 import { FlashSaleProductEntity } from '../flashSaleProducts/flashSaleProduct.entity';
 import { OrderProductEntity } from '../orderProducts/orderProduct.entity';

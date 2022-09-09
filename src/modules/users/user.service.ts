@@ -1,8 +1,8 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { IPaginationOptions, Pagination } from 'nestjs-typeorm-paginate';
-import { userStatus } from 'src/commons/common.enum';
-import { RandomOTP } from 'src/utils/util.random';
+import { userStatus } from '../../commons/common.enum';
+import { RandomOTP } from '../../utils/util.random';
 import { CacheService } from '../cache/cache.service';
 import { MailService } from '../email/email.service';
 import { ChangePasswordDto } from './dto/dto.changePassword';

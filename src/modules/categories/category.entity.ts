@@ -1,4 +1,3 @@
-import { categoryStatus } from 'src/commons/common.enum';
 import {
     BaseEntity,
     Column,
@@ -8,6 +7,7 @@ import {
     PrimaryGeneratedColumn,
     UpdateDateColumn,
 } from 'typeorm';
+import { categoryStatus } from '../../commons/common.enum';
 import { ProductEntity } from '../products/product.entity';
 
 @Entity('Categories')

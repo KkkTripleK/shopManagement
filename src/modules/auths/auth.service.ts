@@ -1,9 +1,9 @@
 import { BadRequestException, HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
-import { userStatus } from 'src/commons/common.enum';
-import { RandomOTP } from 'src/utils/util.random';
-import { VerifyToken } from 'src/utils/util.verifyToken';
+import { VerifyToken } from '../..//utils/util.verifyToken';
+import { userStatus } from '../../commons/common.enum';
+import { RandomOTP } from '../../utils/util.random';
 import { CacheService } from '../cache/cache.service';
 import { MailService } from '../email/email.service';
 import { UserEntity } from '../users/user.entity';

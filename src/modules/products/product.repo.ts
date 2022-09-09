@@ -1,8 +1,8 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { IPaginationOptions, paginate, Pagination } from 'nestjs-typeorm-paginate';
-import { productStatus } from 'src/commons/common.enum';
 import { Repository } from 'typeorm';
+import { productStatus } from '../../commons/common.enum';
 import { CategoryRepository } from '../categories/category.repo';
 import { CreateProductDto } from './dto/dto.create.dto';
 import { ProductEntity } from './product.entity';

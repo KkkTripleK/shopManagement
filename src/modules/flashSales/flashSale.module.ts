@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { typeOrmConfig } from 'src/configs/config.typeorm';
+import { typeOrmConfig } from '../../configs/config.typeorm';
 import { FlashSaleController } from './flashSale.controller';
 import { FlashSaleEntity } from './flashSale.entity';
 import { FlashSaleRepository } from './flashSale.repo';

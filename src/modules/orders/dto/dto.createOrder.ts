@@ -1,8 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsEnum, IsString, Matches } from 'class-validator';
-import { orderPayment, orderShipment } from 'src/commons/common.enum';
-import { UserEntity } from 'src/modules/users/user.entity';
-import { PHONE_REGEX } from 'src/utils/util.regex';
+import { orderPayment, orderShipment } from '../../../commons/common.enum';
+import { UserEntity } from '../../../modules/users/user.entity';
+import { PHONE_REGEX } from '../../../utils/util.regex';
 
 export class createOrderDto {
     @ApiProperty()

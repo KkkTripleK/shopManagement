@@ -1,12 +1,5 @@
-import { couponStatus } from 'src/commons/common.enum';
-import {
-    BaseEntity,
-    Column,
-    CreateDateColumn,
-    Entity,
-    PrimaryGeneratedColumn,
-    UpdateDateColumn,
-} from 'typeorm';
+import { BaseEntity, Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { couponStatus } from '../../commons/common.enum';
 
 @Entity('Coupons')
 export class CouponEntity extends BaseEntity {

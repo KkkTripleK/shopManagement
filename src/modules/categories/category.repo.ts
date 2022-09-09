@@ -1,8 +1,8 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { IPaginationOptions, paginate, Pagination } from 'nestjs-typeorm-paginate';
-import { categoryStatus } from 'src/commons/common.enum';
 import { Repository } from 'typeorm';
+import { categoryStatus } from '../../commons/common.enum';
 import { CategoryEntity } from './category.entity';
 import { CreateCategoryDto } from './dto/dto.create';
 import { UpdateCategoryDto } from './dto/dto.update';

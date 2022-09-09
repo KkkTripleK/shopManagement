@@ -1,5 +1,5 @@
-import { userGender, userRole, userStatus } from 'src/commons/common.enum';
 import { BaseEntity, Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { userGender, userRole, userStatus } from '../../commons/common.enum';
 
 @Entity('Users')
 export class UserEntity extends BaseEntity {

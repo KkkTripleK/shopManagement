@@ -1,6 +1,6 @@
 import { forwardRef, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { typeOrmConfig } from 'src/configs/config.typeorm';
+import { typeOrmConfig } from '../../configs/config.typeorm';
 import { CategoryModule } from '../categories/category.module';
 import { CouponModule } from '../coupons/coupon.module';
 import { FlashSaleProductModule } from '../flashSaleProducts/flashSaleProduct.module';

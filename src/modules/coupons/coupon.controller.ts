@@ -1,8 +1,8 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { userRole } from 'src/commons/common.enum';
-import { Roles } from 'src/decorators/decorator.roles';
-import { JWTandRolesGuard } from 'src/guards/guard.roles';
+import { userRole } from '../../commons/common.enum';
+import { Roles } from '../../decorators/decorator.roles';
+import { JWTandRolesGuard } from '../../guards/guard.roles';
 import { CouponService } from './coupon.service';
 import { createCouponDto } from './dto/dto.createCoupon';
 import { updateCouponDto } from './dto/dto.updateCoupon';

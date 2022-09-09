@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { IPaginationOptions, Pagination } from 'nestjs-typeorm-paginate';
-import { orderStatus, productStatus } from 'src/commons/common.enum';
+import { orderStatus, productStatus } from '../../commons/common.enum';
 import { FlashSaleProductService } from '../flashSaleProducts/flashSaleProduct.service';
 import { FlashSaleEntity } from '../flashSales/flashSale.entity';
 import { OrderProductRepository } from '../orderProducts/orderProduct.repo';
