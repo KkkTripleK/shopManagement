@@ -6,6 +6,7 @@ import {
     Get,
     Param,
     ParseIntPipe,
+    ParseUUIDPipe,
     Patch,
     Post,
     Query,
@@ -16,7 +17,6 @@ import { ApiBadRequestResponse, ApiBearerAuth, ApiOkResponse, ApiTags } from '@n
 import { Pagination } from 'nestjs-typeorm-paginate';
 import { userRole } from '../../commons/common.enum';
 import { Roles } from '../../decorators/decorator.roles';
-import { JwtAuthGuard } from '../../guards/guard.jwt';
 import { JWTandRolesGuard } from '../../guards/guard.roles';
 import { AuthService } from '../auths/auth.service';
 import { ChangePasswordDto } from './dto/dto.changePassword';
@@ -42,7 +42,8 @@ export class UserController {
     }
 
     @Patch('user/update')
-    @UseGuards(JwtAuthGuard)
+    @UseGuards(JWTandRolesGuard)
+    @Roles(userRole.ADMIN, userRole.MEMBER)
     @ApiOkResponse()
     @ApiBadRequestResponse()
     async updateAccount(@Body() param: UpdateDto, @Req() req: any): Promise<any> {
@@ -58,7 +59,8 @@ export class UserController {
     }
 
     @Post('user/change-password')
-    @UseGuards(JwtAuthGuard)
+    @UseGuards(JWTandRolesGuard)
+    @Roles(userRole.ADMIN, userRole.MEMBER)
     @ApiOkResponse()
     @ApiBadRequestResponse()
     async changePassword(@Body() requestBody: ChangePasswordDto, @Req() req: any) {
@@ -76,7 +78,7 @@ export class UserController {
         return 'The account have been change to Inactive status!';
     }
 
-    @Get('/admin/list-account')
+    @Get('admin/list-account')
     @UseGuards(JWTandRolesGuard)
     @Roles(userRole.ADMIN)
     @ApiOkResponse()
@@ -92,22 +94,22 @@ export class UserController {
         });
     }
 
-    @Get('/admin/account/:id')
+    @Get('admin/account/:userId')
     @UseGuards(JWTandRolesGuard)
     @Roles(userRole.ADMIN)
     @ApiOkResponse()
     @ApiBadRequestResponse()
-    async showUserByID(@Param('id') id: string) {
-        return await this.userService.findAccount({ id });
+    async showUserByID(@Param('userId', new ParseUUIDPipe()) userId: string) {
+        return await this.userService.findAccount({ id: userId });
     }
 
-    @Delete('/admin/account/:userID')
+    @Delete('admin/account/:userId')
     @UseGuards(JWTandRolesGuard)
     @Roles(userRole.ADMIN)
     @ApiOkResponse()
     @ApiBadRequestResponse()
-    async deleteUserByID(@Param('userID') userID: string) {
-        await this.userService.deleteAccount({ id: userID });
+    async deleteUserByID(@Param('userId', new ParseUUIDPipe()) userId: string) {
+        await this.userService.deleteAccount({ id: userId });
         return 'The account have been change to Inactive status!';
     }
 }

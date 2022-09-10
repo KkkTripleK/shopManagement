@@ -1,4 +1,4 @@
-import { BadRequestException, HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { VerifyToken } from '../..//utils/util.verifyToken';
@@ -76,14 +76,14 @@ export class AuthService {
     async validateUser(username: object, password: string): Promise<UserEntity> {
         const userInfo = await this.userRepository.findAccount(username);
         if (userInfo === null) {
-            throw new HttpException('Username is not exist!', HttpStatus.BAD_REQUEST);
+            throw new BadRequestException('Username is not exist!');
         }
         const isMatch = await bcrypt.compare(password, userInfo.password);
         if (!isMatch) {
-            throw new HttpException('Password is not correct!', HttpStatus.BAD_REQUEST);
+            throw new BadRequestException('Password is not correct!');
         }
         if (userInfo.accountStatus === 'Not Active') {
-            throw new HttpException('Please verify account before login!', HttpStatus.BAD_REQUEST);
+            throw new BadRequestException('Please verify account before login!');
         }
         return userInfo;
     }
@@ -92,7 +92,7 @@ export class AuthService {
         const payload = await this.verifyToken.verifyTokenWithoutBearer(refreshToken);
         const refreshTokenRedis = await this.cacheService.get(`users:${payload.username}:refreshToken`);
         if (refreshToken !== refreshTokenRedis) {
-            throw new HttpException('Refresh token is invalid!', HttpStatus.BAD_REQUEST);
+            throw new BadRequestException('Refresh token is invalid!');
         }
         const newAccessToken = await this.createToken(payload.username, process.env.ACCESS_TOKEN_TTL);
         return { newAccessToken };

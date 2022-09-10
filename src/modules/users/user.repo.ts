@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
 import { IPaginationOptions, paginate, Pagination } from 'nestjs-typeorm-paginate';
@@ -25,12 +25,15 @@ export class UserRepository {
             const newUserInfo = await this.userRepo.save(createUserDto);
             return newUserInfo;
         } catch (error) {
-            throw new HttpException('Create new account failed!', HttpStatus.BAD_REQUEST);
+            throw new BadRequestException('Create new account failed!');
         }
     }
 
     async updateAccount(username: object, param: UpdateDto): Promise<UserEntity> {
         const info = await this.userRepo.findOneBy(username);
+        if (info === null) {
+            throw new BadRequestException('Username is invalid!');
+        }
         for (const key in param) {
             info[key] = param[key];
         }

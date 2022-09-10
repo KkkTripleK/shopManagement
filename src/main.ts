@@ -12,7 +12,7 @@ async function main() {
             whitelist: true,
         }),
     );
-
+    app.setGlobalPrefix('api/v1');
     const config = new DocumentBuilder()
         .setTitle('E Commerce')
         .setDescription('Shopping Website')

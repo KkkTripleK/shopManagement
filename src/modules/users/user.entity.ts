@@ -3,7 +3,7 @@ import { userGender, userRole, userStatus } from '../../commons/common.enum';
 
 @Entity('Users')
 export class UserEntity extends BaseEntity {
-    @PrimaryGeneratedColumn()
+    @PrimaryGeneratedColumn('uuid')
     id: string;
 
     @Column({ unique: true })

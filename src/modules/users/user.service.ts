@@ -36,11 +36,15 @@ export class UserService {
     }
 
     async updateAccount(username: object, param: UpdateDto): Promise<UpdateDto> {
+        if (Object.getOwnPropertyNames(param).length === 0) {
+            throw new BadRequestException('You do not change any information!');
+        }
         return this.userRepository.updateAccount(username, param);
     }
 
     async deleteAccount(id: object) {
-        await this.userRepository.updateAccount(id, {
+        await this.userRepository.findAccount(id);
+        return this.userRepository.updateAccount(id, {
             accountStatus: userStatus.REMOVED,
         });
     }
