@@ -36,6 +36,6 @@ import { UserService } from './user.service';
         AuthService,
         ConfigService,
     ],
-    exports: [UserRepository, VerifyToken, JwtService, MailService, RandomOTP],
+    exports: [UserRepository, VerifyToken, JwtService, MailService, RandomOTP, UserService],
 })
 export class UserModule {}

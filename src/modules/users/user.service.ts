@@ -23,6 +23,10 @@ export class UserService {
         return this.userRepository.getListAccount(options);
     }
 
+    async findListAccount() {
+        return this.userRepository.findListAccount();
+    }
+
     async findAccount(param: object): Promise<UserEntity> {
         try {
             const result = await this.userRepository.findAccount(param);
@@ -51,9 +55,16 @@ export class UserService {
 
     async forgotPassword(username: string) {
         const userInfo = await this.findAccount({ username });
-        const activeCode = this.randomOTP.randomOTP();
-        this.mailService.sendMail(userInfo.email, activeCode);
-        const newPassword = await bcrypt.hash(activeCode, Number(process.env.PRIVATE_KEY));
+        const randomPassword = this.randomOTP.randomOTP();
+        this.mailService.sendMail(
+            userInfo.email,
+            'VMO-EShop: Forgot password',
+            `<p>Hi Mr/Ms. <b>${userInfo.fullName}</b></p>
+            <p>Your new password is: ${randomPassword}. </p>
+            <p>Please change your password after login.</p>
+            <i>Thank you!</i>`,
+        );
+        const newPassword = await bcrypt.hash(randomPassword, Number(process.env.PRIVATE_KEY));
         await this.userRepository.updateAccount({ username }, { password: newPassword });
         await this.cacheService.del(`users:${username}:refreshToken`);
     }

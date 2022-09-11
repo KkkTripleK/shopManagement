@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { BadRequestException, HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { IPaginationOptions, paginate, Pagination } from 'nestjs-typeorm-paginate';
 import { Repository } from 'typeorm';
@@ -96,13 +96,17 @@ export class ProductRepository {
     }
 
     async showProductByProductId(id: object): Promise<ProductEntity> {
-        return this.productRepo.findOne({
-            where: [id],
-            relations: {
-                category: true,
-                pictures: true,
-            },
-        });
+        try {
+            return this.productRepo.findOne({
+                where: [id],
+                relations: {
+                    category: true,
+                    pictures: true,
+                },
+            });
+        } catch (error) {
+            throw new BadRequestException('ProductID is invalid!');
+        }
     }
 
     async adminShowProductByID(id: object): Promise<ProductEntity> {

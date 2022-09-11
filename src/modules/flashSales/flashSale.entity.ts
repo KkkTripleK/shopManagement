@@ -14,6 +14,9 @@ export class FlashSaleEntity extends BaseEntity {
     @Column({ default: false })
     onSale: boolean;
 
+    @Column({ nullable: true, default: false })
+    notification: boolean;
+
     @CreateDateColumn({
         default: `now()`,
         nullable: false,

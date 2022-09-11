@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsDateString, IsNumber, IsOptional } from 'class-validator';
+import { IsNumber, IsOptional } from 'class-validator';
 import { FlashSaleEntity } from 'src/modules/flashSales/flashSale.entity';
 import { ProductEntity } from 'src/modules/products/product.entity';
 
@@ -22,16 +22,6 @@ export class updateFlashSaleProductDto {
     @IsOptional()
     @IsNumber()
     discount?: number;
-
-    @ApiProperty()
-    @IsDateString({}, { each: true })
-    @IsOptional()
-    begin?: Date[];
-
-    @ApiProperty()
-    @IsDateString({}, { each: true })
-    @IsOptional()
-    end?: Date[];
 
     @ApiProperty()
     @IsOptional()

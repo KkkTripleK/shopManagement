@@ -45,7 +45,7 @@ export class FlashSaleProductEntity extends BaseEntity {
     @Column()
     totalQty: number;
 
-    @Column({ nullable: true, default: 10 })
+    @Column({ default: 0 })
     qtyRemain: number;
 
     @Column({

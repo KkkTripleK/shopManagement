@@ -44,7 +44,14 @@ export class AuthService {
         }
 
         const activeCode = this.randomOTP.randomOTP();
-        this.mailService.sendMail(createUserDto.email, activeCode);
+        this.mailService.sendMail(
+            createUserDto.email,
+            'VMO-EShop: Verify your account',
+            `<b>Welcome ${createUserDto.fullName} to VMO-EShop!</b>
+            <p>Your activate code is: <b>${activeCode} </b>. </p>
+            <p>Please active your account to login to VMO-EShop.</p>
+            <i>Thank you!</i>`,
+        );
         await this.verificationService.saveActiveCode(createUserDto.username, activeCode);
         return this.userRepository.createUser(createUserDto);
     }

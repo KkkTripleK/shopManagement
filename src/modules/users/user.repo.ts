@@ -19,6 +19,10 @@ export class UserRepository {
         return paginate<UserEntity>(listAccount, options);
     }
 
+    async findListAccount() {
+        return this.userRepo.find();
+    }
+
     async createUser(createUserDto: CreateUserDto): Promise<any> {
         try {
             createUserDto.password = await bcrypt.hash(createUserDto.password, Number(process.env.PRIVATE_KEY));

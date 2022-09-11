@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { productStatus } from 'src/commons/common.enum';
 import { Repository } from 'typeorm';
 import { createFlashSaleProductDto } from './dto/dto.create';
 import { FlashSaleProductEntity } from './flashSaleProduct.entity';
@@ -16,13 +17,26 @@ export class FlashSaleProductRepository {
     }
 
     async getFlashSaleProductByFlashSaleId(fk_FlashSaleId: string) {
-        const rs = this.flashSaleProductRepo
+        const flashSaleProductInfo = this.flashSaleProductRepo
             .createQueryBuilder('flashSaleProduct')
             .leftJoinAndSelect('flashSaleProduct.fk_Product', 'fk_Product')
             .leftJoinAndSelect('flashSaleProduct.fk_FlashSale', 'fk_FlashSale')
             .where('fk_FlashSale.id =:id', { id: fk_FlashSaleId })
+            .andWhere('fk_Product.status =:status', { status: productStatus.STOCK })
             .getMany();
-        return rs;
+        return flashSaleProductInfo;
+    }
+
+    async checkExistFlashSaleProduct(fk_FlashSaleId: string, fk_ProductId: string) {
+        const flashSaleProductInfo = this.flashSaleProductRepo
+            .createQueryBuilder('flashSaleProduct')
+            .leftJoinAndSelect('flashSaleProduct.fk_Product', 'fk_Product')
+            .leftJoinAndSelect('flashSaleProduct.fk_FlashSale', 'fk_FlashSale')
+            .where('fk_FlashSale.id =:id', { id: fk_FlashSaleId })
+            .where('fk_Product.id =:id', { id: fk_ProductId })
+            .andWhere('fk_Product.status =:status', { status: productStatus.STOCK })
+            .getOne();
+        return flashSaleProductInfo;
     }
 
     async getFlashSaleProductByFlashSaleProductId(fk_FlashSaleProductId: string) {
@@ -31,6 +45,7 @@ export class FlashSaleProductRepository {
             .leftJoinAndSelect('flashSaleProduct.fk_Product', 'fk_Product')
             .leftJoinAndSelect('flashSaleProduct.fk_FlashSale', 'fk_FlashSale')
             .where('flashSaleProduct.id =:id', { id: fk_FlashSaleProductId })
+            .andWhere('fk_Product.status =:status', { status: productStatus.STOCK })
             .getOne();
         return rs;
     }

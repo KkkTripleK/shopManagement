@@ -72,16 +72,15 @@ export class ProductService {
     }
 
     async inFlashSale(flashSaleInfo: FlashSaleEntity) {
+        // FlashSale for Stock product only
         const listFlashSaleProductInfo = await this.flashSaleProductService.getFlashSaleProductByFlashSaleId(
             flashSaleInfo.id,
         );
         for (const flashSaleProductInfo of listFlashSaleProductInfo) {
             const productInfo = await this.showProductByID(flashSaleProductInfo.fk_Product.id);
-            const newPrice = (productInfo.price * (100 - flashSaleProductInfo.discount)) / 100;
-            try {
+            if (productInfo.status === productStatus.STOCK) {
+                const newPrice = (productInfo.price * (100 - flashSaleProductInfo.discount)) / 100;
                 await this.updateProductByID(productInfo.id, { price: newPrice });
-            } catch (error) {
-                console.log(error);
             }
         }
         console.log('FlashSale is comming!');
@@ -93,8 +92,10 @@ export class ProductService {
         );
         for (const flashSaleProductInfo of listFlashSaleProductInfo) {
             const productInfo = await this.showProductByID(flashSaleProductInfo.fk_Product.id);
-            const newPrice = (productInfo.price / (100 - flashSaleProductInfo.discount)) * 100;
-            await this.updateProductByID(productInfo.id, { price: newPrice });
+            if (productInfo.status === productStatus.STOCK) {
+                const newPrice = (productInfo.price / (100 - flashSaleProductInfo.discount)) * 100;
+                await this.updateProductByID(productInfo.id, { price: newPrice });
+            }
         }
         console.log('FlashSale is end!');
     }
