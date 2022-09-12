@@ -1,11 +1,11 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
-import { MailService } from 'src/modules/email/email.service';
-import { UserService } from 'src/modules/users/user.service';
 import { flashSaleProductStatus } from '../commons/common.enum';
+import { MailService } from '../modules/email/email.service';
 import { FlashSaleProductService } from '../modules/flashSaleProducts/flashSaleProduct.service';
 import { FlashSaleService } from '../modules/flashSales/flashSale.service';
 import { ProductService } from '../modules/products/product.service';
+import { UserService } from '../modules/users/user.service';
 
 @Injectable()
 export class TasksService {

@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { IPaginationOptions, paginate, Pagination } from 'nestjs-typeorm-paginate';
-import { couponStatus } from 'src/commons/common.enum';
 import { Repository } from 'typeorm';
+import { couponStatus } from '../../commons/common.enum';
 import { CouponEntity } from './coupon.entity';
 import { createCouponDto } from './dto/dto.createCoupon';
 

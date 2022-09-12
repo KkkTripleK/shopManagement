@@ -11,7 +11,16 @@ import {
     Query,
     UseGuards,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiQuery, ApiTags } from '@nestjs/swagger';
+import {
+    ApiBadRequestResponse,
+    ApiBearerAuth,
+    ApiConsumes,
+    ApiCreatedResponse,
+    ApiForbiddenResponse,
+    ApiOkResponse,
+    ApiQuery,
+    ApiTags,
+} from '@nestjs/swagger';
 import { Pagination } from 'nestjs-typeorm-paginate';
 import { userRole } from '../../commons/common.enum';
 import { Roles } from '../../decorators/decorator.roles';
@@ -30,25 +39,40 @@ export class CouponController {
     @Post('admin/coupon')
     @UseGuards(JWTandRolesGuard)
     @Roles(userRole.ADMIN)
+    @ApiConsumes('application/x-www-form-urlencoded')
+    @ApiOkResponse()
+    @ApiCreatedResponse()
+    @ApiBadRequestResponse()
+    @ApiForbiddenResponse()
     async createNewCoupon(@Body() couponInfo: createCouponDto) {
         return this.couponService.createNewCoupon(couponInfo);
     }
 
-    @Patch('admin/coupon/:couponId')
+    @Patch('admin/coupon/:id')
     @UseGuards(JWTandRolesGuard)
     @Roles(userRole.ADMIN)
-    async updateCouponInfo(@Param('couponId') couponId: string, @Body() param: updateCouponDto) {
-        return this.couponService.updateCouponInfo(couponId, param);
+    @ApiConsumes('application/x-www-form-urlencoded')
+    @ApiOkResponse()
+    @ApiCreatedResponse()
+    @ApiBadRequestResponse()
+    @ApiForbiddenResponse()
+    async updateCouponInfo(@Param('id') id: string, @Body() param: updateCouponDto) {
+        return this.couponService.updateCouponInfo(id, param);
     }
 
-    @Get('user/coupon/info/:couponId')
+    @Get('user/coupon/:id')
+    @ApiConsumes('application/x-www-form-urlencoded')
+    @ApiOkResponse()
+    @ApiCreatedResponse()
+    @ApiBadRequestResponse()
+    @ApiForbiddenResponse()
     @UseGuards(JWTandRolesGuard)
     @Roles(userRole.ADMIN, userRole.MEMBER)
-    async getCoupon(@Param('couponId') couponId: string) {
-        return this.couponService.getCouponById(couponId);
+    async getCoupon(@Param('id') id: string) {
+        return this.couponService.getCouponById(id);
     }
 
-    @Get('user/coupon/list')
+    @Get('user/coupon')
     @ApiQuery({
         name: 'limit',
         type: 'number',
@@ -58,6 +82,8 @@ export class CouponController {
         type: 'number',
     })
     @UseGuards(JWTandRolesGuard)
+    @ApiOkResponse()
+    @ApiConsumes('application/x-www-form-urlencoded')
     @Roles(userRole.ADMIN, userRole.MEMBER)
     async getListCoupon(
         @Query('page', new DefaultValuePipe(1), ParseIntPipe) page = 1,
@@ -66,14 +92,19 @@ export class CouponController {
         return this.couponService.getListCoupon({
             page,
             limit,
-            route: `localhost:${process.env.PORT}/api/v1/user/coupon/list`,
+            route: `localhost:${process.env.PORT}/api/v1/user/coupon`,
         });
     }
 
-    @Delete('admin/coupon/:couponId')
+    @Delete('admin/coupon/:id')
+    @ApiConsumes('application/x-www-form-urlencoded')
+    @ApiOkResponse()
+    @ApiCreatedResponse()
+    @ApiBadRequestResponse()
+    @ApiForbiddenResponse()
     @UseGuards(JWTandRolesGuard)
     @Roles(userRole.ADMIN)
-    async inactiveCoupon(@Param('couponId') couponId: string) {
-        return this.couponService.inactiveCoupon(couponId);
+    async inactiveCoupon(@Param('id') id: string) {
+        return this.couponService.inactiveCoupon(id);
     }
 }

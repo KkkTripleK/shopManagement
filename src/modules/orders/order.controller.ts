@@ -13,7 +13,15 @@ import {
     Req,
     UseGuards,
 } from '@nestjs/common';
-import { ApiBadRequestResponse, ApiBearerAuth, ApiForbiddenResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import {
+    ApiBadRequestResponse,
+    ApiBearerAuth,
+    ApiConsumes,
+    ApiCreatedResponse,
+    ApiForbiddenResponse,
+    ApiOkResponse,
+    ApiTags,
+} from '@nestjs/swagger';
 import { Pagination } from 'nestjs-typeorm-paginate';
 import { userRole } from '../../commons/common.enum';
 import { Roles } from '../../decorators/decorator.roles';
@@ -30,7 +38,7 @@ import { OrderService } from './order.service';
 export class OrderController {
     constructor(private orderService: OrderService) {}
 
-    @Get('user/order/all')
+    @Get('user/order')
     @UseGuards(JWTandRolesGuard)
     @Roles(userRole.MEMBER, userRole.ADMIN)
     @ApiOkResponse()
@@ -46,21 +54,21 @@ export class OrderController {
             {
                 page,
                 limit,
-                route: `localhost:${process.env.PORT}/user/order/all`,
+                route: `localhost:${process.env.PORT}/user/order`,
             },
             fk_User,
         );
     }
 
-    @Get('user/order/single/:orderId')
+    @Get('user/order/:id')
     @UseGuards(JWTandRolesGuard)
     @Roles(userRole.MEMBER, userRole.ADMIN)
     @ApiOkResponse()
     @ApiForbiddenResponse()
     @ApiBadRequestResponse()
-    async getOrderByIdAndUsername(@Param('orderId', new ParseUUIDPipe()) orderId: string, @Req() req: any) {
+    async getOrderByIdAndUsername(@Param('id', new ParseUUIDPipe()) id: string, @Req() req: any) {
         const fk_User = req.userInfo.username;
-        return this.orderService.getOrderByOrderIdAndUsername(orderId, fk_User);
+        return this.orderService.getOrderByOrderIdAndUsername(id, fk_User);
     }
 
     @Post('user/order/create')
@@ -69,33 +77,38 @@ export class OrderController {
     @ApiOkResponse()
     @ApiBadRequestResponse()
     @ApiForbiddenResponse()
+    @ApiConsumes('application/x-www-form-urlencoded')
+    @ApiCreatedResponse()
     async createOrder(@Body() orderInfo: createOrderDto, @Req() req: any) {
         orderInfo.fk_User = req.userInfo.username;
         return this.orderService.createOrder(orderInfo);
     }
 
-    @Patch('user/order/:orderId')
+    @Patch('user/order/:id')
     @UseGuards(JWTandRolesGuard)
     @Roles(userRole.MEMBER, userRole.ADMIN)
     @ApiOkResponse()
     @ApiForbiddenResponse()
     @ApiBadRequestResponse()
-    async updateOrder(@Param('orderId') orderId: string, @Body() updateOrder: updateOrderDto, @Req() req: any) {
+    @ApiConsumes('application/x-www-form-urlencoded')
+    async updateOrder(@Param('id') id: string, @Body() updateOrder: updateOrderDto, @Req() req: any) {
         const fk_User = req.userInfo.username;
-        return this.orderService.updateOrder(orderId, updateOrder, fk_User);
+        return this.orderService.updateOrder(id, updateOrder, fk_User);
     }
 
-    @Delete('user/order/:orderId')
+    @Delete('user/order/:id')
     @UseGuards(JWTandRolesGuard)
     @Roles(userRole.MEMBER, userRole.ADMIN)
     @ApiOkResponse()
+    @ApiCreatedResponse()
     @ApiBadRequestResponse()
-    async deleteOrder(@Param('orderId') orderId: string, @Req() req: any) {
+    @ApiConsumes('application/x-www-form-urlencoded')
+    async deleteOrder(@Param('id') id: string, @Req() req: any) {
         const fk_User = req.userInfo.username;
-        return this.orderService.deleteOrder(orderId, fk_User);
+        return this.orderService.deleteOrder(id, fk_User);
     }
 
-    @Get('admin/order/all')
+    @Get('admin/order')
     @UseGuards(JWTandRolesGuard)
     @Roles(userRole.ADMIN)
     @ApiOkResponse()
@@ -108,28 +121,28 @@ export class OrderController {
         return this.orderService.adminGetListOrder({
             page,
             limit,
-            route: `localhost:${process.env.PORT}/admin/order/all`,
+            route: `localhost:${process.env.PORT}/admin/order`,
         });
     }
 
-    @Get('admin/order/single/:orderId')
+    @Get('admin/order/:id')
     @UseGuards(JWTandRolesGuard)
     @Roles(userRole.ADMIN)
     @ApiOkResponse()
     @ApiBadRequestResponse()
     @ApiForbiddenResponse()
-    async adminGetOrderByID(@Param('orderId') orderId: string) {
-        return this.orderService.adminGetOrderByOrderID(orderId);
+    async adminGetOrderByID(@Param('id', new ParseUUIDPipe()) id: string) {
+        return this.orderService.adminGetOrderByOrderID(id);
     }
 
-    @Get('admin/order/username/:username')
+    @Get('admin/order/username/:id')
     @UseGuards(JWTandRolesGuard)
     @Roles(userRole.ADMIN)
     @ApiOkResponse()
     @ApiBadRequestResponse()
     @ApiForbiddenResponse()
     async adminGetOrderByUsername(
-        @Param('username') username: string,
+        @Param('id') id: string,
         @Query('page', new DefaultValuePipe(1), ParseIntPipe) page = 1,
         @Query('limit', new DefaultValuePipe(3), ParseIntPipe) limit = 3,
     ): Promise<Pagination<OrderEntity>> {
@@ -137,9 +150,9 @@ export class OrderController {
             {
                 page,
                 limit,
-                route: `localhost:${process.env.PORT}/admin/order/username/${username}`,
+                route: `localhost:${process.env.PORT}/admin/order/username/${id}`,
             },
-            username,
+            id,
         );
     }
 
@@ -149,12 +162,13 @@ export class OrderController {
     @ApiOkResponse()
     @ApiForbiddenResponse()
     @ApiBadRequestResponse()
+    @ApiConsumes('application/x-www-form-urlencoded')
     async orderConfirm(@Body('id', new ParseUUIDPipe()) id: string, @Req() req: any) {
         const fk_User = req.userInfo.username;
         return this.orderService.orderConfirm(id, fk_User);
     }
 
-    @Post('user/order-coupon/add-coupon')
+    @Post('user/order/add-coupon')
     @UseGuards(JWTandRolesGuard)
     @Roles(userRole.MEMBER, userRole.ADMIN)
     @ApiOkResponse()
@@ -164,7 +178,7 @@ export class OrderController {
         return this.orderService.addCouponToOrder(requestBody, req.userInfo.username);
     }
 
-    @Delete('user/order-coupon/remove-coupon')
+    @Delete('user/order/remove-coupon')
     @UseGuards(JWTandRolesGuard)
     @Roles(userRole.MEMBER, userRole.ADMIN)
     @ApiOkResponse()

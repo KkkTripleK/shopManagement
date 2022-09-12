@@ -23,7 +23,7 @@ import {
     ApiTags,
 } from '@nestjs/swagger';
 import { Pagination } from 'nestjs-typeorm-paginate';
-import { userRole } from 'src/commons/common.enum';
+import { userRole } from '../../commons/common.enum';
 import { Roles } from '../../decorators/decorator.roles';
 import { JWTandRolesGuard } from '../../guards/guard.roles';
 import { multerOptions } from '../../utils/util.multer';
@@ -50,14 +50,14 @@ export class PictureController {
         });
     }
 
-    @Get('picture/:pictureId')
-    async showPictureByID(@Param('pictureId') pictureId: string) {
-        return this.pictureService.showPictureByID(pictureId);
+    @Get('picture/:id')
+    async showPictureByID(@Param('id') id: string) {
+        return this.pictureService.showPictureByID(id);
     }
 
-    @Get('picture/product/:productId')
-    async showPictureByProductID(@Param('productId') productId: string) {
-        return this.pictureService.showPictureByProductID(productId);
+    @Get('picture/product/:id')
+    async showPictureByid(@Param('id') id: string) {
+        return this.pictureService.showPictureByProductID(id);
     }
 
     @Post('admin/picture')
@@ -75,23 +75,23 @@ export class PictureController {
         return this.pictureService.uploadPicture(file, requestBody);
     }
 
-    @Patch('admin/picture/:pictureId')
+    @Patch('admin/picture/:id')
     @UseGuards(JWTandRolesGuard)
     @Roles(userRole.ADMIN)
     @ApiOkResponse()
     @ApiBadRequestResponse()
     @ApiForbiddenResponse()
-    async updatePicture(@Body() requestBody: UpdatePictureDto, @Param('pictureId') pictureId: string) {
-        return this.pictureService.updatePicture(pictureId, requestBody);
+    async updatePicture(@Body() requestBody: UpdatePictureDto, @Param('id') id: string) {
+        return this.pictureService.updatePicture(id, requestBody);
     }
 
-    @Delete('admin/picture/:pictureId')
+    @Delete('admin/picture/:id')
     @UseGuards(JWTandRolesGuard)
     @Roles(userRole.ADMIN)
     @ApiOkResponse()
     @ApiBadRequestResponse()
     @ApiForbiddenResponse()
-    async deletePictureByID(@Param('pictureId') pictureId: string) {
-        return this.pictureService.deletePicture(pictureId);
+    async deletePictureByID(@Param('id') id: string) {
+        return this.pictureService.deletePicture(id);
     }
 }

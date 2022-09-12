@@ -1,6 +1,7 @@
 import { forwardRef, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { typeOrmConfig } from '../../configs/config.typeorm';
+import { cacheModule } from '../cache/cache.module';
 import { CategoryModule } from '../categories/category.module';
 import { CouponModule } from '../coupons/coupon.module';
 import { FlashSaleProductModule } from '../flashSaleProducts/flashSaleProduct.module';
@@ -21,6 +22,7 @@ import { OrderService } from './order.service';
         UserModule,
         CouponModule,
         FlashSaleProductModule,
+        cacheModule,
         forwardRef(() => OrderProductModule),
     ],
     controllers: [OrderController],

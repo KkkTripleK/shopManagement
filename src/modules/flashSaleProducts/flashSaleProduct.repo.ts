@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { IPaginationOptions, paginate, Pagination } from 'nestjs-typeorm-paginate';
-import { productStatus } from 'src/commons/common.enum';
 import { Repository } from 'typeorm';
+import { productStatus } from '../../commons/common.enum';
 import { createFlashSaleProductDto } from './dto/dto.create';
 import { FlashSaleProductEntity } from './flashSaleProduct.entity';
 

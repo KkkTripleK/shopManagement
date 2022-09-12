@@ -10,6 +10,7 @@ import { UserEntity } from '../users/user.entity';
 import { UserRepository } from '../users/user.repo';
 import { VerificationService } from '../verifications/verification.service';
 import { CreateUserDto } from './dto/dto.create';
+import { LoginDTO } from './dto/dto.login';
 import { VerifyDTO } from './dto/dto.verify';
 
 @Injectable()
@@ -33,13 +34,12 @@ export class AuthService {
     }
 
     async createUser(createUserDto: CreateUserDto): Promise<CreateUserDto> {
-        const findExistUser = await this.checkExistUsername(createUserDto);
-        if (findExistUser) {
+        const findExistUser = this.checkExistUsername(createUserDto);
+        const findExistEmail = this.checkExistEmail(createUserDto);
+        const values = await Promise.all([findExistUser, findExistEmail]);
+        if (values[0]) {
             throw new BadRequestException('Username already exist!');
-        }
-
-        const findExistEmail = await this.checkExistEmail(createUserDto);
-        if (findExistEmail) {
+        } else if (values[1]) {
             throw new BadRequestException('Email already exist!');
         }
 
@@ -64,9 +64,17 @@ export class AuthService {
         this.userRepository.updateAccount({ username: verifyDTO.username }, { accountStatus: userStatus.ACTIVE });
     }
 
-    async userLogin(username: string): Promise<object> {
+    async userLogin(requestBody: LoginDTO): Promise<object> {
+        const username = requestBody.username;
+        const password = requestBody.password;
+        const userInfo = await this.validateUser({ username }, password);
         const accessToken = await this.createToken(username, process.env.ACCESS_TOKEN_TTL);
         const refreshToken = await this.createToken(username, process.env.REFRESH_TOKEN_TTL);
+        await this.cacheService.set(
+            `users:${username}:role`,
+            userInfo.role,
+            Number(process.env.CACHE_REFRESH_TOKEN_TTL),
+        );
         await this.cacheService.set(
             `users:${username}:accessToken`,
             accessToken,

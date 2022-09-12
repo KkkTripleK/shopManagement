@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { IPaginationOptions, Pagination } from 'nestjs-typeorm-paginate';
-import { flashSaleProductStatus, productStatus } from 'src/commons/common.enum';
+import { flashSaleProductStatus, productStatus } from '../../commons/common.enum';
 import { FlashSaleService } from '../flashSales/flashSale.service';
 import { ProductRepository } from '../products/product.repo';
 import { createFlashSaleProductDto } from './dto/dto.create';
@@ -82,16 +82,17 @@ export class FlashSaleProductService {
         if (flashSaleProductInfo.status !== flashSaleProductStatus.ACTIVE) {
             throw new BadRequestException('Can not change FlashSaleProduct info!');
         }
-        if (
-            param.totalQty === 0 ||
-            param.qtyRemain === 0 ||
-            param.discount === 0 ||
-            !param.totalQty ||
-            !param.qtyRemain ||
-            !param.discount
-        ) {
-            throw new BadRequestException('Please enter the correct key and value need to update!');
-        }
+        // if (
+        //     param.totalQty === 0 ||
+        //     param.qtyRemain === 0 ||
+        //     param.discount === 0 ||
+        //     !param.totalQty ||
+        //     !param.qtyRemain ||
+        //     !param.discount
+        // ) {
+        //     console.log(param);
+        //     throw new BadRequestException('Please enter the correct key and value need to update!');
+        // }
         if (param.qtyRemain) {
             if (param.qtyRemain > flashSaleProductInfo.totalQty) {
                 throw new BadRequestException('The remaining quantity cannot be greater than the total quantity!');

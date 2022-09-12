@@ -32,7 +32,7 @@ import { UserService } from './user.service';
 export class UserController {
     constructor(private userService: UserService, private authService: AuthService) {}
 
-    @Get('user/info')
+    @Get('user')
     @UseGuards(JWTandRolesGuard)
     @Roles(userRole.ADMIN, userRole.MEMBER)
     @ApiOkResponse()
@@ -78,7 +78,7 @@ export class UserController {
         return 'The account have been change to Inactive status!';
     }
 
-    @Get('admin/list-account')
+    @Get('admin/account')
     @UseGuards(JWTandRolesGuard)
     @Roles(userRole.ADMIN)
     @ApiOkResponse()
@@ -95,24 +95,24 @@ export class UserController {
         });
     }
 
-    @Get('admin/account/:userId')
+    @Get('admin/account/:id')
     @UseGuards(JWTandRolesGuard)
     @Roles(userRole.ADMIN)
     @ApiOkResponse()
     @ApiBadRequestResponse()
     @ApiForbiddenResponse()
-    async showUserByID(@Param('userId', new ParseUUIDPipe()) userId: string) {
-        return await this.userService.findAccount({ id: userId });
+    async showUserByID(@Param('id', new ParseUUIDPipe()) id: string) {
+        return await this.userService.findAccount({ id: id });
     }
 
-    @Delete('admin/account/:userId')
+    @Delete('admin/account/:id')
     @UseGuards(JWTandRolesGuard)
     @Roles(userRole.ADMIN)
     @ApiOkResponse()
     @ApiBadRequestResponse()
     @ApiForbiddenResponse()
-    async deleteUserByID(@Param('userId', new ParseUUIDPipe()) userId: string) {
-        await this.userService.deleteAccount({ id: userId });
+    async deleteUserByID(@Param('id', new ParseUUIDPipe()) id: string) {
+        await this.userService.deleteAccount({ id: id });
         return 'The account have been change to Inactive status!';
     }
 }

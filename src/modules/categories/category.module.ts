@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { MulterModule } from '@nestjs/platform-express';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { typeOrmConfig } from '../../configs/config.typeorm';
+import { cacheModule } from '../cache/cache.module';
 import { UserModule } from '../users/user.module';
 import { CategoryController } from './category.controller';
 import { CategoryEntity } from './category.entity';
@@ -14,6 +15,7 @@ import { CategoryService } from './category.service';
         TypeOrmModule.forFeature([CategoryEntity]),
         MulterModule,
         UserModule,
+        cacheModule,
     ],
     controllers: [CategoryController],
     providers: [CategoryService, CategoryRepository],

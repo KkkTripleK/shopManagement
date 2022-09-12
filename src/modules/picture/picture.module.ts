@@ -4,6 +4,7 @@ import { MulterModule } from '@nestjs/platform-express';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { typeOrmConfig } from '../../configs/config.typeorm';
 import { VerifyToken } from '../../utils/util.verifyToken';
+import { cacheModule } from '../cache/cache.module';
 import { CategoryEntity } from '../categories/category.entity';
 import { CategoryRepository } from '../categories/category.repo';
 import { ProductEntity } from '../products/product.entity';
@@ -20,6 +21,7 @@ import { PictureService } from './picture.service';
         TypeOrmModule.forRoot(typeOrmConfig),
         TypeOrmModule.forFeature([UserEntity, PictureEntity, ProductEntity, CategoryEntity]),
         MulterModule,
+        cacheModule,
     ],
     controllers: [PictureController],
     providers: [

@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { typeOrmConfig } from '../../configs/config.typeorm';
+import { cacheModule } from '../cache/cache.module';
 import { CategoryModule } from '../categories/category.module';
 import { FlashSaleModule } from '../flashSales/flashSale.module';
 import { ProductEntity } from '../products/product.entity';
@@ -16,6 +17,7 @@ import { FlashSaleProductService } from './flashSaleProduct.service';
         FlashSaleModule,
         UserModule,
         CategoryModule,
+        cacheModule,
         TypeOrmModule.forRoot(typeOrmConfig),
         TypeOrmModule.forFeature([FlashSaleProductEntity, ProductEntity]),
     ],

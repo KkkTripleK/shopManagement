@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { typeOrmConfig } from '../../configs/config.typeorm';
+import { cacheModule } from '../cache/cache.module';
 import { CategoryModule } from '../categories/category.module';
 import { OrderModule } from '../orders/order.module';
 import { ProductEntity } from '../products/product.entity';
@@ -17,7 +18,7 @@ import { OrderProductService } from './orderProduct.service';
         TypeOrmModule.forFeature([OrderProductEntity, ProductEntity]),
         OrderModule,
         UserModule,
-        // ProductModule,
+        cacheModule,
         CategoryModule,
     ],
     controllers: [OrderProductController],

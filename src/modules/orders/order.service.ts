@@ -220,22 +220,22 @@ export class OrderService {
         const couponId = requestBody.couponId;
         const couponInfo = await this.couponService.getCouponById(couponId);
         if (couponInfo === null) {
-            throw new BadRequestException(`Coupon ${couponId} is invalid`);
+            throw new BadRequestException(`Coupon ${couponId} is invalid!`);
         } else if (couponInfo.status === couponStatus.INACTIVE) {
-            throw new BadRequestException(`Coupon ${couponId} is inactived`);
+            throw new BadRequestException(`Coupon ${couponId} is inactived!`);
         } else if (couponInfo.qtyRemain === 0) {
-            throw new BadRequestException(`Coupon ${couponId} is not available`);
+            throw new BadRequestException(`Coupon ${couponId} is out stock!`);
         }
         if (couponInfo.begin.getTime() >= Date.now() || couponInfo.end.getTime() <= Date.now()) {
-            throw new BadRequestException('Coupon is not available!');
+            throw new BadRequestException(`Coupon ${couponId} is not ready to use!`);
         } else if (couponInfo.qtyRemain === 0) {
-            throw new BadRequestException('Coupon is not available!');
+            throw new BadRequestException(`Coupon ${couponId} is not available!`);
         }
         const listOrderInfo = await this.getListOrderByUsername(username);
         for (const orderInfo of listOrderInfo) {
             if (orderInfo.fk_Coupon !== null) {
                 if (couponInfo.id !== couponId) {
-                    throw new BadRequestException(`Coupon ${couponId} was used already`);
+                    throw new BadRequestException(`Coupon ${couponId} was used already!`);
                 }
             }
         }

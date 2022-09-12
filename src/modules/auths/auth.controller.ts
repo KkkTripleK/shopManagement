@@ -1,7 +1,6 @@
-import { Body, Controller, Get, Headers, Post, UseGuards } from '@nestjs/common';
-import { ApiBadRequestResponse, ApiConsumes, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { Body, Controller, Get, Headers, Post } from '@nestjs/common';
+import { ApiBadRequestResponse, ApiConsumes, ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { HeadersObject } from '@nestjs/swagger/dist/interfaces/open-api-spec.interface';
-import { ValidateAuthGuard } from '../../guards/guard.validate';
 import { VerifyToken } from '../../utils/util.verifyToken';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from './dto/dto.create';
@@ -16,7 +15,9 @@ export class AuthController {
 
     @Post('register')
     @ApiOkResponse()
+    @ApiCreatedResponse()
     @ApiBadRequestResponse()
+    @ApiConsumes('application/x-www-form-urlencoded')
     async userRegister(@Body() requestBody: CreateUserDto): Promise<object> {
         return this.authService.createUser(requestBody);
     }
@@ -24,24 +25,24 @@ export class AuthController {
     @Post('register/verify')
     @ApiOkResponse()
     @ApiBadRequestResponse()
+    @ApiConsumes('application/x-www-form-urlencoded')
     async userVerify(@Body() requestBody: VerifyDTO): Promise<string> {
         await this.authService.verifyUser(requestBody);
         return 'Verify account successful!';
     }
 
     @Post('login')
-    @UseGuards(ValidateAuthGuard)
     @ApiOkResponse()
     @ApiBadRequestResponse()
-    @ApiConsumes('multipart/form-data')
+    @ApiConsumes('application/x-www-form-urlencoded')
     async userLogin(@Body() requestBody: LoginDTO): Promise<object> {
-        console.log(requestBody);
-        return this.authService.userLogin(requestBody.username);
+        return this.authService.userLogin(requestBody);
     }
 
-    @Post('regenerateToken')
+    @Post('access-token')
     @ApiOkResponse()
     @ApiBadRequestResponse()
+    @ApiConsumes('application/x-www-form-urlencoded')
     async regenerateToken(@Body() requestBody: GenerateTokenDto): Promise<object> {
         return this.authService.regenerateToken(requestBody.refreshToken);
     }

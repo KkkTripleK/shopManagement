@@ -36,7 +36,7 @@ export class ProductController {
         name: 'page',
         type: 'number',
     })
-    @Get('product/all')
+    @Get('product')
     async showListProduct(
         @Query('page', new DefaultValuePipe(1), ParseIntPipe) page = 1,
         @Query('limit', new DefaultValuePipe(3), ParseIntPipe) limit = 3,
@@ -48,9 +48,9 @@ export class ProductController {
         });
     }
 
-    @Get('product/:productID')
-    async showProductByID(@Param('productID') productID: string): Promise<ProductEntity> {
-        return this.productService.showProductByID(productID);
+    @Get('product/:id')
+    async showProductByID(@Param('id') id: string): Promise<ProductEntity> {
+        return this.productService.showProductByID(id);
     }
 
     @ApiQuery({
@@ -81,7 +81,7 @@ export class ProductController {
     @ApiQuery({
         name: 'page',
     })
-    @Get('admin/product/all')
+    @Get('admin/product')
     @UseGuards(JWTandRolesGuard)
     @Roles(userRole.ADMIN)
     async adminShowListProduct(
@@ -95,11 +95,11 @@ export class ProductController {
         });
     }
 
-    @Get('/admin/product/:productID')
+    @Get('/admin/product/:id')
     @UseGuards(JWTandRolesGuard)
     @Roles(userRole.ADMIN)
-    async adminShowProductByID(@Param('productID') productID: string): Promise<ProductEntity> {
-        return this.productService.adminShowProductByID(productID);
+    async adminShowProductByID(@Param('id') id: string): Promise<ProductEntity> {
+        return this.productService.adminShowProductByID(id);
     }
 
     @Post('admin/product/create')
@@ -109,12 +109,12 @@ export class ProductController {
         return this.productService.createNewProduct(requestBody);
     }
 
-    @Patch('admin/product/:productID')
+    @Patch('admin/product/:id')
     @UseGuards(JWTandRolesGuard)
     @Roles(userRole.ADMIN)
-    async updateProductByID(@Param('productID') productID: string, @Body() requestBody: UpdateProductDto) {
-        await this.productService.updateProductByID(productID, requestBody);
-        return `Update productID <${productID}> successful!`;
+    async updateProductByID(@Param('id') id: string, @Body() requestBody: UpdateProductDto) {
+        await this.productService.updateProductByID(id, requestBody);
+        return `Update productID <${id}> successful!`;
     }
 
     @Post('admin/product/addToCate')
@@ -124,11 +124,11 @@ export class ProductController {
         return this.productService.addProductToCategory(requestBody);
     }
 
-    @Delete('admin/product/:productID')
+    @Delete('admin/product/:id')
     @UseGuards(JWTandRolesGuard)
     @Roles(userRole.ADMIN)
-    async inactiveProductByID(@Param('productID') productID: string) {
-        await this.productService.inactiveProductByID(productID);
+    async inactiveProductByID(@Param('id') id: string) {
+        await this.productService.inactiveProductByID(id);
         return 'Inactive product successful!';
     }
 }

@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { IsEnum, IsNumber, IsOptional } from 'class-validator';
-import { flashSaleProductStatus } from 'src/commons/common.enum';
+import { flashSaleProductStatus } from '../../../commons/common.enum';
 
 export class updateFlashSaleProductDto {
     @ApiProperty()
