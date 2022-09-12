@@ -15,19 +15,17 @@ export class AuthController {
     constructor(private authService: AuthService, private verifyToken: VerifyToken) {}
 
     @Post('register')
-    @ApiConsumes('multipart/form-data')
     @ApiOkResponse()
     @ApiBadRequestResponse()
-    async userRegister(@Body() createUserDto: CreateUserDto): Promise<object> {
-        return this.authService.createUser(createUserDto);
+    async userRegister(@Body() requestBody: CreateUserDto): Promise<object> {
+        return this.authService.createUser(requestBody);
     }
 
     @Post('register/verify')
     @ApiOkResponse()
     @ApiBadRequestResponse()
-    @ApiConsumes('multipart/form-data')
-    async userVerify(@Body() verifyDTO: VerifyDTO): Promise<string> {
-        await this.authService.verifyUser(verifyDTO);
+    async userVerify(@Body() requestBody: VerifyDTO): Promise<string> {
+        await this.authService.verifyUser(requestBody);
         return 'Verify account successful!';
     }
 
@@ -36,14 +34,14 @@ export class AuthController {
     @ApiOkResponse()
     @ApiBadRequestResponse()
     @ApiConsumes('multipart/form-data')
-    async userLogin(@Body() loginDTO: LoginDTO): Promise<object> {
-        return this.authService.userLogin(loginDTO.username);
+    async userLogin(@Body() requestBody: LoginDTO): Promise<object> {
+        console.log(requestBody);
+        return this.authService.userLogin(requestBody.username);
     }
 
     @Post('regenerateToken')
     @ApiOkResponse()
     @ApiBadRequestResponse()
-    @ApiConsumes('multipart/form-data')
     async regenerateToken(@Body() requestBody: GenerateTokenDto): Promise<object> {
         return this.authService.regenerateToken(requestBody.refreshToken);
     }

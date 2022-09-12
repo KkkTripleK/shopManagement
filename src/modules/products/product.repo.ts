@@ -45,7 +45,6 @@ export class ProductRepository {
     }
 
     async findProductByName(options: IPaginationOptions, nameProduct: string): Promise<Pagination<ProductEntity>> {
-        console.log(nameProduct);
         const listProduct = this.productRepo
             .createQueryBuilder('product')
             .leftJoinAndSelect('product.category', 'category')
@@ -143,6 +142,18 @@ export class ProductRepository {
         const productInfo = await this.adminShowProductByID({ id });
         for (const key in requestBody) {
             productInfo[key] = requestBody[key];
+            if (key === 'status') {
+                throw new HttpException('Cannot update the status of Product!', HttpStatus.BAD_REQUEST);
+            }
+        }
+
+        if (productInfo.qtyInstock < productInfo.qtyRemaining) {
+            throw new BadRequestException('Quantity remaining can not be more then quantity instock!');
+        }
+        if (productInfo.status === productStatus.STOCK && productInfo.qtyRemaining === 0) {
+            productInfo.status = productStatus.OUTSTOCK;
+        } else if (productInfo.status === productStatus.OUTSTOCK && productInfo.qtyRemaining !== 0) {
+            productInfo.status = productStatus.STOCK;
         }
         return this.productRepo.save(productInfo);
     }
@@ -151,5 +162,9 @@ export class ProductRepository {
         const productInfo = await this.adminShowProductByID({ id: productId });
         productInfo.category = await this.categoryRepo.findCategoryByID(categoryId);
         return this.productRepo.save(productInfo);
+    }
+
+    async findProductByParam(param: object) {
+        return this.productRepo.findOne({ where: [param] });
     }
 }

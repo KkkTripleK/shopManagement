@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { createOrderProductDto } from './dto/dto.createOrderProduct';
@@ -11,14 +11,18 @@ export class OrderProductRepository {
         private orderProductRepo: Repository<OrderProductEntity>,
     ) {}
 
-    async updateProductInOrderProduct(orderProductId: string) {
-        return this.orderProductRepo.findOne({
+    async getProductInOrderProduct(orderProductId: string) {
+        const orderProductInfo = await this.orderProductRepo.findOne({
             where: [{ id: orderProductId }],
             relations: {
                 fk_Order: true,
                 fk_Product: true,
             },
         });
+        if (orderProductInfo === null) {
+            throw new NotFoundException('OrderProductId is invalid!');
+        }
+        return orderProductInfo;
     }
 
     async createOrderProduct(requestBody: createOrderProductDto): Promise<OrderProductEntity> {

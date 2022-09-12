@@ -8,20 +8,13 @@ import {
     ParseIntPipe,
     Patch,
     Post,
+    Query,
     UploadedFile,
     UseGuards,
     UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import {
-    ApiBadRequestResponse,
-    ApiBearerAuth,
-    ApiBody,
-    ApiConsumes,
-    ApiOkResponse,
-    ApiParam,
-    ApiTags,
-} from '@nestjs/swagger';
+import { ApiBadRequestResponse, ApiBearerAuth, ApiBody, ApiOkResponse, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { Pagination } from 'nestjs-typeorm-paginate';
 import { userRole } from '../../commons/common.enum';
 import { Roles } from '../../decorators/decorator.roles';
@@ -39,25 +32,29 @@ import { UpdateCategoryDto } from './dto/dto.update';
 export class CategoryController {
     constructor(private cateService: CategoryService) {}
 
-    @ApiParam({
+    @Get('category/all')
+    @ApiQuery({
         name: 'limit',
+        type: 'number',
     })
-    @ApiParam({
+    @ApiQuery({
         name: 'page',
+        type: 'number',
     })
-    @Get('category/all/:page/:limit')
+    @ApiOkResponse()
+    @ApiBadRequestResponse()
     async showList(
-        @Param('page', new DefaultValuePipe(1), ParseIntPipe) page = 1,
-        @Param('limit', new DefaultValuePipe(3), ParseIntPipe) limit = 3,
+        @Query('page', new DefaultValuePipe(1), ParseIntPipe) page = 1,
+        @Query('limit', new DefaultValuePipe(3), ParseIntPipe) limit = 3,
     ): Promise<Pagination<CategoryEntity>> {
         return this.cateService.showList({
             page,
             limit,
-            route: `localhost:${process.env.PORT}/category/all`,
+            route: `localhost:${process.env.PORT}/api/v1/category/all/`,
         });
     }
 
-    @Get('category/:categoryID')
+    @Get('category/single/:categoryID')
     @ApiOkResponse()
     @ApiBadRequestResponse()
     async findCategoryByID(@Param('categoryID') categoryID: string) {
@@ -67,7 +64,6 @@ export class CategoryController {
     @Post('admin/category/create')
     @UseGuards(JWTandRolesGuard)
     @Roles(userRole.ADMIN)
-    @ApiConsumes('multipart/form-data')
     @ApiOkResponse()
     @ApiBadRequestResponse()
     async createNewCategory(@Body() createCategoryDto: CreateCategoryDto): Promise<CategoryEntity> {
@@ -78,21 +74,21 @@ export class CategoryController {
     @UseGuards(JWTandRolesGuard)
     @Roles(userRole.ADMIN)
     @UseInterceptors(FileInterceptor('file', multerOptions))
-    @ApiConsumes('multipart/form-data')
+    // @ApiConsumes('multipart/form-data')
     @ApiBody({
         description: 'Banner',
         type: uploadFileDto,
     })
     @ApiOkResponse()
     @ApiBadRequestResponse()
-    async upload(@UploadedFile() file, @Body() requestBody: any) {
+    async uploadBanner(@UploadedFile() file, @Body() requestBody: any) {
+        console.log(file);
         return this.cateService.uploadBanner(file, requestBody);
     }
 
     @Patch('admin/category/:categoryID')
     @UseGuards(JWTandRolesGuard)
     @Roles(userRole.ADMIN)
-    @ApiConsumes('multipart/form-data')
     @ApiOkResponse()
     @ApiBadRequestResponse()
     async updateCategoryInfo(@Param('categoryID') categoryID: string, @Body() requestBody: UpdateCategoryDto) {
@@ -102,7 +98,6 @@ export class CategoryController {
     @Delete('admin/category/:categoryID')
     @UseGuards(JWTandRolesGuard)
     @Roles(userRole.ADMIN)
-    @ApiConsumes('multipart/form-data')
     @ApiOkResponse()
     @ApiBadRequestResponse()
     async inactiveCategoryByID(@Param('categoryID') categoryID: string) {

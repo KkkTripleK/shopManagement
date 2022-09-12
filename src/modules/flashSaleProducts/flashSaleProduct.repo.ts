@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { IPaginationOptions, paginate, Pagination } from 'nestjs-typeorm-paginate';
 import { productStatus } from 'src/commons/common.enum';
 import { Repository } from 'typeorm';
 import { createFlashSaleProductDto } from './dto/dto.create';
@@ -56,5 +57,15 @@ export class FlashSaleProductRepository {
             flashSaleProductInfo[key] = param[key];
         }
         return this.flashSaleProductRepo.save(flashSaleProductInfo);
+    }
+
+    async listFlashSaleProduct(options: IPaginationOptions): Promise<Pagination<FlashSaleProductEntity>> {
+        const listFlashSaleProduct = await this.flashSaleProductRepo
+            .createQueryBuilder('flashSaleProduct')
+            .leftJoinAndSelect('flashSaleProduct.fk_Product', 'fk_Product')
+            .leftJoinAndSelect('flashSaleProduct.fk_FlashSale', 'fk_FlashSale')
+            .andWhere('fk_Product.status =:status', { status: productStatus.STOCK })
+            .orderBy('fk_FlashSale.flashSaleBegin');
+        return paginate<FlashSaleProductEntity>(listFlashSaleProduct, options);
     }
 }

@@ -1,8 +1,11 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
-import { productStatus } from 'src/commons/common.enum';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { IPaginationOptions, Pagination } from 'nestjs-typeorm-paginate';
+import { flashSaleProductStatus, productStatus } from 'src/commons/common.enum';
 import { FlashSaleService } from '../flashSales/flashSale.service';
 import { ProductRepository } from '../products/product.repo';
 import { createFlashSaleProductDto } from './dto/dto.create';
+import { updateFlashSaleProductDto } from './dto/dto.update';
+import { FlashSaleProductEntity } from './flashSaleProduct.entity';
 import { FlashSaleProductRepository } from './flashSaleProduct.repo';
 
 @Injectable()
@@ -60,7 +63,52 @@ export class FlashSaleProductService {
         return this.flashSaleProductRepo.getFlashSaleProductByFlashSaleId(fk_FlashSaleId);
     }
 
-    async updateFlashSaleProduct(fk_FlashSaleProductId: string, param: object) {
+    async getFlashSaleProductByFlashSaleProductId(FlashSaleProductId: string) {
+        const flashSaleProductInfo = await this.flashSaleProductRepo.getFlashSaleProductByFlashSaleProductId(
+            FlashSaleProductId,
+        );
+        if (flashSaleProductInfo === null) {
+            throw new NotFoundException('FlashSaleProductId is invalid!');
+        }
+        return flashSaleProductInfo;
+    }
+
+    async listFlashSaleProduct(options?: IPaginationOptions): Promise<Pagination<FlashSaleProductEntity>> {
+        return this.flashSaleProductRepo.listFlashSaleProduct(options);
+    }
+
+    async updateFlashSaleProduct(fk_FlashSaleProductId: string, param: updateFlashSaleProductDto) {
+        const flashSaleProductInfo = await this.getFlashSaleProductByFlashSaleProductId(fk_FlashSaleProductId);
+        if (flashSaleProductInfo.status !== flashSaleProductStatus.ACTIVE) {
+            throw new BadRequestException('Can not change FlashSaleProduct info!');
+        }
+        if (
+            param.totalQty === 0 ||
+            param.qtyRemain === 0 ||
+            param.discount === 0 ||
+            !param.totalQty ||
+            !param.qtyRemain ||
+            !param.discount
+        ) {
+            throw new BadRequestException('Please enter the correct key and value need to update!');
+        }
+        if (param.qtyRemain) {
+            if (param.qtyRemain > flashSaleProductInfo.totalQty) {
+                throw new BadRequestException('The remaining quantity cannot be greater than the total quantity!');
+            } else if (param.qtyRemain <= 0) {
+                throw new BadRequestException('The remaining quantity cannot be smaller than 0!');
+            }
+        }
+        if (param.totalQty) {
+            if (param.totalQty < flashSaleProductInfo.qtyRemain) {
+                throw new BadRequestException('The total quantity cannot be smaller than the remaining quantity!');
+            }
+        }
+        if (param.discount) {
+            if (param.discount >= 100) {
+                throw new BadRequestException('The discount cannot be equal or greater than 100%!');
+            }
+        }
         return this.flashSaleProductRepo.updateFlashSaleProduct(fk_FlashSaleProductId, param);
     }
 }

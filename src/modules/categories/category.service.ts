@@ -47,13 +47,15 @@ export class CategoryService {
     }
 
     async deletePictureFromAssets(path: string) {
+        console.log(path);
         fs.unlinkSync(path);
     }
 
     async uploadBanner(file: any, requestBody: any) {
         const productInfo = await this.cateRepo.findCategoryByID(requestBody.productId);
+        console.log(productInfo);
         if (productInfo === null) {
-            this.deletePictureFromAssets(file.path);
+            await this.deletePictureFromAssets(file.path);
             throw new HttpException('ProductId is invalid!', HttpStatus.BAD_REQUEST);
         } else if (productInfo.banner !== null) {
             this.deletePictureFromAssets(productInfo.banner);

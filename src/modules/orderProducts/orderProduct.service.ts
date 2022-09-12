@@ -111,7 +111,7 @@ export class OrderProductService {
     }
 
     async updateProductInOrderProduct(orderProductId: string, newQty: string, username: string) {
-        const orderProductInfo = await this.orderProductRepo.updateProductInOrderProduct(orderProductId);
+        const orderProductInfo = await this.orderProductRepo.getProductInOrderProduct(orderProductId);
         if (orderProductInfo === null) {
             throw new BadRequestException('OrderProductID is invalid!');
         }
@@ -134,12 +134,12 @@ export class OrderProductService {
         return `Update orderProduct ${orderProductId} successful!`;
     }
 
-    async checkProductExist(productId): Promise<ProductEntity> {
+    async checkProductExist(productId: any): Promise<ProductEntity> {
         const productInfo = await this.productRepo.showProductByProductId({
             id: productId,
         });
         if (productInfo === null) {
-            throw new BadRequestException('ProductID is invalid!');
+            throw new BadRequestException('ProductId is invalid!');
         }
         return productInfo;
     }
@@ -158,7 +158,7 @@ export class OrderProductService {
     }
 
     async deleteOrderProductInOrder(orderProductId: string, username: string) {
-        const orderProductInfo = await this.orderProductRepo.updateProductInOrderProduct(orderProductId);
+        const orderProductInfo = await this.orderProductRepo.getProductInOrderProduct(orderProductId);
         // check status of Orders, status === shopping --> Update Orders
 
         const orderInfo = await this.orderService.getOrderByOrderIdAndUsername(orderProductInfo.fk_Order.id, username);
@@ -182,7 +182,7 @@ export class OrderProductService {
 
     async adminDeleteOrderProductInOrder(orderProductId: string) {
         // Step 3. Check status of Orders, status === Shopping --> Update
-        const orderProductInfo = await this.orderProductRepo.updateProductInOrderProduct(orderProductId);
+        const orderProductInfo = await this.orderProductRepo.getProductInOrderProduct(orderProductId);
         const orderInfo = await this.orderService.adminGetOrderByOrderID(orderProductInfo.fk_Order.id);
         if (orderInfo.status === orderStatus.SHOPPING) {
             orderInfo.totalProductPrice -= orderProductInfo.totalPrice;

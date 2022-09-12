@@ -1,8 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsNumber, IsOptional } from 'class-validator';
-import { FlashSaleEntity } from 'src/modules/flashSales/flashSale.entity';
-import { ProductEntity } from 'src/modules/products/product.entity';
+import { IsEnum, IsNumber, IsOptional } from 'class-validator';
+import { flashSaleProductStatus } from 'src/commons/common.enum';
 
 export class updateFlashSaleProductDto {
     @ApiProperty()
@@ -25,9 +24,6 @@ export class updateFlashSaleProductDto {
 
     @ApiProperty()
     @IsOptional()
-    fk_Product?: ProductEntity;
-
-    @ApiProperty()
-    @IsOptional()
-    fk_FlashSale?: FlashSaleEntity;
+    @IsEnum(flashSaleProductStatus)
+    status?: flashSaleProductStatus;
 }

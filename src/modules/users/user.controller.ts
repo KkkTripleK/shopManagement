@@ -13,7 +13,7 @@ import {
     Req,
     UseGuards,
 } from '@nestjs/common';
-import { ApiBadRequestResponse, ApiBearerAuth, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBadRequestResponse, ApiBearerAuth, ApiForbiddenResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { Pagination } from 'nestjs-typeorm-paginate';
 import { userRole } from '../../commons/common.enum';
 import { Roles } from '../../decorators/decorator.roles';
@@ -83,6 +83,7 @@ export class UserController {
     @Roles(userRole.ADMIN)
     @ApiOkResponse()
     @ApiBadRequestResponse()
+    @ApiForbiddenResponse()
     async showList(
         @Query('page', new DefaultValuePipe(1), ParseIntPipe) page = 1,
         @Query('limit', new DefaultValuePipe(3), ParseIntPipe) limit = 3,
@@ -90,7 +91,7 @@ export class UserController {
         return this.userService.getListAccount({
             page,
             limit,
-            route: `localhost:${process.env.PORT}/admin/list-account`,
+            route: `localhost:${process.env.PORT}/api/v1/admin/list-account`,
         });
     }
 
@@ -99,6 +100,7 @@ export class UserController {
     @Roles(userRole.ADMIN)
     @ApiOkResponse()
     @ApiBadRequestResponse()
+    @ApiForbiddenResponse()
     async showUserByID(@Param('userId', new ParseUUIDPipe()) userId: string) {
         return await this.userService.findAccount({ id: userId });
     }
@@ -108,6 +110,7 @@ export class UserController {
     @Roles(userRole.ADMIN)
     @ApiOkResponse()
     @ApiBadRequestResponse()
+    @ApiForbiddenResponse()
     async deleteUserByID(@Param('userId', new ParseUUIDPipe()) userId: string) {
         await this.userService.deleteAccount({ id: userId });
         return 'The account have been change to Inactive status!';

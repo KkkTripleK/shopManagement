@@ -130,8 +130,8 @@ export class OrderService {
                     );
                 }
             }
-            productInfo.qtyRemaining = String(Number(productInfo.qtyRemaining) - Number(orderProductInfo.qty));
-            if (productInfo.qtyRemaining === '0') {
+            productInfo.qtyRemaining = Number(productInfo.qtyRemaining) - Number(orderProductInfo.qty);
+            if (productInfo.qtyRemaining === 0) {
                 productInfo.status = productStatus.OUTSTOCK;
             }
             await this.productRepo.createNewProduct(productInfo);

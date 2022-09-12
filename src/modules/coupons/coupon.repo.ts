@@ -1,5 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { IPaginationOptions, paginate, Pagination } from 'nestjs-typeorm-paginate';
+import { couponStatus } from 'src/commons/common.enum';
 import { Repository } from 'typeorm';
 import { CouponEntity } from './coupon.entity';
 import { createCouponDto } from './dto/dto.createCoupon';
@@ -22,7 +24,11 @@ export class CouponRepository {
         return this.couponRepo.findOne({ where: [{ id: couponId }] });
     }
 
-    async getListCoupon() {
-        return this.couponRepo.find();
+    async getListCoupon(options: IPaginationOptions): Promise<Pagination<CouponEntity>> {
+        const listCoupon = await this.couponRepo.manager
+            .createQueryBuilder(CouponEntity, 'coupon')
+            .where({ status: couponStatus.ACTIVE })
+            .orderBy('coupon.begin');
+        return paginate<CouponEntity>(listCoupon, options);
     }
 }

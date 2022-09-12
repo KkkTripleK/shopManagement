@@ -35,10 +35,10 @@ export class ProductEntity extends BaseEntity {
     weight: string;
 
     @Column()
-    qtyInstock: string;
+    qtyInstock: number;
 
     @Column({ nullable: true })
-    qtyRemaining: string;
+    qtyRemaining: number;
 
     @Column()
     description: string;

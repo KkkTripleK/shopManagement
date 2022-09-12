@@ -11,6 +11,7 @@ export class PictureService {
     constructor(private pictureRepo: PictureRepository, private productRepo: ProductRepository) {}
 
     async uploadPicture(file, requestBody) {
+        console.log(file);
         const productInfo = await this.productRepo.showProductByProductId({
             id: requestBody.productId,
         });

@@ -1,4 +1,5 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { IPaginationOptions, Pagination } from 'nestjs-typeorm-paginate';
 import { couponStatus } from '../../commons/common.enum';
 import { CouponEntity } from './coupon.entity';
 import { CouponRepository } from './coupon.repo';
@@ -22,11 +23,15 @@ export class CouponService {
     }
 
     async getCouponById(couponId: string): Promise<CouponEntity> {
-        return this.couponRepo.getCouponById(couponId);
+        const couponInfo = await this.couponRepo.getCouponById(couponId);
+        if (couponInfo === null) {
+            throw new NotFoundException('CouponId is invalid');
+        }
+        return couponInfo;
     }
 
-    async getListCoupon(): Promise<CouponEntity[]> {
-        return this.couponRepo.getListCoupon();
+    async getListCoupon(options?: IPaginationOptions): Promise<Pagination<CouponEntity>> {
+        return this.couponRepo.getListCoupon(options);
     }
 
     async inactiveCoupon(couponId: string) {

@@ -38,20 +38,23 @@ export class CreateProductDto {
     weight: string;
 
     @ApiProperty()
-    @IsString()
-    qtyInstock: string;
+    @Type(() => Number)
+    @IsNumber()
+    qtyInstock: number;
 
     @ApiProperty()
-    @IsString()
+    @Type(() => Number)
+    @IsNumber()
     @IsOptional()
-    qtyRemaining?: string;
+    qtyRemaining?: number;
 
     @ApiProperty()
     @IsString()
     @IsOptional()
     description?: string;
 
+    @IsOptional()
     @ApiProperty()
     @IsEnum(productStatus)
-    status: productStatus;
+    status?: productStatus;
 }

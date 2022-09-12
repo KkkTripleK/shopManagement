@@ -52,7 +52,7 @@ export class OrderController {
         );
     }
 
-    @Get('user/order/:orderId')
+    @Get('user/order/single/:orderId')
     @UseGuards(JWTandRolesGuard)
     @Roles(userRole.MEMBER, userRole.ADMIN)
     @ApiOkResponse()
@@ -112,7 +112,7 @@ export class OrderController {
         });
     }
 
-    @Get('admin/order/id/:orderId')
+    @Get('admin/order/single/:orderId')
     @UseGuards(JWTandRolesGuard)
     @Roles(userRole.ADMIN)
     @ApiOkResponse()

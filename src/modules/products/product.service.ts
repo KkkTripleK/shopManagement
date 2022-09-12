@@ -23,10 +23,19 @@ export class ProductService {
     ) {}
 
     async createNewProduct(requestBody: CreateProductDto): Promise<ProductEntity> {
-        if (Number(requestBody.qtyRemaining) >= Number(requestBody.qtyInstock)) {
+        const checkProductExist = await this.productRepository.findProductByParam([
+            { name: requestBody.name },
+            { weight: requestBody.weight },
+        ]);
+        if (checkProductExist !== null) {
+            throw new BadRequestException('The product was included in Shop!');
+        }
+        if (requestBody.qtyRemaining >= requestBody.qtyInstock) {
             throw new BadRequestException('Quantity remaining can not be more then quantity instock!');
-        } else if (Number(requestBody.qtyRemaining) === 0) {
+        } else if (requestBody.qtyRemaining === 0) {
             requestBody.status = productStatus.OUTSTOCK;
+        } else if (requestBody.qtyRemaining === undefined) {
+            requestBody.qtyRemaining = requestBody.qtyInstock;
         }
         return this.productRepository.createNewProduct(requestBody);
     }

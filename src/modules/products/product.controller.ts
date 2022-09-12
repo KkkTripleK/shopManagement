@@ -11,7 +11,7 @@ import {
     Query,
     UseGuards,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { Pagination } from 'nestjs-typeorm-paginate';
 import { userRole } from '../../commons/common.enum';
 import { Roles } from '../../decorators/decorator.roles';
@@ -28,6 +28,14 @@ import { ProductService } from './product.service';
 export class ProductController {
     constructor(private productService: ProductService) {}
 
+    @ApiQuery({
+        name: 'limit',
+        type: 'number',
+    })
+    @ApiQuery({
+        name: 'page',
+        type: 'number',
+    })
     @Get('product/all')
     async showListProduct(
         @Query('page', new DefaultValuePipe(1), ParseIntPipe) page = 1,
@@ -36,7 +44,7 @@ export class ProductController {
         return this.productService.showListProduct({
             page,
             limit,
-            route: `localhost:${process.env.PORT}/product/all`,
+            route: `localhost:${process.env.PORT}/api/v1/product/all`,
         });
     }
 
@@ -45,6 +53,12 @@ export class ProductController {
         return this.productService.showProductByID(productID);
     }
 
+    @ApiQuery({
+        name: 'limit',
+    })
+    @ApiQuery({
+        name: 'page',
+    })
     @Get('product/find/:nameProduct')
     async findProductByName(
         @Param('nameProduct') nameProduct: string,
@@ -55,12 +69,18 @@ export class ProductController {
             {
                 page,
                 limit,
-                route: `localhost:${process.env.PORT}/product/all`,
+                route: `localhost:${process.env.PORT}/api/v1/product/find/${nameProduct}`,
             },
             nameProduct,
         );
     }
 
+    @ApiQuery({
+        name: 'limit',
+    })
+    @ApiQuery({
+        name: 'page',
+    })
     @Get('admin/product/all')
     @UseGuards(JWTandRolesGuard)
     @Roles(userRole.ADMIN)
@@ -71,7 +91,7 @@ export class ProductController {
         return this.productService.adminShowListProduct({
             page,
             limit,
-            route: `localhost:${process.env.PORT}/admin/product/all`,
+            route: `localhost:${process.env.PORT}/api/v1/admin/product/all`,
         });
     }
 
