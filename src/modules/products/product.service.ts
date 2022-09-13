@@ -1,5 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { IPaginationOptions, Pagination } from 'nestjs-typeorm-paginate';
+import { DataSource } from 'typeorm';
 import { orderStatus, productStatus } from '../../commons/common.enum';
 import { FlashSaleProductService } from '../flashSaleProducts/flashSaleProduct.service';
 import { FlashSaleEntity } from '../flashSales/flashSale.entity';
@@ -20,6 +21,7 @@ export class ProductService {
         private orderProductRepo: OrderProductRepository,
         private orderProductService: OrderProductService,
         private flashSaleProductService: FlashSaleProductService,
+        private dataSource: DataSource,
     ) {}
 
     async createNewProduct(requestBody: CreateProductDto): Promise<ProductEntity> {
@@ -74,10 +76,21 @@ export class ProductService {
     4. Check status of Orders
     5. Order.Status === Shopping --> Update info that orderProduct and Order
     */
-
-        // Step 1. Check exist product & Step 2: Change info of product
-        const productInfo = await this.productRepository.updateProductByID(productID, requestBody);
-        await this.orderService.updateOrderInfoByProduct(productInfo);
+        const queryRunner = this.dataSource.createQueryRunner();
+        await queryRunner.connect();
+        await queryRunner.startTransaction();
+        try {
+            // Step 1. Check exist product & Step 2: Change info of product
+            const productInfo = await this.productRepository.updateProductByID(productID, requestBody);
+            await queryRunner.manager.save(productInfo);
+            await this.orderService.updateOrderInfoByProduct(productInfo);
+            await queryRunner.commitTransaction();
+        } catch (err) {
+            await queryRunner.rollbackTransaction();
+            throw err;
+        } finally {
+            await queryRunner.release();
+        }
     }
 
     async inFlashSale(flashSaleInfo: FlashSaleEntity) {
@@ -108,7 +121,7 @@ export class ProductService {
         }
         console.log('FlashSale is end!');
     }
-
+    //<Need to  check Order.status before delete order>
     async inactiveProductByID(productID: string) {
         /* 
         1. Change status of product
@@ -117,17 +130,26 @@ export class ProductService {
         4. Update price of Order
         5. Delete orderProduct
         */
-
-        // Step 1. Change status of product
-        await this.productRepository.updateProductByID(productID, {
-            status: productStatus.INACTIVE,
-        });
-        // Step 2. Find orderProducts and Orders are containing a deleted product
-        const listOrderProductInfo = await this.orderProductRepo.getListOrderProductByProductId(productID);
-        for (const orderProductInfo of listOrderProductInfo) {
-            if (orderProductInfo.fk_Order.status === orderStatus.SHOPPING) {
-                await this.orderProductService.adminDeleteOrderProductInOrder(orderProductInfo.id);
+        const queryRunner = this.dataSource.createQueryRunner();
+        await queryRunner.connect();
+        await queryRunner.startTransaction();
+        try {
+            // Step 1. Change status of product
+            await this.productRepository.updateProductByID(productID, {
+                status: productStatus.INACTIVE,
+            });
+            // Step 2. Find orderProducts and Orders are containing a deleted product
+            const listOrderProductInfo = await this.orderProductRepo.getListOrderProductByProductId(productID);
+            for (const orderProductInfo of listOrderProductInfo) {
+                if (orderProductInfo.fk_Order.status === orderStatus.SHOPPING) {
+                    await this.orderProductService.adminDeleteOrderProductInOrder(orderProductInfo.id);
+                }
             }
+        } catch (error) {
+            await queryRunner.rollbackTransaction();
+            throw error;
+        } finally {
+            await queryRunner.release();
         }
     }
 

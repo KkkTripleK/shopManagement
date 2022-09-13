@@ -6,11 +6,6 @@ export class UpdateProductDto {
     @ApiProperty({ required: false })
     @IsString()
     @IsOptional()
-    id?: string;
-
-    @ApiProperty({ required: false })
-    @IsString()
-    @IsOptional()
     name?: string;
 
     @ApiProperty({ required: false })
@@ -54,9 +49,4 @@ export class UpdateProductDto {
     @IsString()
     @IsOptional()
     description?: string;
-
-    @ApiProperty({ required: false })
-    @IsString()
-    @IsOptional()
-    status?: string;
 }

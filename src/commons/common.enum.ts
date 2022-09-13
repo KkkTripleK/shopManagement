@@ -34,7 +34,6 @@ export enum orderPayment {
 export enum orderStatus {
     SHOPPING = 'Shopping',
     ORDERED = 'Ordered',
-    SHIPPING = 'Shipping',
     COMPLETED = 'Completed',
     REMOVED = 'Removed',
 }

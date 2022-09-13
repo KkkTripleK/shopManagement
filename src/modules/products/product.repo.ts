@@ -1,7 +1,7 @@
 import { BadRequestException, HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { IPaginationOptions, paginate, Pagination } from 'nestjs-typeorm-paginate';
-import { Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { productStatus } from '../../commons/common.enum';
 import { CategoryRepository } from '../categories/category.repo';
 import { CreateProductDto } from './dto/dto.create.dto';
@@ -13,6 +13,7 @@ export class ProductRepository {
         @InjectRepository(ProductEntity)
         private productRepo: Repository<ProductEntity>,
         private categoryRepo: CategoryRepository,
+        private dataSource: DataSource,
     ) {}
 
     async createNewProduct(requestBody: CreateProductDto): Promise<ProductEntity> {
@@ -142,9 +143,6 @@ export class ProductRepository {
         const productInfo = await this.adminShowProductByID({ id });
         for (const key in requestBody) {
             productInfo[key] = requestBody[key];
-            if (key === 'status') {
-                throw new HttpException('Cannot update the status of Product!', HttpStatus.BAD_REQUEST);
-            }
         }
 
         if (productInfo.qtyInstock < productInfo.qtyRemaining) {
@@ -155,7 +153,14 @@ export class ProductRepository {
         } else if (productInfo.status === productStatus.OUTSTOCK && productInfo.qtyRemaining !== 0) {
             productInfo.status = productStatus.STOCK;
         }
-        return this.productRepo.save(productInfo);
+        // return this.productRepo.manager.save(productInfo)
+        // await this.dataSource
+        //     .createQueryBuilder()
+        //     .update(ProductEntity)
+        //     .set(requestBody)
+        //     .where('id =:id', { id: productInfo.id })
+        //     .execute();
+        return productInfo;
     }
 
     async addProductToCategory(categoryId: string, productId: string) {

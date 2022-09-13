@@ -6,13 +6,13 @@ export class CouponEntity extends BaseEntity {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
-    @Column({ default: 0, nullable: true })
+    @Column({ default: 0 })
     totalQty: number;
 
-    @Column({ default: 0, nullable: true })
+    @Column({ default: 0 })
     qtyRemain: number;
 
-    @Column({ default: 0, nullable: true })
+    @Column({ default: 0 })
     discount: number;
 
     @Column()

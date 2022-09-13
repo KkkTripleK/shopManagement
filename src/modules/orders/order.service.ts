@@ -1,5 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { IPaginationOptions, Pagination } from 'nestjs-typeorm-paginate';
+import { DataSource } from 'typeorm';
 import { couponStatus, flashSaleProductStatus, orderStatus, productStatus } from '../../commons/common.enum';
 import { CouponService } from '../coupons/coupon.service';
 import { FlashSaleProductService } from '../flashSaleProducts/flashSaleProduct.service';
@@ -19,6 +20,7 @@ export class OrderService {
         private orderProductService: OrderProductService,
         private couponService: CouponService,
         private flashSaleProductService: FlashSaleProductService,
+        private dataSource: DataSource,
     ) {}
 
     async getListOrderByUsername(fk_Username: string) {
@@ -77,75 +79,88 @@ export class OrderService {
         4. Confirm and update qtyRemain of Product and Coupon: if qtyRemain === 0 --> change status: OutStock
         */
 
+        const queryRunner = this.dataSource.createQueryRunner();
+        await queryRunner.connect();
+        await queryRunner.startTransaction();
         // Step 1. Check exist Order
-        const orderInfo = await this.getOrderByOrderIdAndUsername(orderId, fk_Username);
-        if (orderInfo.totalProductPrice === 0) {
-            throw new BadRequestException("Order doesn't have any product!");
-        } else if (orderInfo.status !== orderStatus.SHOPPING) {
-            throw new BadRequestException('Can not change the status of this order!');
-        }
-
-        // Step 2. Check valid Coupon
-        if (orderInfo.fk_Coupon !== null) {
-            if (orderInfo.fk_Coupon.begin.getTime() >= Date.now() || orderInfo.fk_Coupon.end.getTime() <= Date.now()) {
-                throw new BadRequestException('Coupon is not available!');
-            } else if (orderInfo.fk_Coupon.qtyRemain === 0) {
-                throw new BadRequestException('Coupon is not available!');
+        try {
+            const orderInfo = await this.getOrderByOrderIdAndUsername(orderId, fk_Username);
+            if (orderInfo.totalProductPrice === 0) {
+                throw new BadRequestException("Order doesn't have any product!");
+            } else if (orderInfo.status !== orderStatus.SHOPPING) {
+                throw new BadRequestException('Cannot confirm this Order!');
             }
-        }
 
-        // Step 3. Check qty remain of each Product
-        const listOrderProductInfo = await this.orderProductService.getListProductByOrderId(orderId, fk_Username);
-        for (const orderProductInfo of listOrderProductInfo) {
-            const productInfo = await this.productRepo.adminShowProductByID({ id: orderProductInfo.fk_Product.id });
-            //onSale
-            if (productInfo.fk_FlashSaleProduct.length !== 0) {
-                const listFlashSaleProduct = productInfo.fk_FlashSaleProduct;
-                for (const flashSaleProduct of listFlashSaleProduct) {
-                    if (flashSaleProduct.status === flashSaleProductStatus.ONSALE) {
-                        if (flashSaleProduct.qtyRemain < Number(orderProductInfo.qty)) {
-                            throw new BadRequestException(
-                                `Order confirm failed! The qty remaining is ${flashSaleProduct.qtyRemain}!`,
-                            );
-                        } else {
-                            flashSaleProduct.qtyRemain -= Number(orderProductInfo.qty);
-                            if (flashSaleProduct.qtyRemain === 0) {
-                                await this.flashSaleProductService.updateFlashSaleProduct(flashSaleProduct.id, {
-                                    qtyRemain: flashSaleProduct.qtyRemain,
-                                    status: flashSaleProductStatus.OUTSTOCK,
-                                });
+            // Step 2. Check valid Coupon
+            if (orderInfo.fk_Coupon !== null) {
+                if (
+                    orderInfo.fk_Coupon.begin.getTime() >= Date.now() ||
+                    orderInfo.fk_Coupon.end.getTime() <= Date.now() ||
+                    orderInfo.fk_Coupon.qtyRemain === 0
+                ) {
+                    throw new BadRequestException('Coupon is not available!');
+                }
+            }
+
+            // Step 3. Check qty remain of each Product
+            const listOrderProductInfo = await this.orderProductService.getListProductByOrderId(orderId, fk_Username);
+            for (const orderProductInfo of listOrderProductInfo) {
+                const productInfo = await this.productRepo.adminShowProductByID({ id: orderProductInfo.fk_Product.id });
+                //onSale
+                if (productInfo.fk_FlashSaleProduct) {
+                    const listFlashSaleProduct = productInfo.fk_FlashSaleProduct;
+                    for (const flashSaleProduct of listFlashSaleProduct) {
+                        if (flashSaleProduct.status === flashSaleProductStatus.ONSALE) {
+                            if (flashSaleProduct.qtyRemain < Number(orderProductInfo.qty)) {
+                                throw new BadRequestException(
+                                    `Order confirm failed! The qty remaining of Product <${flashSaleProduct.fk_Product}> is <${flashSaleProduct.qtyRemain}>!`,
+                                );
                             } else {
-                                await this.flashSaleProductService.updateFlashSaleProduct(flashSaleProduct.id, {
-                                    qtyRemain: flashSaleProduct.qtyRemain,
-                                });
+                                flashSaleProduct.qtyRemain -= Number(orderProductInfo.qty);
+                                if (flashSaleProduct.qtyRemain === 0) {
+                                    flashSaleProduct.status = flashSaleProductStatus.OUTSTOCK;
+                                    await queryRunner.manager.save(flashSaleProduct);
+                                } else {
+                                    await queryRunner.manager.save(flashSaleProduct);
+                                }
                             }
                         }
                     }
+                } else {
+                    // not onSale
+                    if (productInfo.status === productStatus.OUTSTOCK) {
+                        throw new BadRequestException(`Product <${productInfo.name}> is OutStock!`);
+                    } else if (productInfo.status === productStatus.INACTIVE) {
+                        throw new BadRequestException(`Product <${productInfo.name}> is Inactive!`);
+                    } else if (productInfo.qtyRemaining < Number(orderProductInfo.qty)) {
+                        throw new BadRequestException(
+                            `Order confirm failed! The qty remaining of Product <${productInfo.name}> is <${productInfo.qtyRemaining}>!`,
+                        );
+                    }
                 }
-            } else {
-                // not onSale
-                if (Number(productInfo.qtyRemaining) < Number(orderProductInfo.qty)) {
-                    throw new BadRequestException(
-                        `Order confirm failed! The qty remaining is ${productInfo.qtyRemaining}!`,
-                    );
+                productInfo.qtyRemaining = productInfo.qtyRemaining - Number(orderProductInfo.qty);
+                if (productInfo.qtyRemaining === 0) {
+                    productInfo.status = productStatus.OUTSTOCK;
                 }
+                await this.productRepo.createNewProduct(productInfo);
             }
-            productInfo.qtyRemaining = Number(productInfo.qtyRemaining) - Number(orderProductInfo.qty);
-            if (productInfo.qtyRemaining === 0) {
-                productInfo.status = productStatus.OUTSTOCK;
-            }
-            await this.productRepo.createNewProduct(productInfo);
-        }
 
-        //Step 4. Confirm and update qtyRemain of Product and Coupon
-        if (orderInfo.fk_Coupon !== null) {
-            await this.couponService.updateCouponInfo(orderInfo.fk_Coupon.id, {
-                qtyRemain: orderInfo.fk_Coupon.qtyRemain,
+            //Step 4. Confirm and update qtyRemain of Product and Coupon
+            if (orderInfo.fk_Coupon !== null) {
+                await this.couponService.updateCouponInfo(orderInfo.fk_Coupon.id, {
+                    qtyRemain: orderInfo.fk_Coupon.qtyRemain - 1,
+                });
+            }
+            await this.orderRepo.updateOrder(orderInfo, {
+                status: orderStatus.ORDERED,
             });
+            await queryRunner.commitTransaction();
+        } catch (erro) {
+            await queryRunner.rollbackTransaction();
+            throw erro;
+        } finally {
+            await queryRunner.release();
         }
-        return this.orderRepo.updateOrder(orderInfo, {
-            status: orderStatus.ORDERED,
-        });
     }
 
     async updateOrder(orderId: string, param: object, fk_Username: string) {
@@ -244,7 +259,6 @@ export class OrderService {
         orderInfo.fk_Coupon = couponInfo;
         orderInfo.totalOrderPrice =
             orderInfo.shipmentPrice + (orderInfo.totalProductPrice * (100 - Number(couponInfo.discount))) / 100;
-        console.log((orderInfo.totalProductPrice * (100 - Number(couponInfo.discount))) / 100);
 
         return this.createOrder(orderInfo);
     }
@@ -255,7 +269,7 @@ export class OrderService {
         2. Check valid new couponId: Date, Qty, Status
         3. Save new OrderInfo: CouponId, totalOrderPrice
         */
-        console.log({ requestBody });
+
         // Step 1. Check coupon exist in orderId
         const orderInfo = await this.getOrderByOrderIdAndUsername(requestBody.orderId, username);
         if (orderInfo.status !== orderStatus.SHOPPING) {

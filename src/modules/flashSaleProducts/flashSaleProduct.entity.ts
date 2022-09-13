@@ -10,7 +10,6 @@ import {
 } from 'typeorm';
 import { flashSaleProductStatus } from '../../commons/common.enum';
 import { FlashSaleEntity } from '../flashSales/flashSale.entity';
-import { OrderEntity } from '../orders/order.entity';
 import { ProductEntity } from '../products/product.entity';
 
 @Entity('FlashSaleProduct')
@@ -31,13 +30,6 @@ export class FlashSaleProductEntity extends BaseEntity {
         referencedColumnName: 'id',
     })
     fk_FlashSale: FlashSaleEntity;
-
-    @ManyToOne(() => OrderEntity)
-    @JoinColumn({
-        name: 'fk_Order',
-        referencedColumnName: 'id',
-    })
-    fk_Order: OrderEntity;
 
     @Column()
     discount: number;
@@ -67,3 +59,10 @@ export class FlashSaleProductEntity extends BaseEntity {
     })
     updateAt: string;
 }
+
+// @ManyToOne(() => OrderEntity)
+// @JoinColumn({
+//     name: 'fk_Order',
+//     referencedColumnName: 'id',
+// })
+// fk_Order: OrderEntity;

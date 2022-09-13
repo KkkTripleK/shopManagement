@@ -13,7 +13,6 @@ import {
 import { orderPayment, orderShipment, orderStatus } from '../../commons/common.enum';
 import { PHONE_REGEX } from '../../utils/util.regex';
 import { CouponEntity } from '../coupons/coupon.entity';
-import { FlashSaleProductEntity } from '../flashSaleProducts/flashSaleProduct.entity';
 import { OrderProductEntity } from '../orderProducts/orderProduct.entity';
 import { UserEntity } from '../users/user.entity';
 
@@ -73,13 +72,6 @@ export class OrderEntity extends BaseEntity {
     })
     fk_Coupon: CouponEntity;
 
-    @OneToMany(() => FlashSaleProductEntity, (flashSaleProduct) => flashSaleProduct.fk_Order)
-    @JoinColumn({
-        name: 'fk_FlashSaleProduct',
-        referencedColumnName: 'id',
-    })
-    fk_FlashSaleProduct: FlashSaleProductEntity[];
-
     @OneToMany(() => OrderProductEntity, (orderProduct) => orderProduct.fk_Order)
     @JoinColumn({
         name: 'fk_OrderProduct',
@@ -99,3 +91,10 @@ export class OrderEntity extends BaseEntity {
     })
     updateAt: string;
 }
+
+// @OneToMany(() => FlashSaleProductEntity, (flashSaleProduct) => flashSaleProduct.fk_Order)
+// @JoinColumn({
+//     name: 'fk_FlashSaleProduct',
+//     referencedColumnName: 'id',
+// })
+// fk_FlashSaleProduct: FlashSaleProductEntity[];

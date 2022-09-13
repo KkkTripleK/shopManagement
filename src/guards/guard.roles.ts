@@ -13,7 +13,6 @@ export class JWTandRolesGuard implements CanActivate {
         private cacheService: CacheService,
     ) {}
 
-    // Khong call toi DB
     async canActivate(context: ExecutionContext): Promise<boolean> {
         try {
             const requiredRoles = this.reflector.get<string[]>('roles', context.getHandler());

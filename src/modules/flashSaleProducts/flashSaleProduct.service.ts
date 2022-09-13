@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { IPaginationOptions, Pagination } from 'nestjs-typeorm-paginate';
-import { flashSaleProductStatus, productStatus } from '../../commons/common.enum';
+import { productStatus } from '../../commons/common.enum';
 import { FlashSaleService } from '../flashSales/flashSale.service';
 import { ProductRepository } from '../products/product.repo';
 import { createFlashSaleProductDto } from './dto/dto.create';
@@ -79,9 +79,10 @@ export class FlashSaleProductService {
 
     async updateFlashSaleProduct(fk_FlashSaleProductId: string, param: updateFlashSaleProductDto) {
         const flashSaleProductInfo = await this.getFlashSaleProductByFlashSaleProductId(fk_FlashSaleProductId);
-        if (flashSaleProductInfo.status !== flashSaleProductStatus.ACTIVE) {
-            throw new BadRequestException('Can not change FlashSaleProduct info!');
-        }
+        // if (flashSaleProductInfo.status !== flashSaleProductStatus.ACTIVE) {
+        //     throw new BadRequestException('Can not change FlashSaleProduct info!');
+        // }
+
         // if (
         //     param.totalQty === 0 ||
         //     param.qtyRemain === 0 ||

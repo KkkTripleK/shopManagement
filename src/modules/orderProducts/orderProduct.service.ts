@@ -131,7 +131,7 @@ export class OrderProductService {
         orderInfo.totalProductPrice = orderInfo.totalProductPrice - oldTotalPrice + orderProductInfo.totalPrice;
         orderInfo.totalOrderPrice = orderInfo.totalOrderPrice - oldTotalPrice + orderProductInfo.totalPrice;
         await this.orderService.createOrder(orderInfo);
-        return `Update orderProduct ${orderProductId} successful!`;
+        return `Update orderProduct <${orderProductId}> successful!`;
     }
 
     async checkProductExist(productId: any): Promise<ProductEntity> {
@@ -147,7 +147,7 @@ export class OrderProductService {
     async checkQtyRemain(productInfo: ProductEntity, orderQty: number) {
         if (orderQty > Number(productInfo.qtyRemaining)) {
             throw new BadRequestException(
-                `Order product failed, the quantity remain is only ${productInfo.qtyRemaining}!`,
+                `Order product failed, the quantity remain of product <${productInfo.name}> is only ${productInfo.qtyRemaining}!`,
             );
         } else if (orderQty === 0) {
             throw new BadRequestException('The minimum of order product quantity is 1!');
@@ -184,7 +184,9 @@ export class OrderProductService {
         // Step 3. Check status of Orders, status === Shopping --> Update
         const orderProductInfo = await this.orderProductRepo.getProductInOrderProduct(orderProductId);
         const orderInfo = await this.orderService.adminGetOrderByOrderID(orderProductInfo.fk_Order.id);
-        if (orderInfo.status === orderStatus.SHOPPING) {
+        if (orderInfo.status === orderStatus.ORDERED) {
+            throw new BadRequestException('Can not delete orderProduct when order is delivery!');
+        } else if (orderInfo.status === orderStatus.SHOPPING) {
             orderInfo.totalProductPrice -= orderProductInfo.totalPrice;
             if (orderInfo.fk_Coupon !== null) {
                 orderInfo.totalOrderPrice =
